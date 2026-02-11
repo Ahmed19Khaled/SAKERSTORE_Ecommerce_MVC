@@ -1,0 +1,304 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using ShopApp.Models
+@inject UserManager<User> UserManager
+@inject SignInManager<User> SignInManager
+
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] Admin</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome + Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="~/Register/store.png" rel="icon" />
+
+    <style>
+        :root {
+        --sidebar-width: 250px;
+        --collapsed-width: 70px;
+        --primary-color: #4e73df;
+            --secondary-color: #dde0e5;
+        }
+
+        body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--secondary-color);
+        margin: 0;
+        padding: 0;
+        }
+
+        .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        background: #1d3715;
+        box-shadow: 0 0.15rem 1.75rem rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        overflow-x: hidden;
+        z-index: 1000;
+        }
+
+        .sidebar.collapsed {
+        width: var(--collapsed-width);
+        }
+
+        .sidebar h4,
+        .sidebar.collapsed .nav-link span {
+        display: none;
+        }
+
+        .toggle-btn {
+        border: none;
+        background: none;
+        width: 100%;
+        padding: 1rem;
+        text-align: center;
+        }
+
+        .toggle-btn i {
+        font-size: 1.2rem;
+        color: var(--primary-color);
+        }
+
+        .nav-link {
+        color: #f3f4f5;
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        transition: background 0.2s ease;
+        padding:15px;
+        }
+
+        .nav-link:hover
+         {
+        background-color: #40401c;
+        color: var(--primary-color);
+        }
+
+        .nav-link i {
+        margin-left: 10px;
+        min-width: 20px;
+        text-align: center;
+        }
+
+        .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 20px;
+        transition: all 0.3s ease;
+        }
+
+        .main-content.collapsed {
+        margin-left: var(--collapsed-width);
+        }
+
+        .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+        transform: translateY(-5px);
+        }
+
+        .nav-tooltip {
+        position: relative;
+        }
+
+        .nav-tooltip:hover::after {
+        content: attr(data-title);
+        position: absolute;
+        right: -10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #343a40;
+        color: white;
+        padding: 3px 8px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar collapsed" id="sidebar">
+        <!-- تمت إضافة collapsed هنا -->
+        <div class="p-3">
+            <button id="toggleSidebar" class="toggle-btn">
+                <i class="fas fa-angle-double-left"></i>
+            </button>
+            <h4 class="text-center mb-4">Dashboard</h4>
+            <ul class="nav flex-column">
+
+                
+                <li class="nav-item">
+                    <a class="nav-link active" asp-controller="Admin" asp-action="Dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" asp-action="listCategory" asp-controller="Category">
+						<i class="fas fa-file-invoice"></i>
+						<span>Category</span>
+					</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" asp-action="ListsubCategory" asp-controller="SubCategory">
+						<i class="fas fa-file-invoice"></i>
+						<span>SubCategory</span>
+					</a>
+				</li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="ListProduct" asp-controller="Product">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Product</span>
+                    </a>
+                </li>
+              
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="GetAllOrder" asp-controller="OrderManeg">
+                        <i class="fas fa-calendar"></i>
+                        <span>Orders</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="AllAccount" asp-controller="ManagementsAccount">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Accounts</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="" asp-controller="">
+                        <i class="fas fa-envelope"></i>
+                        <span>Messages</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="" asp-controller="">
+                        <i class="fas fa-bell"></i>
+                        <span>Notification</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="" asp-controller="">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+                <!-- User authentication links -->
+                <!-- User Info and Auth Links -->
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <!-- User Info -->
+                 
+                    <li class="nav-item">
+                        <div class="nav-link d-flex align-items-center">
+                            <div class="user d-flex align-items-center" style="min-width: 200px;">
+                                <img src="~/ImageProfile/@user.ProfilePictureUrl" class="rounded-circle" style="width:35px" alt="Alternate Text" />
+                                <span class="fw-bold text-white text-truncate" style="max-width: 150px; display: inline-block;" title="@user.FullName">
+                                    &nbsp; Hello, @user.FullName
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+
+                    
+
+                    <!-- Logout Button -->
+                    <li class="nav-item">
+                        <a href="@Url.Action("Logout", "Account")" class="nav-link">
+                            <i class="bi bi-box-arrow-left fw-bold  " style=" font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; color: #d7093c;"></i>
+                            <span style="color: #ffffff;">Logout</span>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <!-- Login -->
+                    <li class="nav-item">
+                        <a href="@Url.Action("Login", "Account")" class="nav-link">
+                            <i class="fas fa-sign-in-alt"></i>&ensp;
+                            <span> Login</span>
+                        </a>
+                    </li>
+
+                    <!-- Register -->
+                    <li class="nav-item">
+                        <a href="@Url.Action("Register", "Account")" class="nav-link">
+                            <i class="fas fa-user-plus"></i> &ensp;
+                            <span> Register</span>
+                        </a>
+                    </li>
+                }
+
+               
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content collapsed justify-content-center align-items-center" id="mainContent">
+        <!-- تمت إضافة collapsed هنا -->
+        @RenderBody()
+    </div>
+
+    <!-- jQuery أولاً -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- jQuery Validation (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+
+    <!-- Bootstrap بعد jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleBtn = document.getElementById('toggleSidebar');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const icon = toggleBtn.querySelector('i');
+
+            function updateIcon() {
+                if (sidebar.classList.contains('collapsed')) {
+                    icon.classList.remove('fa-angle-double-left');
+                    icon.classList.add('fa-angle-double-right');
+                } else {
+                    icon.classList.remove('fa-angle-double-right');
+                    icon.classList.add('fa-angle-double-left');
+                }
+            }
+
+            updateIcon();
+
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('collapsed');
+                updateIcon();
+            });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

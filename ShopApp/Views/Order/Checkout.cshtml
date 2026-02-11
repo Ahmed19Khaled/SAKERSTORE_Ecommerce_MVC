@@ -1,0 +1,74 @@
+﻿@model ShopApp.ViewModel.OrderCheckoutViewModel
+@{
+    ViewData["Title"] = "إتمام الطلب";
+}
+
+
+<style>
+    .container input{
+    box-shadow:10px;
+     }
+</style>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 shadow-lg p-4 rounded bg-light">
+            <h2 class="text-center mb-4 text-primary">📦 CHECK OUT</h2>
+            <form asp-action="Checkout" asp-controller="Order" method="post">
+                <div class="form-group mb-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                        <input asp-for="FullName" class="form-control" placeholder="Name" />
+                    </div>
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="Phone" />
+                    </div>
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-4">
+                    <input asp-for="Address" class="form-control" placeholder="Adress" />
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-4">
+                    <input asp-for="Country" class="form-control" placeholder="Country" />
+                    <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-4">
+                    <input asp-for="City" class="form-control" placeholder="City" />
+                    <span asp-validation-for="City" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-4">
+                    <label class="form-label fw-bold">طريقة الدفع</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="Online" checked />
+                        <label class="form-check-label">💳 دفع إلكتروني (Visa / MasterCard)</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="CashOnDelivery" />
+                        <label class="form-check-label">📦 الدفع عند الاستلام</label>
+                    </div>
+                    <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                </div>
+
+                <div class="alert alert-success text-end fs-5 mt-4">
+                    💰 <strong>TOTAL PAYMENT </strong> @Model.TotalAmount.ToString("C")
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success btn-lg px-4">SUMIT ✅</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

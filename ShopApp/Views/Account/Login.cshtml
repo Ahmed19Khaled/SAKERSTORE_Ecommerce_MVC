@@ -1,0 +1,421 @@
+﻿@model ShopApp.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+<style>
+    .main1 {
+        margin-top: 0;
+        width: 100%;
+        height: 100%;
+        background: url(/Register/Imag3.jpg) center/cover no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+       
+    }
+
+    .bodya {
+        margin-top: 50px;
+		margin-bottom: 120px;
+        padding: 0 !important;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .contain {
+        width: 400px;
+        padding: 25px;
+        border-radius: 30px;
+        background: #ffffff1a;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 0 30px #0000002a;
+        text-align: center;
+    }
+
+        .contain h2 {
+            margin-bottom: 20px;
+            color: #000;
+        }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 30px;
+        background-color: #ffffffb3;
+        border: none;
+        outline: none;
+    }
+
+    .form-group span {
+        font-size: 14px;
+        color: red;
+    }
+
+    .contain button[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        font-size: 15px;
+        border-radius: 20px;
+        color: white;
+        border: none;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
+        .contain button[type="submit"]:hover {
+            cursor: pointer;
+        }
+
+    .contain p {
+        margin-top: 15px;
+    }
+
+    .contain a {
+        color: black;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+
+    .social-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+        .social-buttons form {
+            margin: 0;
+        }
+
+    .social-button {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .google-login-button {
+        color: #000;
+    }
+
+    .facebook-login-button {
+        color: white;
+        border: none;
+    }
+
+        .google-login-button svg,
+        .facebook-login-button i {
+            height: 20px;
+            width: 20px;
+        }
+    /* خلفية شفافة تغطي الشاشة */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1055;
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+        /* حالة الإخفاء */
+        .modal-overlay.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+</style>
+
+@* ✅ تنبيه للأخطاء بشكل احترافي في منتصف الصفحة *@
+@if (!ViewData.ModelState.IsValid)
+{
+    <div id="errorModal" class="modal-overlay d-flex align-items-center justify-content-center">
+        <div class="alert alert-danger text-center shadow-lg rounded-4 p-4 animate__animated animate__fadeInDown" role="alert" style="max-width:400px;">
+            <div class="d-flex flex-column align-items-center">
+                <i class="bi bi-exclamation-triangle-fill fs-1 text-danger mb-3"></i>
+                <h5 class="fw-bold mb-3">حدثت بعض الأخطاء</h5>
+                <ul class="text-start">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+                <button class="btn btn-outline-danger mt-3" onclick="closeErrorModal()">إغلاق</button>
+            </div>
+        </div>
+    </div>
+}
+
+
+<div class="bodya ">
+    <div class="contain">
+        <form asp-action="Login" method="post">
+            <h2 class="mt-0">Login</h2>
+
+
+            <div class="form-group">
+                <input placeholder="Email" asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input placeholder="Password" asp-for="Password" class="form-control" type="password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <a asp-action="ForgotPassword" class="text-decoration-none small text-primary">Forgot password?</a>
+
+
+            <button class="btn-danger btn" type="submit">Login</button>
+
+            <p>
+                Don't have an account?
+                <a asp-action="Register" asp-controller="Account">Sign Up</a>
+            </p>
+        </form>
+
+        <div class="google-login-button p-2 w-100  btn  " >
+            <form asp-controller="Account" asp-action="ExternalLogin" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="provider" value="Google" />
+                <button type="submit" class="btn btn-secondary w-100 mt-2">
+                    <svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.1" x="0px" y="0px"
+                         class="google-icon" viewBox="0 0 48 48" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12
+                c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24
+                c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                        <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039
+                l5.657-5.657C34.046,6.053,29.268,4,24,4C15.938,4,9.023,8.438,6.306,14.691z"></path>
+                        <path fill="#4CAF50" d="M24,44c5.138,0,9.822-1.977,13.374-5.178l-6.104-5.306C28.717,34.986,26.468,36,24,36
+                c-5.192,0-9.605-3.321-11.282-7.943l-6.49,5.001C9.046,39.627,16.03,44,24,44z"></path>
+                        <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.791,2.235-2.146,4.151-3.928,5.515
+                c0.002-0.001,0.003-0.002,0.005-0.004l6.104,5.306c-0.433,0.383,6.527-4.767,6.527-13.797
+                C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                    </svg> Sign in with Google
+                </button>
+            </form>
+
+            <form asp-controller="Account" asp-action="ExternalLogin" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="provider" value="Facebook" />
+                <button type="submit" class="btn btn-primary w-100 mt-2">
+                    <i class="bi bi-facebook"></i>
+                    Sign in with Facebook
+                </button>
+            </form>
+
+
+        </div>
+
+    
+    </div>
+</div>
+<script>
+      function closeErrorModal() {
+        let modal = document.getElementById("errorModal");
+        if (modal) {
+            modal.classList.add("hide"); // يضيف كلاس الإخفاء
+            setTimeout(() => modal.style.display = "none", 400); // يختفي نهائي بعد الأنيميشن
+        }
+    }
+
+    // إغلاق عند الضغط خارج البوكس
+    window.addEventListener("click", function (e) {
+        let modal = document.getElementById("errorModal");
+        if (modal && e.target === modal) {
+            closeErrorModal();
+        }
+    });
+
+    // ✅ يختفي تلقائي بعد 5 ثواني
+    window.addEventListener("DOMContentLoaded", function () {
+        let modal = document.getElementById("errorModal");
+        if (modal) {
+            setTimeout(closeErrorModal, 5000);
+        }
+    });
+
+</script>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+}
+
+
+
+@* 
+     <style>
+    .bodya{
+        margin: 0;
+        padding: 0;
+
+        width: 100%;
+        background: url(/imageCategory/Electronc.jpg);
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    p {
+        margin-left: 20px;
+    }
+
+    .contain {
+        height: 479px;
+        flex-basis: 350px;
+        padding: 10px;
+        border-radius: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: #fafafa4b;
+        backdrop-filter: blur(20px);
+    }
+
+    form {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    input {
+        width: 90%;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 30px;
+        background-color: #ffffffb3;
+        border: transparent solid;
+        outline: none;
+    }
+
+    button {
+        width: 90%;
+        padding: 5px;
+        font-size: 15px;
+        border-radius: 20px;
+        margin: 5px;
+        background-color: teal;
+        color: white;
+        border: transparent solid;
+        box-shadow: rgb(10, 11, 11) 1px 3px;
+    }
+
+    .buttons-container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .apple-login-button, .google-login-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3px;
+        width: 80%;
+        height: 30px;
+        border-radius: 20px;
+        text-align: center;
+        margin: 5px;
+    }
+
+    .apple-login-button {
+        color: white;
+        background-color: black;
+        box-shadow: rgba(128, 138, 138, 0.795) 1px 3px;
+    }
+
+    .google-login-button {
+        color: black;
+        background-color: white;
+        box-shadow: rgb(10, 11, 11) 1px 3px;
+    }
+
+        button:hover, .apple-login-button:hover, .google-login-button:hover {
+            cursor: pointer;
+            box-shadow: none;
+        }
+
+        button:focus, .apple-login-button:focus, .google-login-button:focus {
+        }
+</style>
+
+<div class="bodya">
+	<div class="contain">
+		<form action="">
+			<h2>Welcome back!</h2>
+			<div class="form-group">
+				<input asp-for="Email" class="form-control" placeholder="Email" />
+				<span asp-validation-for="Email" class="text-danger"></span>
+			</div>
+			<div class="form-group">
+				<input asp-for="Password" class="form-control" type="password" placeholder="Password" />
+				<span asp-validation-for="Password" class="text-danger"></span>
+			</div>
+
+			<p><a href="#">Forgot Password?</a></p>
+			<button>login</button>
+			<p>Dont have an Accont? <a href="/sign up/Sign_up.html">sign up</a></p>
+
+
+		</form>
+
+		<div class="buttons-container">
+
+			<div class="apple-login-button">
+				<svg stroke="currentColor" fill="currentColor" stroke-width="0" class="apple-icon"
+					 viewBox="0 0 1024 1024" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+					<path d="M747.4 535.7c-.4-68.2 30.5-119.6 92.9-157.5-34.9-50-87.7-77.5-157.3-82.8-65.9-5.2-138 38.4-164.4 38.4-27.9 0-91.7-36.6-141.9-36.6C273.1 298.8 163 379.8 163 544.6c0 48.7 8.9 99 26.7 150.8 23.8 68.2 109.6 235.3 199.1 232.6 46.8-1.1 79.9-33.2 140.8-33.2 59.1 0 89.7 33.2 141.9 33.2 90.3-1.3 167.9-153.2 190.5-221.6-121.1-57.1-114.6-167.2-114.6-170.7zm-105.1-305c50.7-60.2 46.1-115 44.6-134.7-44.8 2.6-96.6 30.5-126.1 64.8-32.5 36.8-51.6 82.3-47.5 133.6 48.4 3.7 92.6-21.2 129-63.7z">
+					</path>
+				</svg>
+				<span>Log in with Apple</span>
+			</div>
+			<div class="google-login-button">
+				<svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.1" x="0px" y="0px"
+					 class="google-icon" viewBox="0 0 48 48" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+					<path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12
+                c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24
+                c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+					<path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039
+                l5.657-5.657C34.046,6.053,29.268,4,24,4C15.938,4,9.023,8.438,6.306,14.691z"></path>
+					<path fill="#4CAF50" d="M24,44c5.138,0,9.822-1.977,13.374-5.178l-6.104-5.306C28.717,34.986,26.468,36,24,36
+                c-5.192,0-9.605-3.321-11.282-7.943l-6.49,5.001C9.046,39.627,16.03,44,24,44z"></path>
+					<path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.791,2.235-2.146,4.151-3.928,5.515
+                c0.002-0.001,0.003-0.002,0.005-0.004l6.104,5.306c-0.433,0.383,6.527-4.767,6.527-13.797
+                C44,22.659,43.862,21.35,43.611,20.083z"></path>
+				</svg>
+				<span>Log in with Google</span>
+			</div>
+		</div>
+	</div>
+
+  </div>
+
+
+  *@
+
+
+

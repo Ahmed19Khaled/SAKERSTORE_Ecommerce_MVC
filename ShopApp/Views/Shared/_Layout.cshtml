@@ -1,0 +1,1598 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using ShopApp.Data
+@inject AppDBcontext _context
+@{
+    List<ShopApp.Models.Category> categories = new();
+    ShopApp.Models.Order order = null;
+    string userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+    try
+    {
+        categories = _context.Categories
+            .Include(c => c.SubCategories)
+            .AsNoTracking()
+            .ToList();
+
+        if (userId != null)
+        {
+            order = _context.Orders
+                .Where(x => x.UserId == userId && x.Status != "Cancelled" && x.Status != "FailedDelivery" && x.Status != "Delivery")
+                .OrderByDescending(x => x.Id)
+                .AsNoTracking()
+                .FirstOrDefault();
+        }
+    }
+    catch { }
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+    <title>@ViewData["Title"] - SAKERSTOR</title>
+
+    <link rel="icon" href="~/Register/store.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    @* icons *@
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    @* somm *@
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
+    <style>
+        :root {
+            --primary: #8e44ad;
+            --primary-dark: #732d91;
+            --accent: #ff9f43;
+            --dark: #1f2937;
+            --muted: #6b7280;
+            --bg: #f3f4f6;
+            --white: #fff;
+            --header-height: 70px;
+            --mobile-header-height: 60px;
+            --top-bar-height: 50px;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: calc(var(--header-height) + var(--top-bar-height));
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        .hover-underline {
+            position: relative;
+        }
+
+            .hover-underline::after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: -4px;
+                left: 0;
+                background-color: currentColor;
+                transition: width 0.3s ease;
+            }
+
+            .hover-underline:hover::after {
+                width: 100%;
+            }
+
+        /* ===== TOP BAR RESPONSIVE ===== */
+        .top-bar {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: #fff;
+            font-size: 0.85rem;
+            padding: 8px 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1100;
+            height: var(--top-bar-height);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .top-bar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .top-bar-left, .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .top-bar a {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+            padding: 4px 0;
+        }
+
+            .top-bar a:hover {
+                color: #fff;
+                transform: translateY(-1px);
+            }
+
+        /* ===== HEADER RESPONSIVE ===== */
+        .header {
+            position: fixed;
+            top: var(--top-bar-height);
+            left: 0;
+            right: 0;
+            z-index: 1090;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-md);
+            height: var(--header-height);
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(142, 68, 173, 0.1);
+        }
+
+        .header-inner {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 20px;
+            padding: 8px 0;
+            height: 100%;
+        }
+
+        /* Logo Container */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+            .logo:hover {
+                transform: translateY(-2px);
+            }
+
+        .logo-icon {
+            font-size: 1.5em;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text {
+            font-size: 0.9em;
+            letter-spacing: -0.5px;
+        }
+
+        /* Search Container */
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search {
+            position: relative;
+            width: 100%;
+        }
+
+            .search input {
+                width: 100%;
+                border-radius: var(--radius-lg);
+                padding: 14px 52px 14px 24px;
+                border: 2px solid rgba(142, 68, 173, 0.1);
+                font-size: 0.95rem;
+                transition: var(--transition);
+                background: rgba(255, 255, 255, 0.9);
+                backdrop-filter: blur(10px);
+            }
+
+                .search input:focus {
+                    outline: none;
+                    border-color: var(--primary);
+                    background: #fff;
+                    box-shadow: 0 0 0 4px rgba(142, 68, 173, 0.1);
+                    transform: translateY(-1px);
+                }
+
+            .search button {
+                position: absolute;
+                right: 8px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 42px;
+                height: 42px;
+                border-radius: 50%;
+                border: none;
+                background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+                color: #fff;
+                cursor: pointer;
+                transition: var(--transition);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: var(--shadow-sm);
+            }
+
+                .search button:hover {
+                    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+                    transform: translateY(-50%) scale(1.05);
+                    box-shadow: var(--shadow-md);
+                }
+
+        /* Icons Container */
+        .icons-container {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 0;
+        }
+
+        /* Menu Toggle Button */
+        .menu-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(142, 68, 173, 0.1);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+            .menu-toggle:hover {
+                background: rgba(142, 68, 173, 0.1);
+                border-color: var(--primary);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+        /* Mobile Search Toggle */
+        .mobile-search-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            border: 2px solid rgba(142, 68, 173, 0.1);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+            .mobile-search-toggle:hover {
+                background: rgba(142, 68, 173, 0.1);
+                border-color: var(--primary);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+        /* ===== DESKTOP NAV RESPONSIVE ===== */
+        .nav-desktop {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            position: fixed;
+            top: calc(var(--header-height) + var(--top-bar-height));
+            width: 100%;
+            z-index: 1080;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .nav-desktop-inner {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+            .nav-desktop-inner::-webkit-scrollbar {
+                display: none;
+            }
+
+        .nav-desktop a {
+            padding: 16px 20px;
+            font-weight: 500;
+            white-space: nowrap;
+            position: relative;
+            border-radius: var(--radius-md);
+            margin: 0 2px;
+            transition: var(--transition);
+        }
+
+            .nav-desktop a:hover {
+                color: var(--primary);
+                background: rgba(142, 68, 173, 0.05);
+                transform: translateY(-2px);
+            }
+
+                .nav-desktop a:hover::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 8px;
+                    left: 20px;
+                    right: 20px;
+                    height: 2px;
+                    background: linear-gradient(90deg, var(--primary), var(--accent));
+                    border-radius: 2px;
+                }
+
+        /* Mega Menu Improvements */
+        .dropdown-menu-custom {
+            border: none;
+            box-shadow: var(--shadow-lg);
+            border-radius: var(--radius-md);
+            margin-top: 8px !important;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(142, 68, 173, 0.1);
+            min-width: 280px;
+            z-index: 10000;
+        }
+
+        .dropdown-item {
+            border-radius: var(--radius-sm);
+            padding: 10px 16px;
+            margin: 2px 0;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+            .dropdown-item:hover {
+                background: linear-gradient(90deg, rgba(142, 68, 173, 0.1), rgba(255, 159, 67, 0.1));
+                color: var(--primary);
+                transform: translateX(4px);
+                box-shadow: var(--shadow-sm);
+            }
+
+        .dropdown-submenu > .dropdown-menu {
+            top: -12px;
+            left: 100%;
+            margin-left: 2px;
+            display: none;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .dropdown-submenu:hover > .dropdown-menu {
+            display: block;
+            z-index: 10000;
+        }
+
+        /* ===== RESPONSIVE BREAKPOINTS ===== */
+
+        /* Large Desktop (≥1400px) */
+        @@media (min-width: 1400px) {
+            .container {
+                max-width: 1320px;
+            }
+
+            .search-container {
+                max-width: 700px;
+            }
+        }
+
+        /* Desktop (≥992px) */
+        @@media (min-width: 992px) {
+            .nav-desktop {
+                display: block;
+            }
+
+            .header-inner {
+                grid-template-columns: 220px 1fr 300px;
+            }
+
+            .logo {
+                font-size: 2rem;
+            }
+        }
+
+        /* Tablet (768px - 991px) */
+        @@media (min-width: 768px) and (max-width: 991px) {
+            body {
+                padding-top: calc(var(--mobile-header-height) + var(--top-bar-height));
+            }
+
+            .header {
+                top: var(--top-bar-height);
+                height: var(--mobile-header-height);
+            }
+
+            .header-inner {
+                grid-template-columns: 160px 1fr auto;
+                gap: 12px;
+                padding: 6px 0;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .search-container {
+                display: none;
+            }
+
+            .icons-container {
+                gap: 8px;
+            }
+
+            .menu-toggle,
+            .mobile-search-toggle {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .top-bar-content {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .top-bar-left, .top-bar-right {
+                gap: 16px;
+            }
+
+            .top-bar {
+                font-size: 0.8rem;
+                padding: 6px 0;
+            }
+        }
+
+        /* Mobile (576px - 767px) */
+        @@media (min-width: 576px) and (max-width: 767px) {
+            body {
+                padding-top: calc(var(--mobile-header-height) + var(--top-bar-height));
+            }
+
+            .header {
+                top: var(--top-bar-height);
+                height: var(--mobile-header-height);
+            }
+
+            .header-inner {
+                grid-template-columns: auto 1fr auto;
+                gap: 8px;
+                padding: 4px 0;
+            }
+
+            .logo {
+                font-size: 1.3rem;
+            }
+
+            .logo-icon {
+                font-size: 1.2em;
+            }
+
+            .search-container {
+                display: none;
+            }
+
+            .icons-container {
+                gap: 6px;
+            }
+
+            .menu-toggle,
+            .mobile-search-toggle {
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
+            }
+
+            .top-bar {
+                display: none;
+            }
+
+            .nav-desktop {
+                top: var(--mobile-header-height);
+            }
+        }
+
+        /* Small Mobile (≤575px) */
+        @@media (max-width: 575px) {
+            body {
+                padding-top: var(--mobile-header-height);
+            }
+
+            .header {
+                top: 0;
+                height: var(--mobile-header-height);
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(20px);
+            }
+
+            /* .header-inner {
+                grid-template-columns: 1fr auto auto;
+                gap: 8px;
+                padding: 4px 0;
+            } */
+
+            .logo-container {
+                order: 2;
+                justify-content: center;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+                justify-content: center;
+            }
+
+            .logo-icon {
+                display: none;
+            }
+
+            .search-container {
+                display: none;
+            }
+
+            .icons-container {
+                order: 3;
+                gap: 4px;
+            }
+
+            .menu-toggle {
+                order: 1;
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+
+            .mobile-search-toggle {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+
+            .top-bar {
+                display: none;
+            }
+
+            .nav-desktop {
+                top: var(--mobile-header-height);
+            }
+            /* Hide logo text on very small screens */
+            @@media (max-width: 380px) {
+                .logo-text span:last-child {
+                    display: none;
+                }
+
+                .logo {
+                    font-size: 1.1rem;
+                }
+            }
+        }
+
+        /* Mobile Search Overlay */
+        .mobile-search-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1200;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 100px;
+            animation: fadeIn 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+            .mobile-search-overlay.active {
+                display: flex;
+            }
+
+        .mobile-search-container {
+            width: 90%;
+            max-width: 500px;
+            animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+            .mobile-search-container .search {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: var(--radius-lg);
+                padding: 24px;
+                box-shadow: var(--shadow-lg);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .mobile-search-container input {
+                padding: 16px 24px;
+                font-size: 1rem;
+                background: rgba(255, 255, 255, 0.9);
+                backdrop-filter: blur(10px);
+                border-color: rgba(255, 255, 255, 0.3);
+            }
+
+                .mobile-search-container input:focus {
+                    background: #fff;
+                    border-color: var(--primary);
+                }
+
+            .mobile-search-container button {
+                right: 12px;
+                width: 44px;
+                height: 44px;
+            }
+
+        .close-search {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+
+            .close-search:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: rotate(90deg);
+            }
+
+        /* ===== OFFCANVAS RESPONSIVE ===== */
+        .offcanvas {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1100;
+        }
+
+        .offcanvas-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            padding: 1.5rem;
+        }
+
+        .offcanvas-title {
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+
+        .offcanvas-body {
+            padding: 0;
+            overflow-y: auto;
+        }
+
+        .accordion-item {
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background: transparent;
+        }
+
+        .accordion-button {
+            padding: 1.2rem 1.5rem;
+            font-weight: 500;
+            background: transparent;
+            font-size: 1rem;
+            border-radius: 0;
+        }
+
+            .accordion-button:not(.collapsed) {
+                background: rgba(142, 68, 173, 0.05);
+                color: var(--primary);
+                box-shadow: none;
+            }
+
+            .accordion-button:focus {
+                box-shadow: none;
+                border-color: transparent;
+            }
+
+        .accordion-body {
+            padding: 0.5rem 1.5rem 1rem 3rem;
+            background: rgba(0, 0, 0, 0.01);
+        }
+
+            .accordion-body a {
+                display: flex;
+                align-items: center;
+                padding: 0.75rem 0;
+                color: var(--muted);
+                transition: var(--transition);
+                border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+            }
+
+                .accordion-body a:hover {
+                    color: var(--primary);
+                    padding-left: 10px;
+                    transform: translateX(4px);
+                }
+
+                .accordion-body a i {
+                    margin-right: 12px;
+                    font-size: 0.8rem;
+                }
+
+        /* ===== MOBILE BOTTOM NAV RESPONSIVE ===== */
+        .mobile-bottom {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(142, 68, 173, 0.1);
+            z-index: 1070;
+            padding: 8px 0 12px;
+            box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-bottom-inner {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 8px;
+        }
+
+        @@media (max-width: 991px) {
+            .mobile-bottom {
+                display: block;
+            }
+        }
+
+        .mobile-bottom a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            color: var(--muted);
+            font-size: 0.75rem;
+            flex: 1;
+            transition: var(--transition);
+            border-radius: var(--radius-md);
+            margin: 0 2px;
+            position: relative;
+            min-width: 60px;
+        }
+
+            .mobile-bottom a i {
+                font-size: 1.4rem;
+                margin-bottom: 4px;
+                transition: var(--transition);
+            }
+
+            .mobile-bottom a:hover,
+            .mobile-bottom a.active {
+                color: var(--primary);
+                background: linear-gradient(135deg, rgba(142, 68, 173, 0.1), rgba(255, 159, 67, 0.1));
+                transform: translateY(-4px);
+            }
+
+                .mobile-bottom a:hover i,
+                .mobile-bottom a.active i {
+                    transform: scale(1.1);
+                }
+
+            .mobile-bottom a div {
+                font-size: 0.7rem;
+                font-weight: 500;
+                margin-top: 2px;
+                white-space: nowrap;
+            }
+
+            /* Active indicator */
+            .mobile-bottom a.active::after {
+                content: '';
+                position: absolute;
+                top: -4px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 20px;
+                height: 3px;
+                background: linear-gradient(90deg, var(--primary), var(--accent));
+                border-radius: 2px;
+            }
+
+        /* ===== MAIN CONTENT RESPONSIVE ===== */
+        main {
+            flex: 1;
+            padding: 30px 0;
+            margin-top: 20px;
+            width: 100%;
+            min-height: calc(100vh - var(--header-height) - var(--top-bar-height) - 100px);
+        }
+
+        @@media (max-width: 991px) {
+            main {
+                margin-top: 10px;
+                padding: 20px 0 100px; /* Extra padding for mobile bottom nav */
+            }
+        }
+
+        @@media (max-width: 767px) {
+            main {
+                padding: 16px 0 90px;
+            }
+        }
+
+        /* ===== FOOTER RESPONSIVE ===== */
+        footer {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            margin-top: auto;
+            padding: 60px 0 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            footer::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            text-align: center;
+        }
+
+        @@media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            footer {
+                padding: 40px 0 20px;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @@keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .text-primary {
+            color: var(--primary) !important;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Performance optimizations */
+        .will-change {
+            will-change: transform, opacity;
+        }
+
+        /* Hide scrollbar but keep functionality */
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+            .hide-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+        /* Bottom Navbar */
+        .navbar-bottom {
+            position: sticky; /* أو fixed لو تحب */
+            top: 0;
+            z-index: 1055; /* أعلى من الهيدر */
+            background: #fff;
+            border-top: 1px solid #eee;
+        }
+
+        /* Main dropdown */
+        .dropdown-menu-custom {
+            margin-top: 10px;
+            min-width: 260px;
+            z-index: 9999;
+        }
+
+        /* Submenu */
+        .dropdown-submenu {
+            position: relative;
+        }
+
+            .dropdown-submenu > .dropdown-menu {
+                top: 0;
+                left: 100%;
+                margin-left: 2px;
+                display: none;
+            }
+
+        /* Hover behavior (Desktop only) */
+        @@media (min-width: 992px) {
+            .dropdown-submenu:hover > .dropdown-menu
+
+        {
+            display: block;
+        }
+
+        }
+        /* navbar عند تصغير الشاشه لا يظهر */
+            @@media (max-width: 800px) {
+                .navbar-bottom {
+                    display: none;
+                }
+
+        }
+        
+
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="container top-bar-content">
+            <div class="top-bar-left">
+                <span><i class="fas fa-envelope me-1"></i> <a href="mailto:engahmedgresha@gmail.com">engahmedgresha@gmail.com</a> </span>
+                <span><i class="fas fa-phone-alt me-1"></i> <a href="https://wa.me/201012421198"> +201012421198 </a>  </span>
+            </div>
+            <div class="top-bar-right">
+                <a href="#" class="hover-underline">Track Order</a>
+                <a href="#" class="hover-underline">About</a>
+                <a href="#" class="hover-underline">Contact</a>
+            </div>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container header-inner">
+            <!-- Mobile Menu Toggle -->
+            <button class="menu-toggle d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-label="Open menu">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Logo -->
+            <div class="logo-container">
+                <a asp-controller="Home" asp-action="Index" class="logo">
+                    <i class="fas fa-shopping-bag logo-icon"></i>
+                    <span class="logo-text">SAKER<span class="text-dark">STOR</span></span>
+                </a>
+            </div>
+
+            <!-- Desktop Search -->
+            <div class="search-container d-none d-lg-block">
+                <div class="search">
+                    <input type="text" placeholder="Search for products, brands and more..." aria-label="Search products" />
+                    <button type="button" aria-label="Submit search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Header Icons -->
+            <div class="icons-container">
+                <!-- Mobile Search Toggle -->
+                <button class="mobile-search-toggle d-lg-none" id="mobileSearchToggle" aria-label="Open search">
+                    <i class="fas fa-search"></i>
+                </button>
+                <!-- Cart Component -->
+                <div class="cart-component-wrapper">
+                    @await Component.InvokeAsync("CartSummary")
+                </div>
+                <!-- User Account Component -->
+                <div class="user-component-wrapper">
+                    @await Component.InvokeAsync("InformationNavLogin")
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-bottom">
+            <div class="container d-flex align-items-center gap-4">
+
+                <!-- Categories Dropdown -->
+                <div class="dropdown position-relative">
+                    <button class="btn btn-dark d-flex align-items-center gap-2 px-4 py-2 rounded-pill"
+                            type="button"
+                            id="categoryDropdown"
+                            data-bs-toggle="dropdown"
+                            data-bs-auto-close="outside"
+                            aria-expanded="false">
+                        <i class="fas fa-th-large"></i>
+                        All Categories
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-custom shadow">
+                        @foreach (var cat in categories)
+                        {
+                            <li class="dropdown-submenu">
+                                <a asp-action="PruductCategory" asp-controller="Category" asp-route-Categoryid="@cat.Id" class="dropdown-item d-flex justify-content-between align-items-center">
+                                    @cat.NameDepartment
+                                    @if (cat.SubCategories?.Any() == true)
+                                    {
+                                        <i class="fas fa-chevron-right small"></i>
+                                    }
+                                </a>
+
+                                @if (cat.SubCategories?.Any() == true)
+                                {
+                                    <ul class="dropdown-menu shadow">
+                                        @foreach (var sub in cat.SubCategories)
+                                        {
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-controller="Category"
+                                                   asp-action="PruductCategory"
+                                                   asp-route-SubCatigoryId="@sub.Id">
+                                                    @sub.Name
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+                <!-- Navigation Links -->
+               
+                    <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                    <a class="nav-link" href="#">Shop</a>
+                    <a class="nav-link" href="#">New Arrivals</a>
+
+                    @if (order != null)
+                    {
+                        <a class="nav-link"
+                           asp-controller="Order"
+                           asp-action="OrderConfirmation"
+                           asp-route-orderId="@order.Id">
+                            Track Order
+                        </a>
+                    }
+
+                    <a class="nav-link" href="#">Deals</a>
+                    <a class="nav-link" href="#">Brands</a>
+            </div>
+        </nav>
+
+    </header>
+
+    <!-- Mobile Search Overlay -->
+    <div class="mobile-search-overlay" id="mobileSearchOverlay">
+        <div class="mobile-search-container">
+            <div class="search">
+                <input type="text" placeholder="What are you looking for?" aria-label="Search products" />
+                <button type="button" aria-label="Submit search">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        <button class="close-search" id="closeSearch" aria-label="Close search">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- MOBILE OFFCANVAS -->
+    <div class="offcanvas offcanvas-start" id="mobileMenu" tabindex="-1">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Browse Categories</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="accordion" id="catAcc">
+                @for (int i = 0; i < categories.Count; i++)
+                {
+                    var c = categories[i];
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c@i" aria-expanded="false">
+                                <i class="fas fa-folder me-2"></i> @c.NameDepartment
+                            </button>
+                        </h2>
+                        <div id="c@i" class="accordion-collapse collapse" data-bs-parent="#catAcc">
+                            <div class="accordion-body">
+                                @foreach (var s in c.SubCategories)
+                                {
+                                    <a class="d-block py-2" asp-controller="Category" asp-action="PruductCategory" asp-route-SubCatigoryId="@s.Id">
+                                        <i class="fas fa-chevron-right me-2"></i> @s.Name
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Additional Mobile Menu Links -->
+            <div class="mt-4 px-3">
+                <h6 class="mb-3 text-muted">Quick Links</h6>
+                <a href="/" class="d-block py-2 border-bottom"><i class="fas fa-home me-2"></i> Home</a>
+                <a href="/Account" class="d-block py-2 border-bottom"><i class="fas fa-user me-2"></i> My Account</a>
+                @if (order != null)
+                {
+                    <a asp-controller="Order" asp-action="OrderConfirmation" asp-route-orderId="@order.Id" class="d-block py-2 border-bottom">
+                        <i class="fas fa-truck me-2"></i> Track Order
+                    </a>
+                }
+                <a href="#" class="d-block py-2 border-bottom"><i class="fas fa-tag me-2"></i> Deals</a>
+                <a href="#" class="d-block py-2"><i class="fas fa-headset me-2"></i> Customer Support</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <div class="mobile-bottom">
+        <div class="container mobile-bottom-inner">
+            <a href="/" class="active">
+                <i class="fas fa-home"></i>
+                <div>Home</div>
+            </a>
+            <a href="#" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+                <i class="fas fa-th-large"></i>
+                <div>Categories</div>
+            </a>
+            <a asp-action="AllCart" asp-controller="Cart">
+                <i class="fas fa-shopping-cart"></i>
+                <div>Cart</div>
+            </a>
+            <a asp-action="Manage" asp-controller="Account">
+                <i class="fas fa-user"></i>
+                <div>Account</div>
+            </a>
+        </div>
+    </div>
+
+    <main class="container">
+        @RenderBody()
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <a href="#" class="brand-logo mb-3 d-block text-white" style="font-size: 1.8rem; font-weight: 800;">SAKER<span class="text-white-50">STOR</span></a>
+                    <p class="text-info">Premium online shopping experience. Quality products, fast delivery, and excellent customer service.</p>
+                    <div class="d-flex mt-3 gap-2">
+                        <a href="#" class="social-btn" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 50%; color: #fff;"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-btn" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 50%; color: #fff;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-btn" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 50%; color: #fff;"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h5 class="text-white mb-3">Quick Links</h5>
+                    <div class="d-flex flex-column">
+                        <a href="#" class="footer-link mb-2">Home</a>
+                        <a href="#" class="footer-link mb-2">Shop</a>
+                        <a href="#" class="footer-link mb-2">About Us</a>
+                        <a href="#" class="footer-link mb-2">Contact</a>
+                    </div>
+                </div>
+                <div>
+                    <h5 class="text-white mb-3">Account</h5>
+                    <div class="d-flex flex-column">
+                        <a href="#" class="footer-link mb-2">My Profile</a>
+                        <a href="#" class="footer-link mb-2">Orders</a>
+                        <a href="#" class="footer-link mb-2">Wishlist</a>
+                        <a href="#" class="footer-link mb-2">Settings</a>
+                    </div>
+                </div>
+                <div>
+                    <h5 class="text-white mb-3">Newsletter</h5>
+                    <p class="text-info mb-3">Subscribe to get the latest news and offers.</p>
+                    <form class="d-flex gap-2">
+                        <input type="email" class="form-control" placeholder="Your email" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff;">
+                        <button class="btn btn-primary" style="background: var(--primary); border: none;">Subscribe</button>
+                    </form>
+                    <div class="mt-4">
+                        <i class="fab fa-cc-visa fa-2x me-2 text-secondary"></i>
+                        <i class="fab fa-cc-mastercard fa-2x me-2 text-secondary"></i>
+                        <i class="fab fa-paypal fa-2x text-secondary"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="mb-0">
+                    © @DateTime.Now.Year SAKERSTOR. All Rights Reserved. Designed with
+                    <i class="fas fa-heart text-danger"></i>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile Search Toggle with enhanced UX
+            const mobileSearchToggle = document.getElementById('mobileSearchToggle');
+            const mobileSearchOverlay = document.getElementById('mobileSearchOverlay');
+            const closeSearch = document.getElementById('closeSearch');
+            const searchInput = mobileSearchOverlay?.querySelector('input');
+
+            if (mobileSearchToggle && mobileSearchOverlay) {
+                mobileSearchToggle.addEventListener('click', function() {
+                    mobileSearchOverlay.classList.add('active');
+                    document.body.classList.add('no-scroll');
+                    setTimeout(() => {
+                        if (searchInput) {
+                            searchInput.focus();
+                            searchInput.setAttribute('data-focused', 'true');
+                        }
+                    }, 300);
+
+                    // Add keyboard open animation
+                    mobileSearchToggle.style.animation = 'pulse 0.5s ease';
+                    setTimeout(() => {
+                        mobileSearchToggle.style.animation = '';
+                    }, 500);
+                });
+            }
+
+            if (closeSearch) {
+                closeSearch.addEventListener('click', function() {
+                    mobileSearchOverlay.classList.remove('active');
+                    document.body.classList.remove('no-scroll');
+                    if (searchInput) {
+                        searchInput.blur();
+                        searchInput.removeAttribute('data-focused');
+                    }
+                });
+            }
+
+            // Close overlay when clicking outside
+            if (mobileSearchOverlay) {
+                mobileSearchOverlay.addEventListener('click', function(e) {
+                    if (e.target === mobileSearchOverlay) {
+                        mobileSearchOverlay.classList.remove('active');
+                        document.body.classList.remove('no-scroll');
+                    }
+                });
+            }
+
+            // Close overlay with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && mobileSearchOverlay?.classList.contains('active')) {
+                    mobileSearchOverlay.classList.remove('active');
+                    document.body.classList.remove('no-scroll');
+                }
+            });
+
+            // Advanced header scroll effect with performance optimization
+            let lastScrollTop = 0;
+            let ticking = false;
+            const header = document.querySelector('.header');
+            const navDesktop = document.querySelector('.nav-desktop');
+            const topBarHeight = 38;
+
+            function updateHeaderOnScroll() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+                // Add/remove shadow based on scroll
+                if (scrollTop > 10) {
+                    header.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.1)';
+                } else {
+                    header.style.boxShadow = 'var(--shadow-md)';
+                }
+
+                // Show/hide header on scroll with threshold
+                if (scrollTop > lastScrollTop && scrollTop > 100) {
+                    // Scrolling down - hide
+                    header.classList.add('hidden');
+                    if (navDesktop) navDesktop.classList.add('hidden');
+                } else if (scrollTop < lastScrollTop || scrollTop <= 100) {
+                    // Scrolling up - show
+                    header.classList.remove('hidden');
+                    if (navDesktop) navDesktop.classList.remove('hidden');
+                }
+
+                // Update active section in mobile nav
+                updateMobileNavActiveState();
+
+                lastScrollTop = scrollTop;
+                ticking = false;
+            }
+
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    ticking = true;
+                    requestAnimationFrame(updateHeaderOnScroll);
+                }
+            });
+
+            // Active state for mobile bottom nav with improved logic
+            function updateMobileNavActiveState() {
+                const currentPath = window.location.pathname;
+                const mobileNavLinks = document.querySelectorAll('.mobile-bottom a');
+
+                mobileNavLinks.forEach(link => {
+                    const href = link.getAttribute('href');
+                    // Remove active class from all
+                    link.classList.remove('active');
+
+                    // Add active class based on current path
+                    if (href === currentPath ||
+                        (href === '/Cart' && currentPath.includes('Cart')) ||
+                        (href === '/Account' && currentPath.includes('Account')) ||
+                        (href === '/' && currentPath === '/')) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+
+            // Initialize mobile nav state
+            updateMobileNavActiveState();
+
+            // Close mobile dropdowns when clicking on body
+            document.addEventListener('click', function(e) {
+                const userDropdown = document.querySelector('.user-dropdown.show');
+                const cartDropdown = document.querySelector('.cart-dropdown.show');
+
+                if (userDropdown && !e.target.closest('.user-component-wrapper')) {
+                    userDropdown.classList.remove('show');
+                }
+
+                if (cartDropdown && !e.target.closest('.cart-component-wrapper')) {
+                    cartDropdown.classList.remove('show');
+                }
+
+                // Remove no-scroll class if all dropdowns are closed
+                if (!userDropdown && !cartDropdown && !mobileSearchOverlay?.classList.contains('active')) {
+                    document.body.classList.remove('no-scroll');
+                }
+            });
+
+            // Close offcanvas when clicking on links
+            const offcanvasLinks = document.querySelectorAll('#mobileMenu a');
+            offcanvasLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Don't prevent default for external links
+                    const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('mobileMenu'));
+                    if (offcanvas) {
+                        offcanvas.hide();
+                    }
+
+                    // Add click animation
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+
+            // Mobile bottom nav click effects
+            const mobileBottomLinks = document.querySelectorAll('.mobile-bottom a');
+            mobileBottomLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Add ripple effect
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+
+                    ripple.style.cssText = `
+                        position: absolute;
+                        border-radius: 50%;
+                        background: rgba(142, 68, 173, 0.3);
+                        transform: scale(0);
+                        animation: ripple 0.6s linear;
+                        width: ${size}px;
+                        height: ${size}px;
+                        top: ${y}px;
+                        left: ${x}px;
+                        pointer-events: none;
+                    `;
+
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                });
+            });
+
+            // Add CSS for ripple animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @@keyframes ripple {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Touch gesture for mobile
+            let touchStartY = 0;
+            document.addEventListener('touchstart', function(e) {
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+
+            // Handle window resize with debouncing
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(function() {
+                    // Close all mobile dropdowns when resizing to desktop
+                    if (window.innerWidth >= 992) {
+                        closeAllMobileDropdowns();
+                    }
+                    // Update nav state on resize
+                    updateMobileNavActiveState();
+                }, 250);
+            });
+
+            // Performance: Preload critical images
+            const criticalImages = document.querySelectorAll('img[data-src]');
+            criticalImages.forEach(img => {
+                img.src = img.dataset.src;
+            });
+        });
+
+        // Global function to handle mobile dropdown close
+        function closeAllMobileDropdowns() {
+            // Close user dropdown
+            document.querySelector('.user-dropdown')?.classList.remove('show');
+
+            // Close cart dropdown
+            document.querySelector('.cart-dropdown')?.classList.remove('show');
+
+            // Close search overlay
+            document.querySelector('.mobile-search-overlay')?.classList.remove('active');
+
+            // Restore body scroll
+            document.body.classList.remove('no-scroll');
+        }
+
+        // Smooth scroll to top
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+    </script>
+    @await RenderSectionAsync("Scripts", false)
+</body>
+</html>

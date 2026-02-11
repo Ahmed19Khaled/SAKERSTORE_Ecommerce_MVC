@@ -1,0 +1,599 @@
+﻿@model ShopApp.Models.User
+@inject ShopApp.Data.AppDBcontext context
+@{
+    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+    var order = context.Orders
+     .OrderByDescending(x => x.Id)
+     .Where(X => X.Status != "Cancelled" && X.Status != "FailedDelivery" && X.Status != "Delivery")
+     .FirstOrDefault(o => o.UserId == userId);
+}
+
+<style>
+    /* Container Styles */
+    .user-component-wrapper {
+        position: relative;
+    }
+
+    /* User Container for Desktop */
+    .user-container {
+        position: relative;
+        background-color: transparent;
+        padding: 6px 8px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 0;
+        max-width: 220px;
+    }
+
+        .user-container:hover {
+            background-color: rgba(142, 68, 173, 0.05);
+        }
+
+    /* Profile Image */
+    .profile-image {
+        width: 36px;
+        height: 36px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid rgba(142, 68, 173, 0.2);
+        flex-shrink: 0;
+    }
+
+    /* User Info */
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        min-width: 0;
+        overflow: hidden;
+        flex: 1;
+    }
+
+    .user-greeting {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 400;
+        white-space: nowrap;
+    }
+
+    .user-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1f2937;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+        display: block;
+    }
+
+    /* Dropdown Menu */
+    .user-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 5px 10px rgba(0, 0, 0, 0.05);
+        padding: 12px 0;
+        min-width: 220px;
+        z-index: 2000;
+        animation: dropdownFade 0.2s ease-out;
+    }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+    /* Dropdown Header */
+    .dropdown-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f3f4f6;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .dropdown-header-img {
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #8e44ad;
+    }
+
+    .dropdown-header-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .dropdown-header-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #1f2937;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .dropdown-header-email {
+        font-size: 0.8rem;
+        color: #6b7280;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Dropdown List */
+    .dropdown-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        color: #374151;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+    }
+
+        .dropdown-item:hover {
+            background-color: #f9fafb;
+            color: #8e44ad;
+            border-left-color: #8e44ad;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+            color: #6b7280;
+        }
+
+        .dropdown-item:hover i {
+            color: #8e44ad;
+        }
+
+    .dropdown-divider {
+        height: 1px;
+        background-color: #f3f4f6;
+        margin: 8px 0;
+    }
+
+    .dropdown-footer {
+        padding: 12px 16px 0;
+        border-top: 1px solid #f3f4f6;
+        margin-top: 8px;
+    }
+
+    /* Login/Register Buttons */
+    .auth-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: nowrap;
+    }
+
+    .auth-btn {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+    }
+
+    .auth-btn-login {
+        background-color: #8e44ad;
+        color: white;
+        border: 1px solid #8e44ad;
+    }
+
+        .auth-btn-login:hover {
+            background-color: #732d91;
+            border-color: #732d91;
+            color: white;
+        }
+
+    .auth-btn-register {
+        background-color: transparent;
+        color: #8e44ad;
+        border: 1px solid #8e44ad;
+    }
+
+        .auth-btn-register:hover {
+            background-color: rgba(142, 68, 173, 0.05);
+        }
+
+    /* Mobile Optimizations */
+ @*   @@media (max-width: 991px) {
+        .user-container
+
+    {
+        padding: 4px 6px;
+    }
+
+    .user-info {
+        display: none; /* Hide text on mobile */
+    }
+
+    .profile-image {
+        width: 32px;
+        height: 32px;
+    }
+
+    .user-dropdown {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 85%;
+        max-width: 320px;
+        border-radius: 0;
+        border-left: 1px solid #e5e7eb;
+        animation: slideInRight 0.3s ease-out;
+        display: none;
+        flex-direction: column;
+        z-index: 2000;
+    }
+
+        .user-dropdown.show {
+            display: flex;
+        }
+
+    .dropdown-header {
+        background-color: #8e44ad;
+        color: white;
+        border-bottom: none;
+    }
+
+    .dropdown-header-img {
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .dropdown-header-name,
+    .dropdown-header-email {
+        color: white;
+    }
+
+    .dropdown-header-email {
+        opacity: 0.9;
+    }
+
+    .dropdown-content {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .mobile-dropdown-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1100;
+    }
+
+        .mobile-dropdown-overlay.show {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+    .auth-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .auth-btn {
+        width: 100%;
+        padding: 10px 16px;
+    }
+
+    }
+    *@
+
+    /* Extra Small Screens
+    @@media (max-width: 576px) {
+        .profile-image
+
+    {
+        width: 28px;
+        height: 28px;
+    }
+
+    .user-container {
+        padding: 3px 4px;
+    }
+
+    .user-dropdown {
+        width: 90%;
+    }
+
+    } */
+
+    /* Animations */
+    @@keyframes dropdownFade {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    @@keyframes slideInRight {
+        from
+
+    {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+    }
+
+    /* Arrow Indicator */
+    .dropdown-arrow {
+        font-size: 0.75rem;
+        color: #6b7280;
+        transition: transform 0.3s ease;
+    }
+
+    .user-container.active .dropdown-arrow {
+        transform: rotate(180deg);
+        color: #8e44ad;
+    }
+</style>
+
+@if (Model != null)
+{
+    <div class="user-component-wrapper">
+        <!-- User Container for Desktop -->
+        <div class="user-container" id="userMenu">
+            <img src="~/ImageProfile/@(Model.ProfilePictureUrl == null ? "profile.png" : Model.ProfilePictureUrl)"
+                 class="profile-image"
+                 alt="@Model.FullName's profile picture"
+                 onerror="this.src='/ImageProfile/default-profile.png'" />
+
+            <div class="user-info d-none d-lg-block">
+                <span class="user-greeting">Hello,</span>
+                <span class="user-name" title="@Model.FullName">
+                    @Model.FullName
+                </span>
+            </div>
+
+            <i class="fas fa-chevron-down dropdown-arrow d-none d-lg-block"></i>
+        </div>
+
+        <!-- Mobile Overlay -->
+        <div class="mobile-dropdown-overlay" id="mobileOverlay"></div>
+
+        <!-- Dropdown Menu -->
+        <div class="user-dropdown" id="userDropdown">
+            <!-- Dropdown Header -->
+            <div class="dropdown-header">
+                <img src="~/ImageProfile/@(string.IsNullOrEmpty(Model.ProfilePictureUrl) ? "profile.png" : Model.ProfilePictureUrl)"
+                     class="dropdown-header-img"
+                     alt="Profile"
+                     onerror="this.src='/ImageProfile/default-profile.png'" />
+                <div class="dropdown-header-info">
+                    <div class="dropdown-header-name">@Model.FullName</div>
+                    <div class="dropdown-header-email">@Model.Email</div>
+                </div>
+                <button class="btn-close d-lg-none" id="closeDropdown">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Dropdown Content -->
+            <div class="dropdown-content">
+                <ul class="dropdown-list">
+                    <li>
+                        <a asp-action="Manage" asp-controller="Account" class="dropdown-item">
+                            <i class="fas fa-user-circle"></i>
+                            <span>My Account</span>
+                        </a>
+                    </li>
+
+                    @* <li>
+                        <a asp-action="Orders" asp-controller="Order" class="dropdown-item">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>My Orders</span>
+                        </a>
+                    </li> *@
+
+                    @if (order != null)
+                    {
+                        <li>
+                            <a asp-action="OrderConfirmation" asp-controller="Order"
+                               asp-route-orderId="@order.Id" class="dropdown-item">
+                                <i class="fas fa-truck"></i>
+                                <span>Track Order</span>
+                                <span class="badge bg-warning ms-auto">Active</span>
+                            </a>
+                        </li>
+                    }
+
+                    @* <li>
+                        <a asp-action="Wishlist" asp-controller="Account" class="dropdown-item">
+                            <i class="fas fa-heart"></i>
+                            <span>Wishlist</span>
+                        </a>
+                    </li> *@
+
+                    @* <li>
+                        <a asp-action="Settings" asp-controller="Account" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li> *@
+
+                    @if (!User.IsInRole("User"))
+                    {
+                        <li class="dropdown-divider"></li>
+                        <li>
+                            <a asp-controller="Admin" asp-action="Dashboard" class="dropdown-item">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Admin Dashboard</span>
+                                <span class="badge bg-danger ms-auto">Admin</span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+
+                <!-- Dropdown Footer -->
+                <div class="dropdown-footer">
+                    <a href="@Url.Action("Logout", "Account")" class="dropdown-item text-danger">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="auth-buttons">
+        <a href="@Url.Action("Login", "Account")" class="auth-btn auth-btn-login">
+            <i class="fas fa-sign-in-alt me-2 d-none d-sm-inline"></i>
+            <span>Login</span>
+        </a>
+        <a href="@Url.Action("Register", "Account")" class="auth-btn auth-btn-register">
+            <i class="fas fa-user-plus me-2 d-none d-sm-inline"></i>
+            <span>Register</span>
+        </a>
+    </div>
+}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const userMenu = document.getElementById('userMenu');
+        const userDropdown = document.getElementById('userDropdown');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        const closeDropdown = document.getElementById('closeDropdown');
+
+        if (userMenu && userDropdown) {
+            // Toggle dropdown on desktop
+            userMenu.addEventListener('click', function (e) {
+                e.stopPropagation();
+
+                const isMobile = window.innerWidth < 992;
+
+                if (isMobile) {
+                    // On mobile: show overlay and dropdown as sidebar
+                    userDropdown.classList.add('show');
+                    mobileOverlay.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    // On desktop: toggle dropdown
+                    userDropdown.classList.toggle('show');
+                    userMenu.classList.toggle('active');
+                }
+            });
+
+            // Close dropdown when clicking outside (desktop)
+            document.addEventListener('click', function (e) {
+                if (window.innerWidth >= 992) {
+                    if (!userMenu.contains(e.target) && !userDropdown.contains(e.target)) {
+                        userDropdown.classList.remove('show');
+                        userMenu.classList.remove('active');
+                    }
+                }
+            });
+
+            // Close dropdown on mobile when clicking overlay
+            if (mobileOverlay) {
+                mobileOverlay.addEventListener('click', function () {
+                    userDropdown.classList.remove('show');
+                    mobileOverlay.classList.remove('show');
+                    document.body.style.overflow = '';
+                });
+            }
+
+            // Close dropdown on mobile when clicking close button
+            if (closeDropdown) {
+                closeDropdown.addEventListener('click', function () {
+                    userDropdown.classList.remove('show');
+                    mobileOverlay.classList.remove('show');
+                    document.body.style.overflow = '';
+                });
+            }
+
+            // Handle window resize
+            window.addEventListener('resize', function () {
+                if (window.innerWidth >= 992) {
+                    // Reset on desktop
+                    userDropdown.classList.remove('show');
+                    mobileOverlay.classList.remove('show');
+                    document.body.style.overflow = '';
+                    userMenu.classList.remove('active');
+                }
+            });
+
+            // Close dropdown when clicking on a link inside it
+            const dropdownLinks = userDropdown.querySelectorAll('a');
+            dropdownLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    // Don't close if it's an external link or has special attributes
+                    if (!this.hasAttribute('target') && !this.hasAttribute('data-bs-toggle')) {
+                        setTimeout(() => {
+                            userDropdown.classList.remove('show');
+                            mobileOverlay.classList.remove('show');
+                            userMenu.classList.remove('active');
+                            document.body.style.overflow = '';
+                        }, 300);
+                    }
+                });
+            });
+
+            // Handle Escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && userDropdown.classList.contains('show')) {
+                    userDropdown.classList.remove('show');
+                    mobileOverlay.classList.remove('show');
+                    userMenu.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+    });
+</script>

@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Category>
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "listCategory";
+}
+<p class="mt-1">
+    <a class="btn btn-success btn-sm"  asp-action="CreateCategory">Create New</a>
+</p>
+<table class="table table-hover text-center align-middle w-75 m-auto">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.NameDepartment)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ImageDepartment)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr style="height:100px;">
+            <td>
+                @Html.DisplayFor(modelItem => item.NameDepartment)
+            </td>
+            <td>
+                    <img style="width:70px;height:70px;border:0; " src="/imageCategory/@item.ImageDepartment" alt="@item.NameDepartment" />
+                </td>
+            <td>
+                    <a asp-action="EditCategory" class="btn btn-sm btn-outline-primary" asp-route-id="@item.Id"><i class="bi bi-pencil-square"></i>Edit</a>
+                    <form asp-action="DeleteCategory" asp-route-id="@item.Id" method="post" style="display:inline" onsubmit="return confirm('Are you sure you want to delete this category?');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash3-fill"></i> Delete
+                        </button>
+                    </form>
+                </td>
+        </tr>
+}
+    </tbody>
+</table>

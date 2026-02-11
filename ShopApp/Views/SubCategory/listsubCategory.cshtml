@@ -1,0 +1,93 @@
+﻿@model IEnumerable<ShopApp.Models.SubCategory>
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "List of Subcategories";
+}
+<style>
+    .custom-table {
+        border-collapse: separate;
+        border-spacing: 0 10px;
+    }
+
+        .custom-table thead th {
+            background-color: #212529;
+            color: white;
+        }
+
+        .custom-table tbody tr {
+            background-color: #f8f9fa;
+            transition: background-color 0.3s ease;
+            border-radius: 8px;
+        }
+
+            .custom-table tbody tr:hover {
+                background-color: #e2f0ff; /* فقط تغيير اللون بدون تكبير */
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* ظل بسيط وجميل */
+            }
+
+        .custom-table td, .custom-table th {
+            vertical-align: middle;
+        }
+
+    .subcat-image {
+        height: 50px;
+        width: 80px;
+        object-fit: cover;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-primary">📋 Subcategories List</h2>
+        <a class="btn btn-success" asp-action="CreateSubCategory">
+            <i class="bi bi-plus-circle-fill"></i> Add Subcategory
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table custom-table text-center align-middle shadow-sm">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Name)</th>
+                    <th>@Html.DisplayNameFor(model => model.ImageDepartment)</th>
+                    <th>@Html.DisplayNameFor(model => model.Category)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                        <td>
+                            <img src="/imageSubCategory/@item.ImageDepartment"
+                                 alt="Image"
+                                 class="subcat-image" />
+                        </td>
+                        <td>@Html.DisplayFor(modelItem => item.Category.NameDepartment)</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a asp-action="EditSubCategory"
+                                   class="btn btn-sm btn-outline-primary"
+                                   asp-route-id="@item.Id">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                                <form asp-action="DeleteCategory"
+                                      asp-route-id="@item.Id"
+                                      method="post"
+                                      onsubmit="return confirm('Are you sure you want to delete this subcategory?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash3-fill"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

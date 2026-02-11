@@ -1,0 +1,610 @@
+﻿@model ShopApp.Models.Order
+@{
+    ViewData["Title"] = "Order Details";
+    Layout = "_AdminLayout";
+
+    string statusClass = Model.Status switch
+    {
+        "Pending" => "status-pending",
+        "Processing" => "status-processing",
+        "Shipped" => "status-shipped",
+        "Delivered" => "status-delivered",
+        "FailedDelivery" => "status-failed",
+        "Cancelled" => "status-cancelled",
+        _ => "status-default"
+    };
+
+    string statusIcon = Model.Status switch
+    {
+        "Pending" => "⏳",
+        "Processing" => "⚙️",
+        "Shipped" => "🚚",
+        "Delivered" => "✅",
+        "FailedDelivery" => "❌",
+        "Cancelled" => "🚫",
+        _ => "📦"
+    };
+
+    bool isPaid = Model.ISPaid ?? false;
+    string paymentStatusClass = isPaid ? "payment-paid" : "payment-unpaid";
+    string paymentStatusText = isPaid ? "Paid" : "Unpaid";
+    string paymentStatusIcon = isPaid ? "💳" : "⏸️";
+}
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        --warning-gradient: linear-gradient(135deg, #f6e05e 0%, #ed8936 100%);
+        --danger-gradient: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
+        --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --secondary-gradient: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+    }
+
+    .order-header {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .order-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary-gradient);
+    }
+
+    .status-badge {
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-pending { background: var(--warning-gradient); color: #000; }
+    .status-processing { background: var(--info-gradient); color: white; }
+    .status-shipped { background: #4299e1; color: white; }
+    .status-delivered { background: var(--success-gradient); color: white; }
+    .status-failed { background: var(--danger-gradient); color: white; }
+    .status-cancelled { background: #718096; color: white; }
+    .status-default { background: #a0aec0; color: white; }
+
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .info-card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .info-card-header i {
+        font-size: 1.5rem;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-right: 10px;
+    }
+
+    .payment-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .payment-paid {
+        background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
+        color: #22543d;
+    }
+
+    .payment-unpaid {
+        background: linear-gradient(135deg, #fed7d7, #fc8181);
+        color: #742a2a;
+    }
+
+    .product-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .product-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .product-table th {
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .product-table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .product-table tbody tr:hover {
+        background-color: #f7fafc;
+    }
+
+    .product-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .product-image:hover {
+        transform: scale(1.1);
+        border-color: #667eea;
+    }
+
+    .color-display {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: 3px solid white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: inline-block;
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+        margin-top: 2rem;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(to bottom, #667eea, #764ba2);
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -30px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #667eea;
+        border: 3px solid white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+
+    .btn-gradient {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+
+    .total-amount {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        border: 2px dashed #cbd5e0;
+    }
+
+    .total-amount h3 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: var(--success-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .status-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.75rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        background: #f8fafc;
+    }
+
+    .status-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: white;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <!-- Order Header -->
+    <div class="order-header fade-in">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary rounded-circle p-3 me-3">
+                        <i class="bi bi-receipt text-white fs-2"></i>
+                    </div>
+                    <div>
+                        <h1 class="display-6 fw-bold mb-1" style="background: var(--primary-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
+                            Order #@Model.Id
+                        </h1>
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-calendar me-1"></i>
+                            @Model.OrderDate.ToString("dddd, MMMM dd, yyyy - hh:mm tt")
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="d-flex flex-column gap-2">
+                    <span class="status-badge @statusClass">
+                        @statusIcon @Model.Status
+                    </span>
+                    <span class="payment-badge @paymentStatusClass">
+                        @paymentStatusIcon @paymentStatusText
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Customer Information -->
+        <div class="col-lg-6">
+            <div class="info-card fade-in" style="animation-delay: 0.1s">
+                <div class="info-card-header">
+                    <i class="bi bi-person-badge"></i>
+                    <h5 class="mb-0 fw-bold">Customer Information</h5>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="small text-muted d-block">Full Name</label>
+                        <p class="fw-bold fs-5 mb-3">@Model.FullName</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small text-muted d-block">Phone Number</label>
+                        <p class="fw-bold fs-5 mb-3">
+                            <i class="bi bi-telephone text-primary me-2"></i>@Model.PhoneNumber
+                        </p>
+                    </div>
+                    <div class="col-12">
+                        <label class="small text-muted d-block">Email Address</label>
+                        <p class="fw-bold fs-5 mb-3">
+                            <i class="bi bi-envelope text-primary me-2"></i>@ViewBag.email
+                        </p>
+                    </div>
+                    <div class="col-12">
+                        <label class="small text-muted d-block">Delivery Address</label>
+                        <div class="d-flex align-items-start mt-2">
+                            <i class="bi bi-geo-alt text-warning fs-4 me-3"></i>
+                            <div>
+                                <p class="fw-bold mb-1">@Model.Address</p>
+                                <p class="text-muted mb-0">@Model.City, @Model.Country</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Details -->
+        <div class="col-lg-6">
+            <div class="info-card fade-in" style="animation-delay: 0.2s">
+                <div class="info-card-header">
+                    <i class="bi bi-receipt"></i>
+                    <h5 class="mb-0 fw-bold">Order Details</h5>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="small text-muted d-block">Order ID</label>
+                        <p class="fw-bold fs-5 mb-3">#@Model.Id</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="small text-muted d-block">Payment ID</label>
+                        <p class="fw-bold fs-5 mb-3">@Model.PaymobeOrderId</p>
+                    </div>
+                    <div class="col-12">
+                        <label class="small text-muted d-block">Current Status</label>
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <span class="status-badge @statusClass">
+                                @statusIcon @Model.Status
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="small text-muted d-block mb-2">Update Status</label>
+                        <form asp-action="EditStatuse" method="post" class="d-flex gap-2">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <select name="status" class="form-select status-select flex-grow-1" id="statusSelect">
+                                <option value="Pending" selected="@(Model.Status == "Pending")">⏳ Pending</option>
+                                <option value="Processing" selected="@(Model.Status == "Processing")">⚙️ Processing</option>
+                                <option value="Shipped" selected="@(Model.Status == "Shipped")">🚚 Shipped</option>
+                                <option value="Delivered" selected="@(Model.Status == "Delivered")">✅ Delivered</option>
+                                <option value="FailedDelivery" selected="@(Model.Status == "FailedDelivery")">❌ Failed Delivery</option>
+                                <option value="Cancelled" selected="@(Model.Status == "Cancelled")">🚫 Cancelled</option>
+                            </select>
+                            <button type="submit" class="btn-gradient">
+                                <i class="bi bi-check-lg me-2"></i>Update
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ordered Products -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="info-card fade-in" style="animation-delay: 0.3s">
+                <div class="info-card-header">
+                    <i class="bi bi-cart-check"></i>
+                    <h5 class="mb-0 fw-bold">Ordered Products</h5>
+                    <span class="ms-auto badge bg-primary">@Model.Items.Count Items</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table product-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Color</th>
+                                <th>Image</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr class="fade-in">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-shrink-0">
+                                                <i class="bi bi-box-seam text-primary fs-4"></i>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h6 class="mb-0 fw-bold">@item.Product.Name</h6>
+                                                <small class="text-muted">SKU: @item.Product.Id</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="fw-bold">@item.UnitPrice.ToString("C")</td>
+                                    <td>
+                                        <span class="badge bg-primary rounded-pill p-2">@item.Quantity</span>
+                                    </td>
+                                    <td>
+                                        @if (item.Stock != null && !string.IsNullOrEmpty(item.Stock.Color))
+                                        {
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="color-display" style="background-color: @item.Stock.Color"></div>
+                                                <span class="small">@item.Stock.Color</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">No Color</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <img src="/ImgePro/@(item.Product.Images != null && item.Product.Images.Any() ? item.Product.Images.First().ImageURL : "no-image.jpg")"
+                                             alt="@item.Product.Name"
+                                             class="product-image"
+                                             onerror="this.src='/ImgePro/no-image.jpg'" />
+                                    </td>
+                                    <td class="fw-bold text-success">@((item.Quantity * item.UnitPrice).ToString("C"))</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="info-card fade-in" style="animation-delay: 0.4s">
+                <div class="info-card-header">
+                    <i class="bi bi-clock-history"></i>
+                    <h5 class="mb-0 fw-bold">Order Timeline</h5>
+                </div>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h6 class="fw-bold mb-1">Order Placed</h6>
+                        <p class="text-muted mb-0">@Model.OrderDate.ToString("MMM dd, yyyy - hh:mm tt")</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h6 class="fw-bold mb-1">Payment @(isPaid ? "Confirmed" : "Pending")</h6>
+                        <p class="text-muted mb-0">@(isPaid ? "Paid successfully" : "Awaiting payment")</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h6 class="fw-bold mb-1">Current Status</h6>
+                        <p class="text-muted mb-0">@Model.Status</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="total-amount fade-in" style="animation-delay: 0.5s">
+                <h6 class="text-muted mb-3">TOTAL AMOUNT</h6>
+                <h3>@Model.TotalAmount.ToString("C")</h3>
+                <div class="mt-4">
+                    <p class="text-muted mb-2">Includes all taxes and shipping fees</p>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span class="fw-bold">@(Model.TotalAmount.ToString("C"))</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping</span>
+                        <span class="fw-bold">$0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax</span>
+                        <span class="fw-bold">$0.00</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-bold">Total</span>
+                        <span class="fw-bold fs-4">@Model.TotalAmount.ToString("C")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="@Url.Action("GetAllOrder", "Order")" class="btn btn-outline-primary px-4 rounded-pill">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Orders
+                </a>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-secondary px-4 rounded-pill">
+                        <i class="bi bi-printer me-2"></i>Print Invoice
+                    </button>
+                    <button class="btn-gradient px-4 rounded-pill">
+                        <i class="bi bi-send me-2"></i>Contact Customer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update status select background color
+            const statusSelect = document.getElementById('statusSelect');
+            const statusColors = {
+                "Pending": "#f6e05e",
+                "Processing": "#4facfe",
+                "Shipped": "#4299e1",
+                "Delivered": "#43e97b",
+                "FailedDelivery": "#fc8181",
+                "Cancelled": "#718096"
+            };
+
+            function updateSelectColor() {
+                const color = statusColors[statusSelect.value] || "#ffffff";
+                statusSelect.style.backgroundColor = color;
+                statusSelect.style.color = (statusSelect.value === "Pending") ? "#000" : "#fff";
+            }
+
+            statusSelect.addEventListener('change', updateSelectColor);
+            updateSelectColor();
+
+            // Add animations to table rows
+            const tableRows = document.querySelectorAll('.product-table tbody tr');
+            tableRows.forEach((row, index) => {
+                row.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // Copy order ID to clipboard
+            const copyOrderId = document.createElement('button');
+            copyOrderId.className = 'btn btn-sm btn-outline-secondary ms-2';
+            copyOrderId.innerHTML = '<i class="bi bi-clipboard"></i>';
+            copyOrderId.title = 'Copy Order ID';
+            copyOrderId.onclick = function() {
+                navigator.clipboard.writeText('@Model.Id');
+                showToast('Order ID copied to clipboard!', 'success');
+            };
+
+            // Find order ID element and append copy button
+            const orderIdElement = document.querySelector('p.fw-bold.fs-5:contains("#@Model.Id")');
+            if (orderIdElement) {
+                orderIdElement.appendChild(copyOrderId);
+            }
+        });
+
+        function showToast(message, type) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3`;
+            toast.style.zIndex = '1050';
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', function () {
+                toast.remove();
+            });
+        }
+    </script>
+}

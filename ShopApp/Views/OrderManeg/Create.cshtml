@@ -1,0 +1,135 @@
+﻿@model ShopApp.Models.Order
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "_AdminLayout";
+
+    var itemList = Model.Items.ToList();
+    var products = ViewBag.Products as SelectList;
+}
+
+<h2>Edit Order #@Model.Id</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="FullName"></label>
+        <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="PhoneNumber"></label>
+        <input asp-for="PhoneNumber" class="form-control" />
+        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Address"></label>
+        <input asp-for="Address" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="City"></label>
+        <input asp-for="City" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Country"></label>
+        <input asp-for="Country" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Status"></label>
+        <input asp-for="Status" class="form-control" />
+    </div>
+    <hr />
+    <h4>Order Items</h4>
+
+    <div id="items-container">
+        @for (int i = 0; i < itemList.Count; i++)
+        {
+            <div class="item-row mb-2 d-flex gap-2">
+                <input type="hidden" name="OrderItemIds" value="@itemList[i].Id" />
+                <select name="ProductIds" class="form-select">
+                    <option value="">Select Product</option>
+                    @foreach (var product in products)
+                    {
+                        var selected = itemList[i].ProductId.ToString() == product.Value ? "selected" : "";
+                        <option value="@product.Value" @@selected>@product.Text</option>
+                    }
+                </select>
+
+                <input type="number" name="Quantities" class="form-control" value="@itemList[i].Quantity" min="0" />
+                <button type="button" class="btn btn-danger remove-item">X</button>
+            </div>
+        }
+    </div>
+
+    <button type="button" class="btn btn-sm btn-secondary mt-2" id="add-item">+ Add Item</button>
+
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="GetAllOrder" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+@section Scripts {
+    <script>
+        const products = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+        products.Select(p => new { value = p.Value, text = p.Text })
+    ));
+
+        document.getElementById("add-item").addEventListener("click", function () {
+            const container = document.getElementById("items-container");
+            const row = document.createElement("div");
+            row.classList.add("item-row", "mb-2", "d-flex", "gap-2");
+
+            const select = document.createElement("select");
+            select.name = "ProductIds";
+            select.className = "form-select";
+            products.forEach(p => {
+                const option = document.createElement("option");
+                option.value = p.value;
+                option.text = p.text;
+                select.appendChild(option);
+            });
+
+            const quantity = document.createElement("input");
+            quantity.name = "Quantities";
+            quantity.type = "number";
+            quantity.className = "form-control";
+            quantity.value = "1";
+            quantity.min = "1";
+
+            const hiddenId = document.createElement("input");
+            hiddenId.type = "hidden";
+            hiddenId.name = "OrderItemIds";
+            hiddenId.value = "0"; // new item, not in database yet
+
+            const removeBtn = document.createElement("button");
+            removeBtn.type = "button";
+            removeBtn.className = "btn btn-danger remove-item";
+            removeBtn.innerText = "X";
+            removeBtn.onclick = () => row.remove();
+
+            row.appendChild(hiddenId);
+            row.appendChild(select);
+            row.appendChild(quantity);
+            row.appendChild(removeBtn);
+            container.appendChild(row);
+        });
+
+        document.querySelectorAll(".remove-item").forEach(btn => {
+            btn.addEventListener("click", function () {
+                this.closest(".item-row").remove();
+            });
+        });
+    </script>
+}

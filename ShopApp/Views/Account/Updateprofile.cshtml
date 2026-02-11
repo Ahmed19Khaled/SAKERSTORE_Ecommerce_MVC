@@ -1,0 +1,114 @@
+﻿@model ShopApp.ViewModel.ProfUserViewModel
+
+@{
+    ViewData["Title"] = "Update Profile";
+}
+
+<style>
+    .profile-edit-container {
+        margin: auto;
+    }
+
+    .profile-picture-preview {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #0d6efd;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        transition: 0.3s ease;
+    }
+
+    .form-section {
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="m-3 mt-4 profile-edit-container">
+    <div class="card shadow p-4">
+        <h3 class="mb-4 border-bottom pb-2 text-primary">Edit Profile</h3>
+
+        <form asp-action="UpdateProfile" method="post" enctype="multipart/form-data">
+            <div class="row align-items-center mb-4">
+                <div class="col-md-4 text-center">
+                    <img id="previewImage" src="/ImageProfile/@Model.ProfilePictureUrl" alt="Profile Picture" class="profile-picture-preview mb-2" />
+                </div>
+                <div class="col-md-8">
+                    <label for="ProfileImageInput" class="form-label fw-bold">Upload New Picture</label>
+                    <input type="file" id="ProfileImageInput" name="ProfileImage" class="form-control" accept="image/*" />
+                    <small class="form-text text-muted">Accepted formats: jpg, png, jpeg. Max size: 2MB.</small>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 form-section">
+                    <label class="form-label">Full Name</label>
+                    <input asp-for="FullName" class="form-control" />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 form-section">
+                    <label class="form-label">Phone Number</label>
+                    <input asp-for="PhoneNumber" class="form-control" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 form-section">
+                    <label class="form-label">Gender</label>
+                    <select asp-for="Gender" class="form-select">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 form-section">
+                    <label class="form-label">Birth Date</label>
+                    <input asp-for="BirthDate" type="date" class="form-control" />
+                    <span asp-validation-for="BirthDate" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 form-section">
+                    <label class="form-label">City</label>
+                    <input asp-for="City" class="form-control" />
+                    <span asp-validation-for="City" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 form-section">
+                    <label class="form-label">Country</label>
+                    <input asp-for="Country" class="form-control" />
+                    <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">💾 Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // تأكد من تحميل الصفحة أولاً
+        document.addEventListener("DOMContentLoaded", function() {
+            var input = document.getElementById("ProfileImageInput");
+            var preview = document.getElementById("previewImage");
+
+            input.addEventListener("change", function (event) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        preview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            });
+        });
+    </script>
+}

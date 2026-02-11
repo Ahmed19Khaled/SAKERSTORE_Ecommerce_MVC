@@ -1,0 +1,961 @@
+﻿@model ShopApp.ViewModel.AllProductsDitals
+@inject ShopApp.Data.AppDBcontext context
+
+@{
+    ViewData["Title"] = "Product Category";
+}
+<style>
+    :root {
+        --primary: #8e44ad;
+        --primary-dark: #732d91;
+        --accent: #ff9f43;
+        --danger: #e60e14;
+        --bg: #f8fafc;
+        --card-radius: 14px;
+        --card-padding: 16px;
+        --card-image-height: 280px; /* desktop */
+        --shadow-sm: 0 4px 18px rgba(2,6,23,0.06);
+        --shadow-md: 0 10px 36px rgba(2,6,23,0.12);
+        --transition: 220ms cubic-bezier(.4,0,.2,1);
+    }
+
+    * {
+        box-sizing: border-box
+    }
+
+    body {
+        background: var(--bg);
+        font-family: Poppins,system-ui,Arial;
+        color: #1f2937
+    }
+
+    /* Breadcrumb + Header */
+    .breadcrumb-container {
+        background: linear-gradient(135deg,#fff,#f1f5f9);
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin: 18px 0;
+        border-left: 4px solid var(--primary)
+    }
+
+    .breadcrumb {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap
+    }
+
+    .breadcrumb-item a {
+        color: var(--primary);
+        font-weight: 500
+    }
+
+    .page-header {
+        background: linear-gradient(135deg,var(--primary-dark),var(--primary));
+        color: #fff;
+        border-radius: 16px;
+        padding: 26px;
+        margin-bottom: 22px;
+        position: relative;
+        overflow: hidden
+    }
+
+    .page-title {
+        font-size: 2rem;
+        margin: 0 0 6px
+    }
+
+    .page-subtitle {
+        opacity: .95;
+        margin: 0;
+        font-weight: 500
+    }
+
+    /* Filter Toggle (mobile) */
+    .filter-toggle-container {
+        margin-bottom: 14px
+    }
+
+    .filter-toggle-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px;
+        border-radius: 12px;
+        background: linear-gradient(135deg,var(--primary),var(--primary-dark));
+        color: #fff;
+        border: none;
+        box-shadow: var(--shadow-sm);
+        font-weight: 600
+    }
+
+    /* Layout grid */
+    .page-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 20px;
+    }
+
+    @@media (max-width: 991px) {
+        .page-layout {
+            grid-template-columns: 1fr
+        }
+    }
+
+    /* Sidebar */
+    .desktop-sidebar {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid rgba(0,0,0,0.04);
+        box-shadow: var(--shadow-sm);
+        height: fit-content
+    }
+
+    .filter-section {
+        margin-bottom: 14px
+    }
+
+    .filter-label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block
+    }
+
+    .filter-input, .filter-select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #e6eef6;
+        background: #fbfdff
+    }
+
+    /* Subcategories block */
+    .subcategories-container {
+        background: white;
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 18px;
+        box-shadow: var(--shadow-sm)
+    }
+
+    .subcategories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+        gap: 12px
+    }
+
+    /* PRODUCTS GRID - much smoother, responsive */
+    .products-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        gap: 12px
+    }
+
+    .products-count {
+        background: #fff;
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1px solid #eef3fa;
+        color: #566574
+    }
+
+    .sort-select {
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #e6eef6;
+        background: white;
+        min-width: 160px
+    }
+
+    .products-grid {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    /* PRODUCT CARD - airy and contained */
+    .product-card {
+        background: white;
+        border-radius: var(--card-radius);
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.04);
+        display: flex;
+        flex-direction: column;
+        transition: transform var(--transition), box-shadow var(--transition);
+    }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(142,68,173,0.08)
+        }
+
+    .product-image-wrap {
+        position: relative;
+        width: 100%;
+        height: var(--card-image-height);
+        overflow: hidden;
+        background: #f6f8fb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    /* make image centered and cover */
+    .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform .5s ease;
+    }
+
+    .product-card:hover .product-image {
+        transform: scale(1.04)
+    }
+
+    /* badge */
+    .product-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: linear-gradient(135deg,var(--danger),#ff6b6b);
+        color: white;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: .85rem;
+        box-shadow: var(--shadow-sm)
+    }
+
+    /* Actions: desktop overlay, mobile visible row */
+    .product-actions {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        opacity: 0;
+        transform: translateX(8px);
+        transition: opacity var(--transition), transform var(--transition);
+    }
+
+    .product-card:hover .product-actions {
+        opacity: 1;
+        transform: translateX(0)
+    }
+
+    .action-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: rgba(255,255,255,0.95);
+        box-shadow: var(--shadow-sm);
+        cursor: pointer;
+        transition: transform var(--transition)
+    }
+
+        .action-btn:hover {
+            transform: scale(1.07);
+            color: var(--primary)
+        }
+
+        .action-btn.cart {
+            background: linear-gradient(135deg,var(--primary),var(--primary-dark));
+            color: #fff
+        }
+
+    /* On mobile show actions under image (touch-friendly) */
+    .product-actions-mobile {
+        display: none;
+        padding: 10px;
+        gap: 8px;
+        border-top: 1px solid #f1f4f8;
+        background: white;
+        justify-content: space-between
+    }
+
+        .product-actions-mobile .btn {
+            flex: 1;
+            margin: 0 6px;
+            padding: 10px;
+            border-radius: 10px
+        }
+
+    @@media (max-width: 991px) {
+        :root {
+            --card-image-height: 200px
+        }
+
+        .product-actions {
+            display: none
+        }
+
+        .product-actions-mobile {
+            display: flex
+        }
+    }
+
+    .product-info {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex: 1
+    }
+
+    .product-title {
+        font-size: 1rem;
+        font-weight: 700;
+        line-height: 1.25;
+        margin: 0;
+        min-height: 44px
+    }
+
+    .product-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        color: #6b7280;
+        font-size: .9rem
+    }
+
+    .product-price {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: auto
+    }
+
+    .current-price {
+        font-weight: 800;
+        color: var(--danger);
+        font-size: 1.15rem
+    }
+
+    .original-price {
+        text-decoration: line-through;
+        color: #9aa4af;
+        font-size: .95rem
+    }
+
+    /* Colors */
+    .product-colors {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap
+    }
+
+    .color-option {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid rgba(0,0,0,0.06);
+        cursor: pointer
+    }
+
+        .color-option.selected {
+            outline: 3px solid rgba(0,0,0,0.06);
+            transform: scale(1.06)
+        }
+
+    /* empty */
+    .empty-state {
+        padding: 28px;
+        border-radius: 12px;
+        background: white;
+        text-align: center;
+        box-shadow: var(--shadow-sm)
+    }
+
+    /* small helpers */
+    .btn-link-like {
+        background: transparent;
+        border: none;
+        color: var(--primary);
+        font-weight: 700;
+        cursor: pointer
+    }
+    /* -------- Slider & action fixes --------- */
+
+    /* remove hover-scale on mobile: only apply scale on desktop */
+    @@media (max-width: 991px) {
+        .product-card
+
+    {
+        transform: none !important;
+    }
+
+    .product-card:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    }
+
+    /* slider container */
+    .slider-wrap {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        background: #f6f8fb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: var(--card-image-height, 280px);
+    }
+
+    .slider-inner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+
+    /* each slide */
+    .slide {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transform: scale(1);
+        transition: opacity .28s ease, transform .45s ease;
+    }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+    /* slider controls */
+    .slider-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.85);
+        box-shadow: 0 6px 20px rgba(2,6,23,0.08);
+        cursor: pointer;
+        transition: transform .18s ease;
+        z-index: 5;
+    }
+
+        .slider-btn:hover {
+            transform: translateY(-50%) scale(1.06);
+            color: var(--primary);
+        }
+
+        .slider-btn.prev {
+            left: 12px;
+        }
+
+        .slider-btn.next {
+            right: 12px;
+        }
+
+    /* hide desktop overlay actions on very small screens; mobile row handled separately */
+    @@media (max-width: 991px) {
+        .slider-btn
+
+    {
+        display: none;
+    }
+
+    .product-actions {
+        display: none;
+    }
+    /* ensure overlay not visible on mobile */
+    }
+
+    /* ensure product-actions overlay doesn't cover important clickable areas on mobile */
+    .product-actions {
+        right: 12px;
+        top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        opacity: 0;
+        transform: translateX(8px);
+        transition: opacity .22s ease, transform .22s ease;
+    }
+
+    .product-card:hover .product-actions {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* keep mobile action row visible and not overlapping */
+    .product-actions-mobile {
+        border-top: 1px solid #f1f4f8;
+        background: white;
+        padding: 10px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    /* prevent product-image from stretching layout on mobile */
+    .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* small tweak: reduce overlay z-index conflicts */
+    .product-badge {
+        z-index: 6;
+    }
+
+    .product-actions, .slider-btn {
+        z-index: 7;
+    }
+
+</style>
+
+<!-- ===== MARKUP ===== -->
+
+<div class="breadcrumb-container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index" asp-controller="Home"><i class="fas fa-home me-1"></i>Home</a></li>
+        @if (Model.Category != null)
+        {
+            <li class="breadcrumb-item"><a asp-action="PruductCategory" asp-controller="Category" asp-route-Categoryid="@Model.Category.Id"><i class="fas fa-folder me-1"></i>@Model.Category.NameDepartment</a></li>
+        }
+        @if (Model.SubCategory != null)
+        {
+            <li class="breadcrumb-item active" aria-current="page"><i class="fas fa-tag me-1"></i>@Model.SubCategory.Name</li>
+        }
+    </ol>
+</div>
+
+<div class="page-header">
+    <h1 class="page-title text-center">
+        @if (Model.Category != null)
+        {
+            @Model.Category.NameDepartment
+        }
+        else if (Model.SubCategory != null)
+        {
+
+            @Model.SubCategory.Name
+        }
+        else
+        {
+
+            <text>Products</text>
+        }
+    </h1>
+    <p class="page-subtitle text-center"><i class="fas fa-box-open me-2"></i>@Model.products?.Count()</p>
+</div>
+
+<div class="container">
+    <!-- mobile filter toggle -->
+    <div class="filter-toggle-container d-md-none">
+        <button class="filter-toggle-btn" onclick="openMobileFilter()">
+            <i class="fas fa-sliders-h"></i>
+            Filter & Sort
+        </button>
+    </div>
+
+    <div class="page-layout">
+        <!-- SIDEBAR (desktop) -->
+        <aside class="desktop-sidebar d-none d-md-block" aria-label="Filters">
+            <div class="filter-section">
+                <h4 class="filter-label"><i class="fas fa-search me-2"></i>Search</h4>
+                <form asp-action="PruductCategory" asp-controller="Category" method="get" id="desktopFilterForm">
+                    <input type="text" name="name" class="filter-input mb-3" placeholder="Product name" value="@Context.Request.Query["name"]" />
+                    <h5 class="filter-label">Subcategory</h5>
+                    <select name="SubCatigoryid" class="filter-select mb-3">
+                        <option value="">All Subcategories</option>
+                        @foreach (var sub in context.CategoriesSup)
+                        {
+                            <option value="@sub.Id" selected="@(Context.Request.Query["SubCatigoryid"] == sub.Id.ToString())">@sub.Name</option>
+                        }
+                    </select>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6"><input type="number" name="minPrice" class="filter-input" placeholder="Min" value="@Context.Request.Query["minPrice"]" /></div>
+                        <div class="col-6"><input type="number" name="maxPrice" class="filter-input" placeholder="Max" value="@Context.Request.Query["maxPrice"]" /></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="filter-label">Minimum Offer %</label>
+                        <input type="number" name="offer" min="0" max="100" class="filter-input" value="@Context.Request.Query["offer"]" />
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100">Apply</button>
+                        <button type="button" class="btn btn-outline-secondary w-100" onclick="resetDesktopFilters()">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main>
+            <!-- Subcategories -->
+            @if (Model.Category != null && Model.Category.SubCategories?.Any() == true)
+            {
+                <div class="subcategories-container mb-3">
+                    <h5 class="mb-3"><i class="fas fa-layer-group me-2 text-muted"></i>Shop by Subcategory</h5>
+                    <div class="subcategories-grid">
+                        @foreach (var s in Model.Category.SubCategories)
+                        {
+                            <a asp-action="PruductCategory" asp-controller="Category" asp-route-SubCatigoryId="@s.Id" class="d-flex align-items-center gap-3 p-2 subcategory-card" style="text-decoration:none;border-radius:10px;">
+                                <img src="@Url.Content("~/imageSubCategory/" + (s.ImageDepartment ?? "no-image.jpg"))" onerror="this.src='/ImgePro/no-image.jpg'" loading="lazy" style="width:56px;height:56px;object-fit:cover;border-radius:10px" alt="@s.Name" />
+                                <div>
+                                    <div style="font-weight:700">@s.Name</div>
+                                    <div style="color:#6b7280;font-size:.9rem">@((s.Products?.Count ?? 0)) products</div>
+                                </div>
+                                <div class="ms-auto text-muted"><i class="fas fa-chevron-right"></i></div>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Products header -->
+            <div class="products-header mb-3">
+                <div class="products-count"><i class="fas fa-boxes me-2"></i>Showing @Model.products?.Count()</div>
+                <div class="d-flex gap-2 align-items-center">
+                    <select class="sort-select" onchange="sortProducts(this.value)">
+                        <option value="newest">Newest</option>
+                        <option value="price-low">Price: Low → High</option>
+                        <option value="price-high">Price: High → Low</option>
+                        <option value="name">Name: A → Z</option>
+                        <option value="offer">Best Offers</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            @if (Model.products != null && Model.products.Any())
+            {
+                <div class="products-grid">
+                    @foreach (var product in Model.products)
+                    {
+                        <div class="product-card" role="group" aria-label="@product.Name">
+                            <!-- IMAGE SLIDER -->
+                            <div class="product-image-wrap slider-wrap" data-product-id="@product.Id">
+                                <div class="slider-inner">
+                                    @if (product.Images != null && product.Images.Any())
+                                    {
+                                        var idx = 0;
+                                        foreach (var img in product.Images)
+                                        {
+                                            <img class="product-image slide @(idx == 0 ? "active" : "")"
+                                                 src="@Url.Content("~/ImgePro/" + img.ImageURL)"
+                                                 alt="@product.Name"
+                                                 loading="lazy"
+                                                 data-index="@idx"
+                                                 onerror="this.src='/ImgePro/no-image.jpg'" />
+                                            idx++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <img class="product-image slide active"
+                                             src="@Url.Content("~/ImgePro/no-image.jpg")"
+                                             alt="No Image"
+                                             loading="lazy" />
+                                    }
+                                </div>
+
+                                <!-- Slider Controls (visible on desktop & tablet) -->
+                                <button class="slider-btn prev" aria-label="Previous image" onclick="slidePrev(@product.Id)">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="slider-btn next" aria-label="Next image" onclick="slideNext(@product.Id)">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+
+                                @if (product.Offer.HasValue && product.Offer > 0)
+                                {
+                                    <div class="product-badge">-@product.Offer% </div>
+                                }
+
+                                <!-- Desktop overlay actions (hidden on small screens) -->
+                                <div class="product-actions" aria-hidden="true">
+                                    <button class="action-btn" title="Add to wishlist" onclick="addToWishlist(@product.Id)" aria-label="Add to wishlist"><i class="far fa-heart"></i></button>
+                                    <button class="action-btn" title="Quick view" onclick="quickView(@product.Id)" aria-label="Quick view"><i class="far fa-eye"></i></button>
+                                    <form asp-action="Add" asp-controller="Cart" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@product.Id" />
+                                        <input type="hidden" name="stockid" id="selected-stock-@product.Id" />
+                                        <button type="submit" class="action-btn cart" title="Add to cart" aria-label="Add to cart"><i class="fas fa-shopping-cart"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- mobile actions row (always visible on small screens) -->
+                            <div class="product-actions-mobile d-md-none">
+                                <button class="btn btn-outline-secondary" onclick="addToWishlist(@product.Id)"><i class="far fa-heart me-2"></i>Wishlist</button>
+                                <form asp-action="Add" asp-controller="Cart" method="post" style="display:flex;gap:8px;flex:1">
+                                    <input type="hidden" name="id" value="@product.Id" />
+                                    <input type="hidden" name="stockid" id="selected-stock-mobile-@product.Id" />
+                                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-shopping-cart me-2"></i>Add</button>
+                                </form>
+                            </div>
+
+                            <!-- INFO -->
+                            <div class="product-info">
+                                <h3 class="product-title">
+                                    <a asp-action="DetailsProduct" asp-controller="Product" asp-route-ProductID="@product.Id">@product.Name</a>
+                                </h3>
+
+                                @if (product.Stocks != null && product.Stocks.Any(s => s.QuantityAvaiable > 0))
+                                {
+                                    <div class="product-colors" aria-label="Colors">
+                                        @foreach (var stock in product.Stocks.Where(s => s.QuantityAvaiable > 0).Take(6))
+                                        {
+                                            <div class="color-option"
+                                                 title="@stock.Color"
+                                                 data-stock-id="@stock.StockId"
+                                                 style="background:@stock.Color"
+                                                 onclick="selectColor(this, @product.Id)">
+                                            </div>
+                                        }
+                                    </div>
+                                }
+
+                                <div class="product-price">
+                                    @if (product.Offer.HasValue && product.Offer > 0)
+                                    {
+                                        <div class="current-price">@((product.Price * (100 - product.Offer.Value) / 100).ToString("C"))</div>
+                                        <div class="original-price">@product.Price.ToString("C")</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="current-price">@product.Price.ToString("C")</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div style="font-size:48px;color:#e6eef5"><i class="fas fa-search"></i></div>
+                    <h3 style="margin-top:8px">No products found</h3>
+                    <p style="color:#6b7280">Try removing filters or check other categories.</p>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3">Go to homepage</a>
+                </div>
+            }
+        </main>
+    </div>
+</div>
+
+<!-- MOBILE FILTER (offcanvas-like) -->
+<div id="mobileFilter" aria-hidden="true" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:1400;">
+    <div id="mobileFilterPanel" style="width:92%;max-width:420px;background:white;height:100%;box-shadow:0 12px 48px rgba(2,6,23,0.2);transform:translateX(-100%);transition:transform .34s ease;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;border-bottom:1px solid #f1f5f9">
+            <strong>Filter & Sort</strong>
+            <button class="btn btn-sm btn-outline-secondary" onclick="closeMobileFilter()"><i class="fas fa-times"></i></button>
+        </div>
+        <div style="padding:14px;overflow:auto;height:calc(100% - 110px)">
+            <form id="mobileFilterForm" asp-action="PruductCategory" asp-controller="Category" method="get">
+                <div class="mb-3">
+                    <label class="filter-label">Product name</label>
+                    <input class="filter-input" name="name" value="@Context.Request.Query["name"]" />
+                </div>
+                <div class="mb-3">
+                    <label class="filter-label">Subcategory</label>
+                    <select name="SubCatigoryid" class="filter-select">
+                        <option value="">All</option>
+                        @foreach (var sub in context.CategoriesSup)
+                        {
+                            <option value="@sub.Id" selected="@(Context.Request.Query["SubCatigoryid"] == sub.Id.ToString())">@sub.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-3 row g-2">
+                    <div class="col-6"><input class="filter-input" name="minPrice" placeholder="Min" value="@Context.Request.Query["minPrice"]" /></div>
+                    <div class="col-6"><input class="filter-input" name="maxPrice" placeholder="Max" value="@Context.Request.Query["maxPrice"]" /></div>
+                </div>
+                <div class="mb-3">
+                    <label class="filter-label">Minimum offer %</label>
+                    <input class="filter-input" type="number" min="0" max="100" name="offer" value="@Context.Request.Query["offer"]" />
+                </div>
+            </form>
+        </div>
+        <div style="display:flex;gap:10px;padding:12px;border-top:1px solid #f1f5f9">
+            <button class="btn btn-outline-secondary w-100" onclick="resetMobileFilters()">Reset</button>
+            <button class="btn btn-primary w-100" onclick="document.getElementById('mobileFilterForm').submit()">Apply</button>
+        </div>
+    </div>
+    <div id="mobileFilterOverlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.5)" onclick="closeMobileFilter()"></div>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+@section Scripts {
+
+<script>
+    // helper to show simple toast
+    function showToast(msg, color) {
+        const t = document.createElement('div');
+        t.textContent = msg;
+        t.style.cssText = "position:fixed;top:20px;right:20px;padding:10px 14px;background:"+(color||'#22c55e')+";color:#fff;border-radius:10px;z-index:9999;box-shadow:0 8px 30px rgba(2,6,23,0.2)";
+        document.body.appendChild(t);
+        setTimeout(()=>{ t.style.opacity=0; setTimeout(()=>t.remove(),300)}, 2500);
+    }
+
+    // Select color - marks selection and sets the hidden inputs
+    function selectColor(el, productId) {
+        const card = el.closest('.product-card');
+        if(!card) return;
+        card.querySelectorAll('.color-option').forEach(x=>x.classList.remove('selected'));
+        el.classList.add('selected');
+        const stockId = el.getAttribute('data-stock-id');
+        const desktopInput = document.getElementById('selected-stock-' + productId);
+        const mobileInput = document.getElementById('selected-stock-mobile-' + productId);
+        if(desktopInput) desktopInput.value = stockId || '';
+        if(mobileInput) mobileInput.value = stockId || '';
+    }
+
+    function addToWishlist(id) {
+        // placeholder: implement AJAX or form submit
+        showToast('Added to wishlist', '#6366f1');
+    }
+    function quickView(id) { showToast('Quick view (not implemented)', '#06b6d4'); }
+
+    function sortProducts(val) {
+        // implement sorting (redirect with query or AJAX)
+        showToast('Sorting: ' + val, '#0ea5a4');
+    }
+
+    // Filter mobile open/close
+    function openMobileFilter(){
+        const panel = document.getElementById('mobileFilterPanel');
+        const container = document.getElementById('mobileFilter');
+        container.style.display = 'block';
+        setTimeout(()=>{ panel.style.transform = 'translateX(0)'; }, 20);
+        document.body.style.overflow = 'hidden';
+    }
+    function closeMobileFilter(){
+        const panel = document.getElementById('mobileFilterPanel');
+        const container = document.getElementById('mobileFilter');
+        panel.style.transform = 'translateX(-100%)';
+        document.body.style.overflow = '';
+        setTimeout(()=>{ container.style.display = 'none'; }, 300);
+    }
+    function resetMobileFilters(){ document.getElementById('mobileFilterForm').reset(); }
+
+    // Desktop reset
+    function resetDesktopFilters(){
+        document.getElementById('desktopFilterForm').reset();
+        // optionally remove query params by reloading base url
+        const url = new URL(window.location);
+        url.search = '';
+        window.location.href = url.toString();
+    }
+
+    // Initialize selects: select first available color per product
+    document.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll('.product-card').forEach(card=>{
+            const first = card.querySelector('.color-option');
+            if(first) {
+                first.classList.add('selected');
+                const prodIdInput = card.querySelector('input[id^="selected-stock-"]');
+                const stockId = first.dataset.stockId || first.getAttribute('data-stock-id');
+                if(prodIdInput) prodIdInput.value = stockId || '';
+                // also mobile input
+                const mobileInput = card.querySelector('input[id^="selected-stock-mobile-"]');
+                if(mobileInput) mobileInput.value = stockId || '';
+            }
+        });
+    });
+</script>
+    <script>
+        // Slider state: manage each product's current index
+        (function () {
+            const sliders = {}; // { productId: { slides: [...], idx: 0 } }
+
+            function initSliders() {
+                document.querySelectorAll('.slider-wrap').forEach(wrap => {
+                    const pid = wrap.getAttribute('data-product-id') || Math.random().toString(36).slice(2);
+                    const slides = Array.from(wrap.querySelectorAll('.slide'));
+                    if (!slides.length) return;
+                    sliders[pid] = { slides: slides, idx: slides.findIndex(s => s.classList.contains('active')) || 0, wrap: wrap };
+                    // ensure only the active is visible
+                    updateSlides(pid);
+                });
+            }
+
+            function updateSlides(pid) {
+                const state = sliders[pid];
+                if (!state) return;
+                state.slides.forEach((s, i) => {
+                    if (i === state.idx) {
+                        s.classList.add('active');
+                        s.style.opacity = 1;
+                        s.style.zIndex = 1;
+                    } else {
+                        s.classList.remove('active');
+                        s.style.opacity = 0;
+                        s.style.zIndex = 0;
+                    }
+                });
+            }
+
+            window.slideNext = function(productId) {
+                const pid = productId.toString();
+                if (!sliders[pid]) {
+                    // try fallback: find wrap with that data attribute
+                    const wrap = document.querySelector('.slider-wrap[data-product-id="' + pid + '"]');
+                    if (wrap) initSliders(); else return;
+                }
+                const st = sliders[pid];
+                st.idx = (st.idx + 1) % st.slides.length;
+                updateSlides(pid);
+            };
+
+            window.slidePrev = function(productId) {
+                const pid = productId.toString();
+                if (!sliders[pid]) initSliders();
+                const st = sliders[pid];
+                st.idx = (st.idx - 1 + st.slides.length) % st.slides.length;
+                updateSlides(pid);
+            };
+
+            // add keyboard left/right support when focused inside a product card (desktop)
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                    // find focused product (closest .product-card)
+                    const activeCard = document.activeElement.closest && document.activeElement.closest('.product-card');
+                    if (activeCard) {
+                        const pid = activeCard.querySelector('.slider-wrap')?.getAttribute('data-product-id');
+                        if (pid) {
+                            e.key === 'ArrowRight' ? slideNext(pid) : slidePrev(pid);
+                        }
+                    }
+                }
+            });
+
+            // init on DOM ready
+            document.addEventListener('DOMContentLoaded', function () {
+                initSliders();
+            });
+        })();
+    </script>
+
+}

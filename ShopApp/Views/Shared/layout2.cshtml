@@ -1,0 +1,591 @@
+﻿ @using Microsoft.EntityFrameworkCore
+@using ShopApp.Data
+@inject AppDBcontext _context
+@{
+    // تحسين: وضعنا الكود داخل try-catch لمنع توقف الموقع بالكامل في حال وجود خطأ في القاعدة
+    List<ShopApp.Models.Category> categories = new List<ShopApp.Models.Category>();
+    ShopApp.Models.Order order = null;
+    string userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+    try
+    {
+        categories = _context.Categories
+            .Include(c => c.SubCategories)
+            .AsNoTracking() // تحسين للأداء
+            .ToList();
+
+        if (userId != null)
+        {
+            order = _context.Orders
+             .OrderByDescending(x => x.Id)
+             .Where(X => X.Status != "Cancelled" && X.Status != "FailedDelivery" && X.Status != "Delivery")
+             .AsNoTracking()
+             .FirstOrDefault(o => o.UserId == userId);
+        }
+    }
+    catch
+    {
+        // يمكن تسجيل الخطأ هنا، لكن لن يتوقف الموقع عن العمل
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SAKERSTOR</title>
+
+    <link href="~/Register/store.png" rel="icon" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        :root {
+            --primary-color: #8e44ad; /* بنفسجي عصري */
+            --primary-dark: #732d91;
+            --secondary-color: #2c3e50;
+            --accent-color: #ff9f43; /* برتقالي هادئ للأزرار والخصومات */
+            --light-bg: #f3f4f6;
+            --white: #ffffff;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        .dropdown-submenu {
+            position: relative;
+        }
+
+            .dropdown-submenu > .dropdown-menu {
+                top: 0;
+                left: 100%;
+                margin-left: 0.1rem;
+                display: none;
+            }
+
+            .dropdown-submenu:hover > .dropdown-menu {
+                display: block;
+            }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+            a:hover {
+                color: var(--primary-color);
+            }
+
+        /* === Top Bar === */
+        .top-bar {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            font-size: 0.85rem;
+            padding: 8px 0;
+        }
+
+            .top-bar a {
+                color: #d1d5db;
+            }
+
+                .top-bar a:hover {
+                    color: var(--white);
+                }
+
+        /* === Main Header === */
+        .main-header {
+            background-color: var(--white);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            padding: 15px 0;
+            transition: var(--transition);
+        }
+
+            .main-header.scrolled {
+                padding: 10px 0;
+                box-shadow: var(--shadow-md);
+            }
+
+        .brand-logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Search Bar Modernization */
+        .search-wrapper {
+            position: relative;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .search-input {
+            border-radius: 50px;
+            padding: 12px 50px 12px 25px;
+            border: 2px solid #e5e7eb;
+            background-color: #f9fafb;
+            transition: var(--transition);
+        }
+
+            .search-input:focus {
+                border-color: var(--primary-color);
+                background-color: var(--white);
+                box-shadow: 0 0 0 4px rgba(142, 68, 173, 0.1);
+            }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+            .search-btn:hover {
+                background-color: var(--primary-dark);
+                transform: scale(1.05);
+            }
+
+        /* Icons Area */
+        .nav-icons .icon-item {
+            position: relative;
+            font-size: 1.3rem;
+            color: var(--text-dark);
+            margin-left: 20px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+            .nav-icons .icon-item:hover {
+                background-color: #f3f4f6;
+                color: var(--primary-color);
+            }
+
+        .badge-count {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.7rem;
+            height: 18px;
+            width: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        /* === Navigation Bar (Desktop) === */
+        .navbar-bottom {
+            background-color: var(--white);
+            border-top: 1px solid #e5e7eb;
+            display: none; /* Hidden on mobile */
+        }
+
+        @@media (min-width: 992px) {
+            .navbar-bottom {
+                display: block;
+            }
+        }
+
+        .nav-link-custom {
+            font-weight: 500;
+            padding: 15px 20px;
+            display: inline-block;
+            color: var(--text-dark);
+            position: relative;
+        }
+
+            .nav-link-custom::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                width: 0;
+                height: 3px;
+                background-color: var(--primary-color);
+                transition: var(--transition);
+                transform: translateX(-50%);
+            }
+
+            .nav-link-custom:hover::after, .nav-link-custom.active::after {
+                width: 80%;
+            }
+
+        /* === Mega Menu / Dropdown === */
+        .dropdown-menu-custom {
+            border: none;
+            box-shadow: var(--shadow-md);
+            border-radius: var(--border-radius);
+            margin-top: 0;
+            padding: 10px;
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 8px 15px;
+        }
+
+            .dropdown-item:hover {
+                background-color: #f3f4f6;
+                color: var(--primary-color);
+            }
+
+        /* === Mobile Offcanvas Menu === */
+        .offcanvas-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .offcanvas-title {
+            font-weight: 700;
+        }
+
+        .btn-close {
+            filter: invert(1);
+        }
+
+        .mobile-nav-link {
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+            display: block;
+            font-weight: 500;
+        }
+
+        /* === Main Content === */
+        .main-content {
+            flex: 1;
+            padding: 30px 0;
+        }
+
+        /* === Footer === */
+        .footer {
+            background-color: #1a1a1a;
+            color: #d1d5db;
+            padding-top: 60px;
+            margin-top: auto;
+        }
+
+            .footer h5 {
+                color: white;
+                font-weight: 700;
+                margin-bottom: 20px;
+                position: relative;
+                padding-bottom: 10px;
+            }
+
+                .footer h5::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 40px;
+                    height: 3px;
+                    background-color: var(--primary-color);
+                }
+
+        .footer-link {
+            display: block;
+            margin-bottom: 10px;
+            transition: var(--transition);
+        }
+
+            .footer-link:hover {
+                padding-left: 5px;
+                color: var(--primary-color);
+            }
+
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            transition: var(--transition);
+        }
+
+            .social-btn:hover {
+                background: var(--primary-color);
+                color: white;
+                transform: translateY(-3px);
+            }
+
+        .footer-bottom {
+            background-color: black;
+            padding: 20px 0;
+            margin-top: 40px;
+            font-size: 0.9rem;
+        }
+
+        /* Animation */
+        .animate-fade {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar d-none d-md-block">
+        <div class="container d-flex justify-content-between">
+            <div>
+                <span class="me-3"><i class="fas fa-envelope me-1"></i> support@sakerstor.com</span>
+                <span><i class="fas fa-phone-alt me-1"></i> +1 234 567 890</span>
+            </div>
+            <div>
+                <a href="#" class="me-3">Track Order</a>
+                <a href="#" class="me-3">About</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+    </div>
+
+    <header class="main-header">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between">
+
+                <button class="btn btn-link text-dark d-lg-none fs-2 p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <a asp-action="Index" asp-controller="Home" class="brand-logo mx-auto mx-lg-0">
+                    <i class="fas fa-shopping-bag"></i> SAKER<span class="text-dark">STOR</span>
+                </a>
+
+                <div class="search-wrapper d-none d-lg-block mx-4">
+                    <form>
+                        <input type="text" class="form-control search-input" placeholder="Search for products, brands...">
+                        <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+
+                <div class="nav-icons d-flex align-items-center">
+                    @await Component.InvokeAsync("InformationNavLogin")
+
+                    <div class="position-relative">
+                        @await Component.InvokeAsync("CartSummary")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="navbar-bottom">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <div class="dropdown me-4">
+                    <button class="btn btn-dark d-flex align-items-center gap-2 px-4 py-2 rounded-pill" type="button" id="categoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-th-large"></i> All Categories
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-custom">
+                        @foreach (var cat in categories)
+                        {
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item d-flex justify-content-between align-items-center" href="#">
+                                    @cat.NameDepartment
+                                    @if (cat.SubCategories?.Any() == true)
+                                    {
+                                        <i class="fas fa-chevron-right small"></i>
+                                    }
+                                </a>
+
+                                @if (cat.SubCategories?.Any() == true)
+                                {
+                                    <ul class="dropdown-menu">
+                                        @foreach (var sub in cat.SubCategories)
+                                        {
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-controller="Category"
+                                                   asp-action="PruductCategory"
+                                                   asp-route-SubCatigoryId="@sub.Id">
+                                                    @sub.Name
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </li>
+                        }
+                    </ul>
+
+                </div>
+
+                <div class="flex-grow-1">
+                    <a asp-action="Index" asp-controller="Home" class="nav-link-custom active">Home</a>
+                    <a href="#" class="nav-link-custom">Shop</a>
+                    <a href="#" class="nav-link-custom">New Arrivals</a>
+
+                    @if (order != null)
+                    {
+                        <a asp-action="OrderConfirmation" asp-controller="Order" asp-route-orderId="@order.Id" class="nav-link-custom">
+                            <i class="fas fa-box-open me-1"></i> Track Order
+                        </a>
+                    }
+                </div>
+
+                <a href="#" class="text-danger fw-bold"><i class="fas fa-fire me-1"></i> Flash Sale</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Menu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <form class="mb-4">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search...">
+                    <button class="btn btn-primary" type="button"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+
+            <nav class="nav flex-column">
+                <ul class="list-unstyled">
+                    @await Html.PartialAsync("_CategoryMenuPartial", categories)
+                </ul>
+                <a class="mobile-nav-link" asp-action="Index" asp-controller="Home">Home</a>
+
+
+                @if (order != null)
+                {
+                    <a class="mobile-nav-link" asp-action="OrderConfirmation" asp-controller="Order" asp-route-orderId="@order.Id">My Orders</a>
+                }
+                <a class="mobile-nav-link" href="#">Contact Us</a>
+                <a class="mobile-nav-link text-danger" href="#">Flash Sale!</a>
+            </nav>
+        </div>
+    </div>
+
+    <main class="main-content container animate-fade">
+        @RenderBody()
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="col-lg-4 col-md-6">
+                    <a href="#" class="brand-logo mb-3 d-block text-white">SAKER<span class="text-white-50">STOR</span></a>
+                    <p class="text-secondary">Premium online shopping experience. Quality products, fast delivery, and excellent customer service.</p>
+                    <div class="d-flex mt-3">
+                        <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5>Quick Links</h5>
+                    <div class="d-flex flex-column">
+                        <a href="#" class="footer-link">Home</a>
+                        <a href="#" class="footer-link">Shop</a>
+                        <a href="#" class="footer-link">About Us</a>
+                        <a href="#" class="footer-link">Contact</a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5>Account</h5>
+                    <div class="d-flex flex-column">
+                        <a href="#" class="footer-link">My Profile</a>
+                        <a href="#" class="footer-link">Orders</a>
+                        <a href="#" class="footer-link">Wishlist</a>
+                        <a href="#" class="footer-link">Settings</a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <h5>Newsletter</h5>
+                    <p class="text-secondary">Subscribe to get the latest news and offers.</p>
+                    <form class="d-flex gap-2">
+                        <input type="email" class="form-control" placeholder="Your email">
+                        <button class="btn btn-primary">Subscribe</button>
+                    </form>
+                    <div class="mt-4">
+                        <i class="fab fa-cc-visa fa-2x me-2 text-secondary"></i>
+                        <i class="fab fa-cc-mastercard fa-2x me-2 text-secondary"></i>
+                        <i class="fab fa-paypal fa-2x text-secondary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom text-center">
+            <div class="container">
+                <p class="mb-0">© @DateTime.Now.Year SAKERSTOR. All Rights Reserved. Designed with <i class="fas fa-heart text-danger"></i></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Sticky Header Script
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.main-header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Initialize Tooltips if needed
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

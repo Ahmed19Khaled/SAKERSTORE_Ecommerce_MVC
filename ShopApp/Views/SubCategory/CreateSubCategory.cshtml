@@ -1,0 +1,76 @@
+﻿@model ShopApp.Models.SubCategory
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = Model == null ? "CreateSubCategory" : "EditSubCategory";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-center">
+                    <h4 class="" style="color:white" >@ViewData["Title"]</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- نموذج الإدخال -->
+                        <div class="col-md-6">
+                            <form asp-action="@ViewData["Title"]" method="post" enctype="multipart/form-data">
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Name" class="form-label fw-bold">Name Department</label>
+                                    <input asp-for="Name" class="form-control" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="formFile" class="form-label fw-semibold">Upload Image</label>
+                                    <input asp-for="formFile" type="file" accept="image/*" class="form-control" onchange="previewImage(event)" />
+                                    <span asp-validation-for="formFile" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Select Department</label>
+                                    <select asp-for="CategoryId" class="form-control"
+                                            asp-items="@(new SelectList(ViewBag.Department, "Id", "NameDepartment"))">
+                                        <option value="">-- Select Department --</option>
+                                    </select>
+                                </div>
+
+                                <div class="d-grid gap-2 mt-4">
+                                    <button type="submit" class="btn btn-success">Save</button>
+                                    <a asp-action="listsubCategory" class="btn btn-secondary">Back to List</a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- صورة المعاينة -->
+                        <div class="col-md-6 text-center d-flex align-items-center justify-content-center">
+                            <div>
+                                <h5 class="mb-3">Photo Preview</h5>
+                                <img id="preview" src="/imageSubCategory/@(Model?.ImageDepartment ?? "DefultImage.jpg")"
+                                     class="img-thumbnail"
+                                     style="max-height: 250px; width: 330px;" alt="Photo" />
+                            </div>
+                        </div>
+                    </div> <!-- /row -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImage(event) {
+            var output = document.getElementById('preview');
+            output.src = URL.createObjectURL(event.target.files[0]);
+        }
+	</script>
+      <partial name="_ValidationScriptsPartial" />
+
+}
+
+

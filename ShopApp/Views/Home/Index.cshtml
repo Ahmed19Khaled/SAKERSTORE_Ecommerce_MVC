@@ -1,0 +1,520 @@
+﻿@model ShopApp.ViewModel.HViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --primary-dark: #1d4ed8;
+        --secondary-color: #7c3aed;
+        --accent-color: #f59e0b;
+        --text-dark: #1f2937;
+        --text-light: #6b7280;
+        --bg-light: #f9fafb;
+        --bg-white: #ffffff;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+        --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+        --radius-lg: 16px;
+        --radius-md: 12px;
+        --radius-sm: 8px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        background-color: var(--bg-light);
+        color: var(--text-dark);
+        overflow-x: hidden;
+        max-width: 100%;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary-color);
+        border-radius: 10px;
+    }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+    /* Store header design */
+    .store-header {
+        text-align: center;
+        padding: 2.5rem 1rem;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        margin-bottom: 2rem;
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .store-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+
+    .store-title {
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .store-subtitle {
+        font-size: 1.1rem;
+        font-weight: 400;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Categories section design */
+    .categories-section {
+        padding: 2rem 1rem;
+        max-width: 1400px;
+        margin: 0 auto 3rem;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        position: relative;
+        padding-left: 0.5rem;
+    }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+    .view-all-link {
+        display: inline-flex;
+        align-items: center;
+        color: var(--primary-color);
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition);
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+        background-color: rgba(37, 99, 235, 0.1);
+    }
+
+        .view-all-link:hover {
+            background-color: rgba(37, 99, 235, 0.2);
+            transform: translateX(5px);
+        }
+
+        .view-all-link i {
+            margin-left: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .view-all-link:hover i {
+            transform: translateX(3px);
+        }
+
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    @@media (min-width: 1200px) {
+        .categories-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .categories-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .categories-grid {
+            grid-template-columns: 1fr;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+    }
+
+    .category-card {
+        background: var(--bg-white);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        position: relative;
+        height: 320px;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+    .category-img-container {
+        height: 75%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .category-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transition);
+    }
+
+    .category-card:hover img {
+        transform: scale(1.05);
+    }
+
+    .category-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.7) 100%);
+        opacity: 0.7;
+        transition: var(--transition);
+    }
+
+    .category-card:hover .category-overlay {
+        opacity: 0.9;
+    }
+
+    .category-content {
+        padding: 1.2rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: var(--bg-white);
+    }
+
+    .category-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.3rem;
+        text-align: center;
+    }
+
+    .category-count {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .category-link {
+        text-decoration: none;
+        color: inherit;
+    }
+
+        .category-link:hover {
+            text-decoration: none;
+        }
+
+    /* Featured products section design */
+    .featured-section {
+        padding: 2rem 1rem;
+        background: linear-gradient(180deg, var(--bg-light) 0%, #f0f4ff 100%);
+        border-radius: var(--radius-lg);
+        max-width: 1400px;
+        margin: 0 auto 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .featured-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+    .featured-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: linear-gradient(135deg, var(--accent-color), #f97316);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        z-index: 2;
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Store footer design */
+    .store-footer {
+        text-align: center;
+        padding: 2rem;
+        background: var(--text-dark);
+        color: white;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        margin-top: 3rem;
+    }
+
+    .footer-text {
+        opacity: 0.8;
+        font-size: 0.9rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Navigation buttons design */
+    .navigation-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .nav-btn {
+        padding: 0.8rem 1.8rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-btn-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+        .nav-btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+
+    .nav-btn-secondary {
+        background: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+
+        .nav-btn-secondary:hover {
+            background: rgba(37, 99, 235, 0.1);
+            transform: translateY(-2px);
+        }
+
+    /* Watermark styling */
+    .watermark {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        opacity: 0.1;
+        font-size: 5rem;
+        font-weight: 900;
+        color: var(--primary-color);
+        pointer-events: none;
+        z-index: 2000;
+    }
+
+    /* Mobile optimizations */
+    @@media (max-width: 768px) {
+        .store-title {
+            font-size: 2.2rem;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .navigation-buttons {
+            flex-direction: column;
+            width: 100%;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .nav-btn {
+            width: 100%;
+        }
+
+        .watermark {
+            font-size: 3rem;
+            bottom: 0.5rem;
+            right: 0.5rem;
+        }
+    }
+
+    /* Fade-in animations */
+    .fade-in {
+        animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .delay-1 {
+        animation-delay: 0.2s;
+    }
+
+    .delay-2 {
+        animation-delay: 0.4s;
+    }
+</style>
+
+<!-- Categories Section -->
+<div class="categories-section fade-in">
+    <div class="categories-grid">
+        @foreach (var item in Model.Categories)
+        {
+            <a class="category-link"
+               asp-controller="Category"
+               asp-action="PruductCategory"
+               asp-route-Categoryid="@item.Id">
+                <div class="category-card">
+                    <div class="category-img-container">
+                        <img src="/imageCategory/@item.ImageDepartment" alt="@item.NameDepartment" />
+                        <div class="category-overlay"></div>
+                    </div>
+                    <div class="category-content">
+                        <h3 class="category-title">@item.NameDepartment</h3>
+                        <div class="category-count">Browse Products</div>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+</div>
+
+<!-- Featured Products Section -->
+<div class="featured-section fade-in delay-1">
+    <div class="featured-badge">🔥 Best Sellers</div>
+
+    <div class="section-header">
+        <h2 class="section-title">Latest Products</h2>
+    </div>
+
+    <div>
+        @await Html.PartialAsync("_FeaturedproductsPartial", Model.Products.OrderByDescending(c => c.Id).Take(10).ToList())
+    </div>
+</div>
+
+<!-- Watermark -->
+<div class="watermark">SHOP</div>
+
+<!-- Font Awesome Icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<script>
+    // Add interactive effects
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fade-in animation on scroll
+        const fadeElements = document.querySelectorAll('.fade-in');
+
+        const fadeInOnScroll = function() {
+            fadeElements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('active');
+                }
+            });
+        };
+
+        // Trigger on scroll
+        window.addEventListener('scroll', fadeInOnScroll);
+
+        // Run on initial load
+        fadeInOnScroll();
+
+        // Additional effects on card hover
+        const categoryCards = document.querySelectorAll('.category-card');
+        categoryCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                const title = this.querySelector('.category-title');
+                if (title) {
+                    title.style.color = 'var(--primary-color)';
+                }
+            });
+
+            card.addEventListener('mouseleave', function() {
+                const title = this.querySelector('.category-title');
+                if (title) {
+                    title.style.color = '';
+                }
+            });
+        });
+    });
+</script>

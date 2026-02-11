@@ -1,0 +1,195 @@
+﻿@model List<CartItem>
+@{
+	ViewData["Title"] = "AllCart";
+}
+
+<style>
+	table {
+		background-color: white;
+		border-radius: 10px;
+		overflow: hidden;
+	}
+
+	th, td {
+		vertical-align: middle;
+		text-align: center;
+		color: gray !important;
+	}
+
+	.product-image {
+		height: 100px;
+		object-fit: contain;
+	}
+
+	.quantity-box {
+		background-color: #f0f0f0;
+		padding: 6px;
+		border-radius: 6px;
+		width: 50px;
+		margin: auto;
+	}
+
+	.total-price {
+		color: purple;
+		font-weight: bold;
+	}
+
+	.cart-buttons {
+		display: flex;
+		gap: 10px;
+		justify-content: space-between;
+		margin-top: 20px;
+	}
+
+	.btn-custom {
+		padding: 10px 20px;
+		border-radius: 6px;
+	}
+
+	.btn-purple {
+		background-color: white;
+		border: 1px solid #ccc;
+		color: purple;
+	}
+
+		.btn-purple:hover {
+			background-color: #f3f3f3;
+		}
+
+	.btn-icon {
+		background-color: #f4f4f4;
+		border: none;
+		padding: 6px 10px;
+		border-radius: 6px;
+	}
+
+		.btn-icon i {
+			font-size: 20px;
+			color: gray;
+		}
+</style>
+
+@if (!Model.Any())
+{
+	<p class="text-center">سلتك فارغة.</p>
+}
+else
+{
+	<div class="d-flex flex-wrap mt-4 mx-2 box-shadow  justify-content-between  ">
+		<table class="table  align-middle text-center" style="width:65%">
+			<thead class="bg-light">
+				<tr>
+					<th>Remove</th>
+
+					<th>Image</th>
+					<th>Product(s)</th>
+					<th>Price</th>
+					<th>Qty</th>
+					<th>Color</th>
+					<th>Total</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var item in Model)
+				{
+					<tr>
+						<td>
+							<a class="btn-icon" href="/Cart/Remove/@item.Product.Id">
+								<i class="bi bi-trash3-fill"></i>
+							</a>
+						</td>
+						<td>
+                               <a class="text-decoration-none" asp-action="DetailsProduct" asp-controller="Product" asp-route-ProductID="@item.ProductId">
+
+							<img class="card-img-top"
+								 src="/ImgePro/@(item.Product.Images != null && item.Product.Images.Any() ? item.Product.Images.First().ImageURL : "no-image.jpg")"
+								 alt="@item.Product.Name"
+								 style="height: 50px; object-fit: contain;" />   </a>
+						</td>
+						<td>
+							<div>@item.Product.Name</div>
+
+						</td>
+						<td class="text-primary fw-bold" >  @((item.Product.Price * (100 - item.Product.Offer.Value) / 100).ToString("C"))</td>
+						<td>
+							<form asp-action="Add" asp-controller="Cart" method="post">
+								<input type="hidden" name="id" value="@item.Product.Id" />
+								<input type="hidden" name="stockid" value="@item.StockID" />
+								<input type="number"
+									   min="1"
+									   value="@item.Quantity"
+									   class="quantity-box"
+									   onchange="updateQuantity(@item.ProductId, @item.StockID, this.value, this)" />
+
+							</form>
+						</td>
+
+						<td >  <div class="m-auto p-3" style=" border:double #c26060 ; width:70px;height:30px;background:@item.Stock.Color" /> </td>
+						<td class="total-price" style="color:darkblue !important;"> $@(item.Quantity* item.Product.Price * (100 - item.Product.Offer.Value) / 100)</td>
+
+					</tr>
+				}
+			</tbody>
+
+
+		</table>
+		<div class="card h-75  align-items-center  p-2 ">
+			<div class=" ">
+				<p colspan="6" class="text-end" style="color: red !important; font-size:xx-large">
+					<strong>Total Payment</strong> <span id="total-payment">@ViewBag.Total.ToString("C")</span>
+				</p>
+
+			</div>
+			<div>
+				<p colspan="6" class="text-center">
+
+					<a class="btn btn-purple btn-custom me-2" href="/Cart/Clear">
+						<i class="bi bi-trash me-1"></i>Clear shopping cart
+					</a>
+					<a class="btn btn-purple btn-custom" href="/Home/Index">
+						<i class="bi bi-cart me-1"></i>Continue shopping
+					</a>
+				</p>
+			</div>
+			<div class="w-auto">
+				<a asp-action="Checkout" asp-controller="Order" class="btn btn-outline-success" style="width:200px">Check Out</a>
+
+			</div>
+
+
+		</div>
+
+	</div>
+
+}
+
+<script>
+	function updateQuantity(productId, stockId, qty, inputEl) {
+		fetch('/Cart/UpdateQuantity', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+			},
+			body: JSON.stringify({ productId, stockId, qty })
+		})
+		.then(res => res.json())
+		.then(data => {
+			if (data.success) {
+				const totalCell = inputEl.closest('tr').querySelector('.total-price');
+				totalCell.textContent = `$${data.itemTotal.toFixed(2)}`;
+
+				const cartTotalEl = document.getElementById('total-payment');
+				if (cartTotalEl) cartTotalEl.textContent = `$${data.cartTotal.toFixed(2)}`;
+			} else if (data.redirectUrl) {
+				window.location.href = data.redirectUrl;
+			} else {
+				alert(data.message || "حدث خطأ.");
+			}
+		})
+		.catch(err => {
+			console.error("Error updating quantity:", err);
+		});
+	}
+</script>
+

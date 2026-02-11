@@ -1,0 +1,66 @@
+﻿@model IEnumerable<ShopApp.Models.User>
+@{
+    ViewData["Title"] = "User Management";
+    Layout = "_AdminLayout";
+    var userRoles = ViewBag.UserRoles as Dictionary<string, IList<string>>;
+    var allRoles = ViewBag.AllRoles as List<string>;
+}
+<h2 class="text-center my-4 fw-bold">👥 User Management Panel</h2>
+<form asp-action="AllAccount" method="get" class="mb-4 d-flex justify-content-between align-items-center">
+    <input type="text" name="Email" class="form-control w-50 me-2" placeholder="🔍 email..."  />
+    <input type="text" name="Phone" class="form-control w-50 me-2" placeholder="🔍 Phone..."  />
+    <select class="form-control w-50 me-2" name="Role" asp-items="@(new SelectList(allRoles))">
+        <option value="">🔍 Role<span class="" >></span></option>
+     </select>
+    <button type="submit" class="btn d-flex fw-bold  btn-primary btn-sm">
+        <i class="bi bi-search fs-5 "></i> 
+    </button>
+</form>
+@if (!Model.Any())
+{
+    <div>
+        <p colspan="5" class="text-center text-danger fw-bold ">No users found matching your search.</p>
+    </div>
+}
+
+<div class="table-responsive shadow rounded">
+    <table class="table table-hover align-middle table-bordered border-light-subtle bg-white">
+        <thead class="table-light text-center">
+            <tr>
+                <th><i class="bi bi-envelope-at"></i> Email</th>
+                <th><i class="bi bi-person-fill"></i> Full Name</th>
+                <th><i class="bi bi-telephone"></i> Phone</th>
+                <th><i class="bi bi-shield-lock-fill"></i> Current Roles</th>
+                <th><i class="bi bi-arrow-repeat"></i> Change Role</th>
+            </tr>
+        </thead>
+        <tbody class="text-center">
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Email</td>
+                    <td>@user.FullName</td>
+                    <td>@user.PhoneNumber</td>
+                    <td>
+                        <span class="badge bg-primary">@string.Join(", ", userRoles[user.Id])</span>
+                    </td>
+                    <td>
+                        <form asp-action="ChangeRole" method="post" class="d-flex justify-content-center align-items-center gap-2">
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <select name="newRole" class="form-select w-auto">
+                                @foreach (var role in allRoles)
+                                {
+                                    <option value="@role">@role</option>
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

@@ -1,0 +1,13 @@
+﻿@model ShopApp.Models.Cart
+
+<!-- Cart -->
+
+
+
+<a asp-action="AllCart" asp-controller="Cart" style="background-color: white; padding: 5px 15px; border-radius: 8px; display: flex; align-items: center;">
+    <div class="" style="background-color: #512da8; padding: 10px; border-radius: 8px; margin-right: 10px;">
+        <i class="fa fa-shopping-cart" style="color: white;"></i>
+    </div>
+    <span id="cart-count" style="color: gray;"> @Model.Items.Count Items</span>
+</a>
+      

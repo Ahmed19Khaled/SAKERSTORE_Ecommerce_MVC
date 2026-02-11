@@ -1,0 +1,365 @@
+﻿    @model IEnumerable<ShopApp.Models.Product>
+
+    @{
+        Layout = "_AdminLayout";
+        ViewData["Title"] = "Product Management";
+    }
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-light: #eef2ff;
+            --secondary-color: #3f37c9;
+            --accent-color: #f72585;
+            --text-dark: #2b2d42;
+            --text-muted: #8d99ae;
+            --bg-body: #f8f9fa;
+            --card-bg: #ffffff;
+            --success-soft: #d1fae5;
+            --success-text: #059669;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 20px 40px -10px rgba(67, 97, 238, 0.15);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            font-family: 'Cairo', sans-serif;
+            color: var(--text-dark);
+        }
+
+        /* Header Enhancement */
+        .page-header {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            padding: 2rem 0 3rem;
+            margin-bottom: -30px;
+            border-radius: 0 0 30px 30px;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-content h1 {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* Floating Search Bar */
+        .search-floater {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            margin-top: -30px;
+            position: relative;
+            z-index: 10;
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .form-control-custom {
+            background-color: #f8f9fa;
+            border: 1px solid transparent;
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            transition: all 0.3s;
+        }
+
+            .form-control-custom:focus {
+                background-color: #fff;
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 4px var(--primary-light);
+            }
+
+        /* Product Card */
+        .product-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: none;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 100%;
+            position: relative;
+            box-shadow: var(--shadow-soft);
+        }
+
+            .product-card:hover {
+                transform: translateY(-8px);
+                box-shadow: var(--shadow-hover);
+            }
+
+        .img-wrapper {
+            position: relative;
+            height: 220px;
+            background-color: #f1f1f1;
+            overflow: hidden;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .product-card:hover .product-img {
+            transform: scale(1.1);
+        }
+
+        /* Badges and Offers */
+        .badge-float {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 2;
+            backdrop-filter: blur(5px);
+        }
+
+        .category-tag {
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            background: var(--primary-light);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        /* Product Details */
+        .card-body-custom {
+            padding: 1.5rem;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .price-block {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .current-price {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .old-price {
+            text-decoration: line-through;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Action Buttons */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f1f1f1;
+        }
+
+        .btn-action {
+            padding: 10px;
+            border-radius: var(--radius-md);
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-edit-c {
+            background-color: #f8f9fa;
+            color: var(--text-dark);
+        }
+
+            .btn-edit-c:hover {
+                background-color: var(--primary-color);
+                color: white;
+            }
+
+        .btn-delete-c {
+            background-color: #fff1f2;
+            color: #e11d48;
+        }
+
+            .btn-delete-c:hover {
+                background-color: #e11d48;
+                color: white;
+            }
+
+        /* Main Floating Button */
+        .btn-add-main {
+            background-color: white;
+            color: var(--primary-color);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+            .btn-add-main:hover {
+                transform: scale(1.05);
+                color: var(--secondary-color);
+            }
+
+        .btn-filter {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+        }
+
+            .btn-filter:hover {
+                background: var(--secondary-color);
+                transform: translateY(-2px);
+            }
+    </style>
+
+    <div class="page-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center header-content">
+                <div>
+                    <h1>📦 Inventory Management</h1>
+                    <p class="mb-0 opacity-75">You have <span class="fw-bold">@Model.Count()</span> products in store</p>
+                </div>
+                <a asp-action="CreateProduct" class="btn-add-main">
+                    <i class="bi bi-plus-lg"></i> Add Product
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+        <div class="search-floater">
+            <form asp-action="ListProduct" method="get" class="row g-3 align-items-end">
+                <div class="col-lg-4 col-md-6">
+                    <label class="text-muted small mb-2 ps-1">Product Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-0 position-absolute" style="z-index:10; right:10px; top:12px;">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" name="name" class="form-control form-control-custom ps-5" placeholder="Search..." style="padding-right: 40px !important; padding-left: 10px !important;">
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <label class="text-muted small mb-2 ps-1">Category</label>
+                    <select name="subCategoryId" class="form-select form-control-custom">
+                        <option value="">All</option>
+                        @foreach (var sub in ViewBag.SubCategories as List<SubCategory>)
+                        {
+                            <option value="@sub.Id">@sub.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <label class="text-muted small mb-2 ps-1">Price Range</label>
+                    <div class="d-flex gap-2">
+                        <input type="number" name="minPrice" class="form-control form-control-custom" placeholder="From">
+                        <input type="number" name="maxPrice" class="form-control form-control-custom" placeholder="To">
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <button type="submit" class="btn btn-filter w-100 h-100">
+                        Apply <i class="bi bi-funnel ms-1"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="row g-4 mt-2">
+            @if (Model.Any())
+            {
+                @foreach (var item in Model)
+                {
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="product-card">
+                            <div class="img-wrapper">
+                                @if (item.Offer > 0)
+                                {
+                                    <span class="badge-float">
+                                        <i class="bi bi-lightning-fill"></i> Discount @item.Offer%
+                                    </span>
+                                }
+                                <img src="/ImgePro/@(item.Images != null && item.Images.Any() ? item.Images.First().ImageURL : "default.png")"
+                                     class="product-img" alt="@item.Name">
+                            </div>
+
+                            <div class="card-body-custom">
+                                <span class="category-tag">@item.SubCategory.Name</span>
+                                <h5 class="product-title" title="@item.Name">@item.Name</h5>
+
+                                <div class="price-block">
+                                    <span class="current-price">$@item.Price</span>
+                                    @if (item.Offer > 0)
+                                    {
+                                        <span class="old-price">$@(item.Price * (1 + item.Offer / 100))</span>
+                                    }
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-box-seam me-1"></i> Stock:
+                                        <span class="@(item.Stocks?.Count() > 0 ? "text-success fw-bold" : "text-danger")">
+                                            @((item.Stocks != null) ? item.Stocks.Count() : 0)
+                                        </span>
+                                    </small>
+                                </div>
+
+                                <div class="actions-grid">
+                                    <a asp-action="EditProduct" asp-route-id="@item.Id" class="btn-action btn-edit-c">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    <form asp-action="DeleteProduct" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Delete this product permanently?');">
+                                        <button type="submit" class="btn-action btn-delete-c w-100">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <div class="py-5" style="opacity: 0.6;">
+                        <i class="bi bi-search" style="font-size: 4rem; color: var(--text-muted);"></i>
+                        <h3 class="mt-4 fw-bold">No Results</h3>
+                        <p class="text-muted">Try changing your search criteria or add a new product</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>

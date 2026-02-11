@@ -1,0 +1,1440 @@
+﻿@model ShopApp.Models.Product
+@inject ShopApp.Data.AppDBcontext context
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<style>
+    :root {
+        --primary-color: #7c3aed;
+        --primary-dark: #5b21b6;
+        --secondary-color: #ec4899;
+        --accent-color: #f59e0b;
+        --success-color: #10b981;
+        --danger-color: #ef4444;
+        --text-dark: #1f2937;
+        --text-light: #6b7280;
+        --bg-light: #f9fafb;
+        --bg-white: #ffffff;
+        --border-color: #e5e7eb;
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+        --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+        --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --radius-lg: 20px;
+        --radius-md: 12px;
+        --radius-sm: 8px;
+    }
+
+
+
+    .product-detail-page {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    /* مسار التنقل */
+    .breadcrumb-nav {
+        background: var(--bg-white);
+        border-radius: var(--radius-md);
+        padding: 1rem 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
+        backdrop-filter: blur(10px);
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-light);
+    }
+
+        .breadcrumb-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+        }
+
+            .breadcrumb-item a:hover {
+                background: rgba(124, 58, 237, 0.1);
+                color: var(--primary-dark);
+            }
+
+        .breadcrumb-item.active {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+    .breadcrumb-separator {
+        color: var(--text-light);
+        font-size: 0.8rem;
+    }
+
+    /* تنقل بين المنتجات */
+    .product-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--bg-white);
+        border-radius: var(--radius-md);
+        padding: 1rem 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .nav-link1 {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        color: var(--text-dark);
+        font-weight: 500;
+        padding: 0.75rem 1.25rem;
+        border-radius: var(--radius-sm);
+        transition: var(--transition);
+        background: var(--bg-light);
+        max-width: 300px;
+    }
+
+        .nav-link1:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-link1:hover  .nav-label{
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-link1.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: transparent;
+        }
+
+            .nav-link1.disabled:hover {
+                background: transparent;
+                color: var(--text-dark);
+                transform: none;
+                box-shadow: none;
+            }
+
+    .nav-icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .nav-info {
+        overflow: hidden;
+    }
+
+    .nav-label {
+        font-size: 0.8rem;
+        color: var(--text-light);
+        margin-bottom: 0.25rem;
+    }
+    .nav-label::after {
+        content: '';
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: var(--primary-color);
+        margin-top: 0.25rem;
+        border-radius: 1px;
+        }
+     
+
+    .nav-product-name {
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* القسم الرئيسي */
+    .product-main-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        margin-bottom: 4rem;
+        background: var(--bg-white);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        box-shadow: var(--shadow-md);
+        position: relative;
+        overflow: hidden;
+    }
+
+    @@media (max-width: 992px) {
+        .product-main-section
+
+    {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    }
+
+    /* الشارة */
+    .product-badge {
+        position: absolute;
+        top: 2rem;
+        left: 2rem;
+        z-index: 10;
+    }
+
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .badge-discount {
+        background: linear-gradient(135deg, var(--danger-color), #f87171);
+        color: white;
+    }
+
+    /* معرض الصور */
+    .product-gallery {
+        position: sticky;
+        top: 2rem;
+    }
+
+    .main-image-container {
+        position: relative;
+        width: 100%;
+        height: 500px;
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        cursor: zoom-in;
+    }
+
+    .main-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform 0.5s ease;
+    }
+
+    .main-image-container:hover .main-image {
+        transform: scale(1.05);
+    }
+
+    .zoom-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .main-image-container:hover .zoom-overlay {
+        opacity: 1;
+    }
+
+    .zoom-text {
+        color: white;
+        font-weight: 600;
+        background: rgba(0,0,0,0.7);
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-sm);
+    }
+
+    .thumbnail-gallery {
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+        padding: 0.5rem 0;
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-color) transparent;
+    }
+
+    .thumbnail {
+        flex: 0 0 auto;
+        width: 80px;
+        height: 80px;
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: var(--transition);
+        position: relative;
+    }
+
+        .thumbnail:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .thumbnail.active {
+            border-color: var(--primary-color);
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    /* معلومات المنتج */
+    .product-info {
+        padding: 1rem 0;
+    }
+
+    .product-header {
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1.5rem;
+    }
+
+    .product-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-subtitle {
+        font-size: 1rem;
+        color: var(--text-light);
+        margin-bottom: 1rem;
+    }
+
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stars {
+        color: var(--accent-color);
+        font-size: 1.2rem;
+    }
+
+    .rating-text {
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+
+    /* معلومات السعر */
+    .price-section1 {
+        background: linear-gradient(135deg, #f0f4ff, #e0e7ff);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+    }
+
+    .current-price {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+
+    .price-details {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .original-price {
+        font-size: 1.2rem;
+        color: var(--text-light);
+        text-decoration: line-through;
+    }
+
+    .discount-badge {
+        background: var(--success-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    /* تفاصيل المنتج */
+    .product-details {
+        margin-bottom: 2rem;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: var(--bg-light);
+        border-radius: var(--radius-sm);
+        transition: var(--transition);
+    }
+
+        .detail-item:hover {
+            background: rgba(124, 58, 237, 0.05);
+            transform: translateX(5px);
+        }
+
+    .detail-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+
+    .detail-content h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: var(--text-dark);
+    }
+
+    .detail-content p {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        margin: 0;
+    }
+
+    /* اختيار الخيارات */
+    .options-section {
+        margin-bottom: 2rem;
+    }
+
+    .option-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .option-label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--text-dark);
+        font-size: 1rem;
+    }
+
+    .color-options {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .color-option {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .color-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 3px solid transparent;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+    }
+
+        .color-circle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-md);
+        }
+
+    .color-option.selected .color-circle {
+        border-color: var(--primary-color);
+        transform: scale(1.1);
+    }
+
+    .color-option.selected::after {
+        content: '✓';
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 20px;
+        height: 20px;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
+
+    .color-info {
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.7rem;
+        color: var(--text-light);
+        white-space: nowrap;
+    }
+
+    .stock-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .stock-in {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+    }
+
+    .stock-out {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+
+    /* التحكم بالكمية */
+    .quantity-section {
+        margin-bottom: 2rem;
+    }
+
+    .quantity-control {
+        display: inline-flex;
+        align-items: center;
+        background: var(--bg-white);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border-color);
+    }
+
+    .quantity-btn {
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: var(--bg-light);
+        border-radius: var(--radius-sm);
+        font-size: 1.2rem;
+        color: var(--text-dark);
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .quantity-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+    .quantity-input {
+        width: 60px;
+        height: 40px;
+        border: none;
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        background: transparent;
+        outline: none;
+    }
+
+    /* أزرار الإجراء */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-primary, .btn-secondary, .btn-outline {
+        flex: 1;
+        min-width: 200px;
+        height: 56px;
+        border: none;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+        }
+
+    .btn-secondary {
+        background: var(--accent-color);
+        color: white;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+        }
+
+    .btn-outline {
+        background: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+
+        .btn-outline:hover {
+            background: rgba(124, 58, 237, 0.1);
+            transform: translateY(-3px);
+        }
+
+    .btn-icon {
+        font-size: 1.2rem;
+    }
+
+    /* تفاصيل إضافية */
+    .additional-info {
+        background: var(--bg-light);
+        border-radius: var(--radius-md);
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+
+    .info-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1rem;
+    }
+
+    .tab-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        background: transparent;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-light);
+        cursor: pointer;
+        transition: var(--transition);
+        border-radius: var(--radius-sm);
+        position: relative;
+    }
+
+        .tab-btn:hover {
+            color: var(--primary-color);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+        }
+
+            .tab-btn.active::after {
+                content: '';
+                position: absolute;
+                bottom: -1rem;
+                left: 0;
+                width: 100%;
+                height: 3px;
+                background: var(--primary-color);
+                border-radius: 2px;
+            }
+
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.5s ease;
+    }
+
+        .tab-content.active {
+            display: block;
+        }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* منتجات ذات صلة */
+    .related-products {
+        margin: 4rem 0;
+        padding: 2rem 0;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        position: relative;
+        padding-left: 1rem;
+    }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+    .view-all-btn {
+        background: rgba(124, 58, 237, 0.1);
+        color: var(--primary-color);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-md);
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .view-all-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    /* رسالة التنبيه */
+    .alert-message {
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        z-index: 1000;
+        max-width: 400px;
+        animation: slideIn 0.5s ease;
+    }
+
+    @@keyframes slideIn {
+        from
+
+    {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    }
+
+    /* تحسينات للهواتف */
+    @@media (max-width: 768px) {
+        .product-main-section
+
+    {
+        padding: 1rem;
+    }
+
+    .product-title {
+        font-size: 1.8rem;
+    }
+
+    .current-price {
+        font-size: 2rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn-primary, .btn-secondary, .btn-outline {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .main-image-container {
+        height: 350px;
+    }
+
+    }
+
+    /* تأثيرات دخول */
+    .fade-in {
+        animation: fadeIn 0.8s ease forwards;
+        opacity: 0;
+    }
+
+    .delay-1 {
+        animation-delay: 0.1s;
+    }
+
+    .delay-2 {
+        animation-delay: 0.2s;
+    }
+
+    .delay-3 {
+        animation-delay: 0.3s;
+    }
+</style>
+
+<div class="product-detail-page">
+    <!-- رسائل التنبيه -->
+    @if (TempData["CartError"] != null)
+    {
+        <div class="alert alert-danger alert-message" role="alert">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                <div>@TempData["CartError"]</div>
+            </div>
+        </div>
+    }
+
+    @if (TempData["CartSuccess"] != null)
+    {
+        <div class="alert alert-success alert-message" role="alert">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                <div>@TempData["CartSuccess"]</div>
+            </div>
+        </div>
+    }
+
+    <!-- مسار التنقل -->
+    <nav class="breadcrumb-nav fade-in text-center " style=" align-items: center !important;">
+        <ol class="breadcrumb text-center">
+            <li class="breadcrumb-item">
+                <a asp-action="Index" asp-controller="Home">
+                    <i class="bi bi-house-door"></i> Home
+                </a>
+                <span class="breadcrumb-separator"> <i class="bi bi-chevron-right"></i> </span>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-action="PruductCategory" asp-controller="Category"
+                   asp-route-Categoryid="@Model.SubCategory.CategoryId">
+                    @Model.SubCategory.Category.NameDepartment
+                </a>
+                <span class="breadcrumb-separator"> <i class="bi bi-chevron-right"></i> </span>
+            </li>
+            <li class="breadcrumb-item">
+                <a asp-action="PruductCategory" asp-controller="Category"
+                   asp-route-SubCatigoryid="@Model.SubCategoryId">
+                    @Model.SubCategory.Name
+                </a>
+                <span class=""> <i class="bi bi-chevron-right"></i> </span>
+            </li>
+            <li class="breadcrumb-item active">
+                @Model.Name
+            </li>
+        </ol>
+    </nav>
+
+    <!-- التنقل بين المنتجات -->
+    <div class="product-navigation fade-in delay-1">
+        @if (ViewBag.PreviousProduct != null)
+        {
+            <a class="nav-link1"
+               href="@Url.Action("DetailsProduct", "Product", new { ProductID = ViewBag.PreviousProduct.Id })">
+                <i class="bi bi-chevron-left nav-icon"></i>
+                <div class="nav-info">
+                    <div class="nav-label">last product </div>
+                    <div class="nav-product-name">@ViewBag.PreviousProduct.Name</div>
+                </div>
+            </a>
+        }
+        else
+        {
+            <div class="nav-link1 disabled">
+                <i class="bi bi-chevron-left nav-icon"></i>
+                <div class="nav-info">
+                    <div class="nav-label">last product </div>
+                    <div class="nav-product-name">No </div>
+                </div>
+            </div>
+        }
+
+        @if (ViewBag.NextProduct != null)
+        {
+            <a class="nav-link1"
+               href="@Url.Action("DetailsProduct", "Product", new { ProductID = ViewBag.NextProduct.Id })">
+                <div class="nav-info">
+                    <div class="nav-label">Next product </div>
+                    <div class="nav-product-name">@ViewBag.NextProduct.Name</div>
+                </div>
+                <i class="bi bi-chevron-right nav-icon"></i>
+            </a>
+        }
+        else
+        {
+            <div class="nav-link1 disabled">
+                <div class="nav-info">
+                    <div class="nav-label"> Next product </div>
+                    <div class="nav-product-name">No </div>
+                </div>
+                <i class="bi bi-chevron-right nav-icon"></i>
+            </div>
+        }
+    </div>
+
+    <!-- القسم الرئيسي -->
+    <div class="product-main-section fade-in delay-2">
+        <!-- الشارة -->
+        @if (Model.Offer.HasValue && Model.Offer > 0)
+        {
+            <div class="product-badge">
+                <span class="badge badge-discount">offer @Model.Offer%</span>
+            </div>
+        }
+
+        <!-- معرض الصور -->
+        <div class="product-gallery">
+            <div class="main-image-container" id="mainImageContainer">
+                <img id="mainImage"
+                     src="/ImgePro/@(Model.Images != null && Model.Images.Any() ? Model.Images.First().ImageURL : "no-image.jpg")"
+                     alt="@Model.Name"
+                     class="main-image">
+               
+            </div>
+
+            @if (Model.Images != null && Model.Images.Count > 1)
+            {
+                <div class="thumbnail-gallery">
+                    @foreach (var img in Model.Images)
+                    {
+                        <div class="thumbnail @(img == Model.Images.First() ? "active" : "")"
+                             onclick="changeMainImage('@img.ImageURL')">
+                            <img src="~/ImgePro/@img.ImageURL" alt="Product Image">
+                        </div>
+                    }
+                </div>
+            }
+            <div class="">
+                <h4>معلومات المنتج</h4>
+                <p>@Model.Description</p>
+            </div>
+        </div>
+
+        <!-- معلومات المنتج -->
+        <div class="product-info">
+            <div class="product-header">
+                <h1 class="product-title">@Model.Name</h1>
+                <p class="product-subtitle">@Model.Description</p>
+
+                <div class="product-rating">
+                    <div class="stars">
+                        @for (int i = 0; i < 5; i++)
+                        {
+                            <i class="bi @(i < 4 ? "bi-star-fill" : "bi-star-half")"></i>
+                        }
+                    </div>
+                    <span class="rating-text">(4.5) · 128 rate</span>
+                </div>
+            </div>
+
+            <!-- السعر -->
+            <div class="price-section1">
+                @{
+                    var finalPrice = Model.Offer.HasValue && Model.Offer > 0
+                    ? Model.Price * (100 - Model.Offer.Value) / 100
+                    : Model.Price;
+                }
+                <div class="current-price">$@finalPrice.ToString("N2")</div>
+                <div class="price-details">
+                    @if (Model.Offer.HasValue && Model.Offer > 0)
+                    {
+                        <span class="original-price">$@Model.Price.ToString("N2")</span>
+                        <span class="discount-badge">offer @Model.Offer%</span>
+                    }
+                </div>
+            </div>
+
+            <!-- تفاصيل المنتج -->
+            <div class="product-details">
+                <div class="detail-item">
+                    <div class="detail-icon">
+                        <i class="bi bi-tags"></i>
+                    </div>
+                    <div class="detail-content">
+                        <h4>Category</h4>
+                        <p>
+                            <a asp-action="PruductCategory" asp-controller="Category"
+                               asp-route-SubCatigoryid="@Model.SubCategoryId"
+                               class="text-decoration-none text-primary">
+                                @Model.SubCategory.Name
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-icon">
+                        <i class="bi bi-box"></i>
+                    </div>
+                    <div class="detail-content">
+                        <h4>Stock Status</h4>
+                        <p>
+                            @if (Model.Stocks.Any(s => s.QuantityAvaiable > 0))
+                            {
+                                <span class="stock-status stock-in">
+                                    <i class="bi bi-check-circle"></i> Available 
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="stock-status stock-out">
+                                    <i class="bi bi-x-circle"></i> Out of Stock
+                                </span>
+                            }
+                        </p>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-icon">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <div class="detail-content">
+                        <h4>Delivery</h4>
+                        <p>Free delivery within 5-7 business days</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- اختيار الخيارات -->
+            @if (Model.Stocks != null && Model.Stocks.Any())
+            {
+                <form asp-action="Add" asp-controller="Cart" method="post" id="addToCartForm">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <input type="hidden" name="qty" id="quantityInput" value="1" />
+
+                    <div class="options-section">
+                        <!-- اختيار اللون -->
+                        <div class="option-group d-flex flex-wrap  justify-content-around">
+                            <label class="option-label">Color:</label>
+                            <div class="color-options" id="colorOptions">
+                               @foreach (var stock in Model.Stocks.Where(s => s.QuantityAvaiable > 0))
+                                {
+                                    <div class="color-option @(stock == Model.Stocks.First() ? "selected" : "")"
+                                         data-stock-id="@stock.StockId"
+                                         data-color="@stock.Color"
+                                         onclick="selectColor(this)">
+                                        <div class="color-circle" style="background-color: @stock.Color"></div>
+                                    </div>
+                                }
+                            </div>
+                            <input type="hidden" name="stockid" id="selectedStockIdprod"
+                                   value="@(Model.Stocks.FirstOrDefault(s => s.QuantityAvaiable > 0)?.StockId)" />
+                            <!-- التحكم بالكمية -->
+                            <div class="quantity-section d-flex flex-wrap ">
+                                <label class="option-label mb-2 mx-3"> Qty:</label>
+                                <div class="quantity-control">
+                                    <button type="button" class="quantity-btn" onclick="decreaseQuantity()">
+                                        <i class="bi bi-dash"></i>
+                                    </button>
+                                    <input type="number" id="quantityDisplay" value="1" min="1"
+                                           max="@(Model.Stocks.FirstOrDefault(s => s.QuantityAvaiable > 0)?.QuantityAvaiable ?? 1)"
+                                           class="quantity-input" readonly>
+                                    <button type="button" class="quantity-btn" onclick="increaseQuantity()">
+                                        <i class="bi bi-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+               
+
+                    <!-- أزرار الإجراء -->
+                    <div class="action-buttons">
+                        <button type="submit" class="btn-primary" id="addToCartBtn">
+                            <i class="bi bi-cart-plus btn-icon"></i>
+                            Add to Cart
+                        </button>
+
+                        <button type="button" class="btn-secondary" onclick="addToWishlist()">
+                            <i class="bi bi-heart btn-icon"></i>
+                            Favorites
+                        </button>
+
+                        <a href="/Home/Index" class="btn-outline">
+                            <i class="bi bi-arrow-left btn-icon"></i>
+                            Continue Shopping
+                        </a>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                        <div>
+                            <h5 class="mb-1">This product is currently unavailable</h5>
+                            <p class="mb-0">You can browse similar products</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="@Url.Action("PruductCategory", "Category", new { SubCatigoryid = Model.SubCategoryId })"
+                       class="btn-primary">
+                        <i class="bi bi-grid btn-icon"></i>
+                        Search Similar Products
+                    </a>
+
+                    <a href="/Home/Index" class="btn-outline">
+                        <i class="bi bi-arrow-left btn-icon"></i>
+                        Continue Shopping
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- معلومات إضافية -->
+    <div class="additional-info fade-in delay-3">
+        <div class="info-tabs">
+            <button class="tab-btn active" onclick="switchTab('description')">Description</button>
+            <button class="tab-btn" onclick="switchTab('specs')">Specifications</button>
+            <button class="tab-btn" onclick="switchTab('reviews')">Reviews</button>
+            <button class="tab-btn" onclick="switchTab('shipping')">Shipping & Returns</button>
+        </div>
+
+        <div class="tab-content active" id="descriptionTab">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Product Information</h4>
+                    <p>@Model.Description</p>
+                </div>
+                <div class="col-md-6">
+                    <h4>Features</h4>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> High Quality</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> 1 Year Warranty</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Free Shipping</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> 24/7 Support</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="specsTab">
+            <!-- إضافة المواصفات هنا -->
+        </div>
+
+        <div class="tab-content" id="reviewsTab">
+            <!-- إضافة التقييمات هنا -->
+        </div>
+
+        <div class="tab-content" id="shippingTab">
+            <!-- إضافة معلومات الشحن هنا -->
+        </div>
+    </div>
+
+    <!-- منتجات ذات صلة -->
+    @if (ViewBag.RelationOrder != null)
+    {
+        <div class="related-products">
+            <div class="section-header">
+                <h2 class="section-title">Related Products</h2>
+                <a href="@Url.Action("PruductCategory", "Category", new { SubCatigoryid = Model.SubCategoryId })"
+                   class="view-all-btn">
+                    View All <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+            @await Html.PartialAsync("_RelationProductPartialView", (List<Product>)ViewBag.RelationOrder)
+        </div>
+    }
+
+    <!-- منتجات مميزة -->
+    @if (ViewBag.FuteareProducts != null)
+    {
+        <div class="related-products">
+            <div class="section-header">
+                <h2 class="section-title">You May Also Like</h2>
+                <a href="/Home/Index" class="view-all-btn">
+                    Browse Store <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+            @await Html.PartialAsync("_FeaturedproductsPartial", (List<Product>)ViewBag.FuteareProducts)
+        </div>
+    }
+</div>
+@section Scripts {
+
+<script>
+    // إدارة التبويبات
+    function switchTab(tabName) {
+        // إخفاء كل المحتويات
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // إزالة النشاط من كل الأزرار
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // إظهار المحتوى المحدد
+        document.getElementById(tabName + 'Tab').classList.add('active');
+
+        // تفعيل الزر المحدد
+        event.target.classList.add('active');
+    }
+
+    // تغيير الصورة الرئيسية
+    function changeMainImage(imageUrl) {
+        const mainImage = document.getElementById('mainImage');
+        mainImage.src = `/ImgePro/${imageUrl}`;
+
+        // تحديث التصغير النشط
+        document.querySelectorAll('.thumbnail').forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        event.target.closest('.thumbnail').classList.add('active');
+    }
+
+    // تكبير الصورة
+    const mainImageContainer = document.getElementById('mainImageContainer');
+    const mainImage = document.getElementById('mainImage');
+    let isZoomed = false;
+
+    mainImageContainer.addEventListener('click', function(e) {
+        if (!isZoomed) {
+            mainImage.style.transform = 'scale(2)';
+            mainImage.style.transformOrigin = `${e.offsetX / mainImage.width * 100}% ${e.offsetY / mainImage.height * 100}%`;
+            isZoomed = true;
+        } else {
+            mainImage.style.transform = 'scale(1)';
+            mainImage.style.transformOrigin = 'center center';
+            isZoomed = false;
+        }
+    });
+
+    // اختيار اللون
+    function selectColor(element) {
+        // إزالة التحديد من كل الألوان
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+
+        // تحديد اللون المختار
+        element.classList.add('selected');
+
+        // تحديث المخزن المختار
+        const stockId = element.getAttribute('data-stock-id');
+            document.getElementById('selectedStockIdprod').value = stockId;
+
+        // تحديث أقصى كمية متاحة
+        const maxQuantity = parseInt(element.querySelector('.color-info').textContent.split(' ')[0]);
+        document.getElementById('quantityDisplay').max = maxQuantity;
+
+        // إذا كانت الكمية الحالية أكبر من المتاح
+        const currentQty = parseInt(document.getElementById('quantityDisplay').value);
+        if (currentQty > maxQuantity) {
+            document.getElementById('quantityDisplay').value = maxQuantity;
+            document.getElementById('quantityInput').value = maxQuantity;
+        }
+    }
+
+    // التحكم بالكمية
+    let quantity = 1;
+
+    function increaseQuantity() {
+        const input = document.getElementById('quantityDisplay');
+        const max = parseInt(input.max);
+
+        if (quantity < max) {
+            quantity++;
+            input.value = quantity;
+            document.getElementById('quantityInput').value = quantity;
+        }
+    }
+
+    function decreaseQuantity() {
+        if (quantity > 1) {
+            quantity--;
+            document.getElementById('quantityDisplay').value = quantity;
+            document.getElementById('quantityInput').value = quantity;
+        }
+    }
+
+    // إضافة للسلة مع التأكد من اختيار لون
+    document.getElementById('addToCartForm').addEventListener('submit', function(e) {
+                const selectedStockIdprod = document.getElementById('selectedStockIdprod').value;
+
+            if (!selectedStockIdprod) {
+            e.preventDefault();
+            showAlert('يرجى اختيار لون أولاً', 'warning');
+            return false;
+        }
+
+        if (quantity < 1) {
+            e.preventDefault();
+            showAlert('الكمية يجب أن تكون على الأقل 1', 'warning');
+            return false;
+        }
+    });
+
+    // إضافة للمفضلة
+    function addToWishlist() {
+        const productId = '@Model.Id';
+        const productName = '@Model.Name';
+
+        // هنا يمكنك إضافة منطق إضافة المنتج للمفضلة
+        showAlert(`تمت إضافة ${productName} إلى المفضلة`, 'success');
+
+        // تغيير لون الزر مؤقتاً
+        const btn = event.target.closest('button');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-heart-fill btn-icon"></i> تم الإضافة';
+        btn.style.background = '#10b981';
+
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.style.background = '';
+        }, 2000);
+    }
+
+    // عرض رسالة تنبيه
+    function showAlert(message, type) {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-message`;
+        alert.innerHTML = `
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}-fill fs-5"></i>
+                <div>${message}</div>
+            </div>
+        `;
+
+        document.querySelector('.product-detail-page').appendChild(alert);
+
+        // إزالة الرسالة بعد 5 ثواني
+        setTimeout(() => {
+            alert.remove();
+        }, 5000);
+    }
+
+    // تهيئة الصفحة
+    document.addEventListener('DOMContentLoaded', function() {
+        // إخفاء رسائل التنبيه القديمة بعد 5 ثواني
+        setTimeout(() => {
+            document.querySelectorAll('.alert-message').forEach(alert => {
+                if (alert.classList.contains('alert-danger') || alert.classList.contains('alert-success')) {
+                    alert.remove();
+                }
+            });
+        }, 5000);
+
+        // تعيين الحد الأقصى للكمية بناءً على المخزون
+        const firstStock = document.querySelector('.color-option.selected');
+        if (firstStock) {
+            const maxQuantity = parseInt(firstStock.querySelector('.color-info').textContent.split(' ')[0]);
+            document.getElementById('quantityDisplay').max = maxQuantity;
+        }
+    });
+
+    // تأثيرات التمرير
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // ملاحظة العناصر المتحركة
+    document.querySelectorAll('.fade-in').forEach(el => {
+        observer.observe(el);``
+    });
+    //selectColor 
+    function selectColor(element) {
+        // إزالة التحديد من كل الألوان
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        // تحديد اللون المختار
+        element.classList.add('selected');
+        // تحديث المخزن المختار
+        const stockId = element.getAttribute('data-stock-id');
+        document.getElementById('selectedStockIdprod').value = stockId;
+        // تحديث أقصى كمية متاحة
+        const maxQuantity = parseInt(element.querySelector('.color-info').textContent.split(' ')[0]);
+        document.getElementById('quantityDisplay').max = maxQuantity;
+        // إذا كانت الكمية الحالية أكبر من المتاح
+        const currentQty = parseInt(document.getElementById('quantityDisplay').value);
+        if (currentQty > maxQuantity) {
+            document.getElementById('quantityDisplay').value = maxQuantity;
+            document.getElementById('quantityInput').value = maxQuantity;
+        }
+        }
+
+</script>
+
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+}

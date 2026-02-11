@@ -1,0 +1,228 @@
+﻿@model ShopApp.ViewModel.CartLayoutViewModel
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+<style>
+    .cart-component-wrapper {
+        position: relative;
+    }
+
+    /* Cart button */
+    .cart-container {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        padding: 6px 10px;
+        border-radius: 8px;
+    }
+
+        .cart-container.active .cart-arrow {
+            transform: rotate(180deg);
+        }
+
+    .cart-icon-wrapper {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg,#8e44ad,#732d91);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .cart-icon {
+        color: #fff;
+    }
+
+    .cart-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #ff9f43;
+        color: #fff;
+        border-radius: 50%;
+        min-width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+    }
+
+    .cart-info-wrapper {
+        margin-left: 10px;
+    }
+
+    .cart-arrow {
+        margin-left: 8px;
+    }
+
+    /* Dropdown */
+    .cart-dropdown {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: calc(100% + 8px);
+        width: 360px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 15px 30px rgba(0,0,0,.15);
+        z-index: 9999;
+    }
+
+        .cart-dropdown.show {
+            display: block;
+        }
+
+    .cart-dropdown-header {
+        padding: 16px;
+        background: linear-gradient(135deg,#8e44ad,#732d91);
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .cart-dropdown-content {
+        max-height: 350px;
+        overflow: auto;
+        padding: 16px;
+    }
+
+    .cart-items-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .cart-item {
+        display: flex;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .cart-item-image {
+        width: 70px;
+        height: 70px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .cart-item-name {
+        font-weight: 600;
+    }
+
+    .cart-dropdown-footer {
+        padding: 16px;
+        border-top: 1px solid #eee;
+    }
+
+    .cart-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .cart-btn-view {
+        border: 2px solid #8e44ad;
+        color: #8e44ad;
+    }
+
+    .cart-btn-checkout {
+        background: #8e44ad;
+        color: #fff;
+    }
+</style>
+
+<div class="cart-component-wrapper">
+    <!-- Button -->
+    <div class="cart-container" id="cartMenu">
+        <div class="cart-icon-wrapper">
+            <i class="fas fa-shopping-cart cart-icon"></i>
+            @if (Model.Count > 0)
+            {
+                <span class="cart-badge">@Model.Count</span>
+            }
+        </div>
+
+        <div class="cart-info-wrapper d-none d-lg-block">
+            <div>Your Cart</div>
+            <strong>@Model.Total.ToString("C")</strong>
+        </div>
+
+        <i class="fas fa-chevron-down cart-arrow d-none d-lg-block"></i>
+    </div>
+
+    <!-- Dropdown -->
+    <div class="cart-dropdown" id="cartDropdown">
+        <div class="cart-dropdown-header">
+            <strong>Shopping Cart</strong>
+            <span>@Model.Count items</span>
+        </div>
+
+        <div class="cart-dropdown-content">
+            @if (Model.cartItems == null || !Model.cartItems.Any())
+            {
+                <p class="text-center text-muted">Your cart is empty</p>
+            }
+            else
+            {
+                <ul class="cart-items-list">
+                    @foreach (var item in Model.cartItems)
+                    {
+                        <li class="cart-item">
+                            <img class="cart-item-image"
+                                 src="/ImgePro/@(item.Product.Images.FirstOrDefault()?.ImageURL ?? "no-image.jpg")" />
+                            <div>
+                                <div class="cart-item-name">@item.Product.Name</div>
+                                <small>Qty: @item.Quantity</small><br />
+                                <strong>@(item.Product.Price* item.Quantity)</strong>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        @if (Model.cartItems != null && Model.cartItems.Any())
+        {
+            <div class="cart-dropdown-footer">
+                <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+                    <span>Subtotal</span>
+                    <strong>@Model.Total.ToString("C")</strong>
+                </div>
+                <div style="display:flex;gap:10px">
+                    <a href="@Url.Action("AllCart", "Cart")"
+                       class="cart-btn cart-btn-view">View Cart</a>
+                    <a href="@Url.Action("Checkout", "Order")"
+                       class="cart-btn cart-btn-checkout">Checkout</a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const cartMenu = document.getElementById("cartMenu");
+        const cartDropdown = document.getElementById("cartDropdown");
+
+        cartMenu.addEventListener("click", function (e) {
+            e.stopPropagation();
+            cartDropdown.classList.toggle("show");
+            cartMenu.classList.toggle("active");
+        });
+
+        document.addEventListener("click", function () {
+            cartDropdown.classList.remove("show");
+            cartMenu.classList.remove("active");
+        });
+    });
+</script>

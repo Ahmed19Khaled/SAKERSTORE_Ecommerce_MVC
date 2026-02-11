@@ -1,0 +1,133 @@
+﻿@model ShopApp.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+<style>
+    .cont{
+        margin-bottom:200px;
+        color: #fff;
+        padding:15px 20px;
+        box-shadow: 0 0 1rem 0 rgba(0, 0, 0, .2);
+        position: relative;
+        background: #ffffff1a;
+        border: 2px solid #ffffff30;
+        box-shadow: 0 0 30px #0000002a;
+        backdrop-filter: blur(20px);
+        border-radius: 25px;
+        text-align: center !important;
+        justify-content: center !important;
+        align-items: center;
+        margin-bottom: 200px !important;
+    }
+	.cont input {
+        background:#d6dad6;
+        border-radius:20px;
+        margin-top:20px;
+        padding:10px;
+        height:auto;
+	}
+
+    .main1 {
+        background-image: url(/Register/Imag3.jpg);
+        background-size:cover;
+        background-repeat:no-repeat;
+    }
+.cont form{
+        text-align: center !important;
+        justify-content: center !important;
+        align-items: center;
+ }
+    .cont button{
+        width:80%;
+        margin:auto ;
+       border-radius:15px;
+    }
+</style>
+
+
+<div class="justify-content-center m-auto mt-4 cont " style="width:400px;min-height:550px" >
+	<h2 class="text-center mt-0 "style="color:#1a1a1a" >@ViewData["Title"]</h2> 
+    <form asp-action="Register" method="post">
+        <div class="form-group">
+            <input placeholder="Full Name" asp-for="FullName" class="  form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input placeholder="Email" asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input placeholder="password" asp-for="Password" class="form-control" type="password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input placeholder="ConfirmPassword" asp-for="ConfirmPassword" class="form-control" type="password" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-sm mt-4 fw-bolder " style="background:#00a73e">Regester</button>
+    </form>
+    <div class="justify-content-center mt-3">
+        <p>
+            Already have an account? <a asp-action="Login" asp-controller="Account" class="fw-bold  " style="text-decoration:underline;color:black; ">login</a>
+        </p>
+   </div>
+    <div class="google-login-button p-2 w-100  btn  " style="border-radius:15px;">
+        <form asp-controller="Account" asp-action="ExternalLogin" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="provider" value="Google" />
+            <button type="submit" class="btn btn-secondary w-100 mt-2">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.1" x="0px" y="0px"
+                     class="google-icon" viewBox="0 0 48 48" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12
+                c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24
+                c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039
+                l5.657-5.657C34.046,6.053,29.268,4,24,4C15.938,4,9.023,8.438,6.306,14.691z"></path>
+                    <path fill="#4CAF50" d="M24,44c5.138,0,9.822-1.977,13.374-5.178l-6.104-5.306C28.717,34.986,26.468,36,24,36
+                c-5.192,0-9.605-3.321-11.282-7.943l-6.49,5.001C9.046,39.627,16.03,44,24,44z"></path>
+                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.791,2.235-2.146,4.151-3.928,5.515
+                c0.002-0.001,0.003-0.002,0.005-0.004l6.104,5.306c-0.433,0.383,6.527-4.767,6.527-13.797
+                C44,22.659,43.862,21.35,43.611,20.083z"></path>
+                </svg> Sign in with Google
+            </button>
+        </form>
+
+        <form asp-controller="Account" asp-action="ExternalLogin" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="provider" value="Facebook" />
+            <button type="submit" class="btn btn-primary w-100 mt-2">
+                <i class="bi bi-facebook"></i>
+                Sign in with Facebook
+            </button>
+        </form>
+
+     
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+@* 
+        <svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.1" x="0px" y="0px"
+             class="google-icon" viewBox="0 0 48 48" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12
+                c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24
+                c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
+            <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039
+                l5.657-5.657C34.046,6.053,29.268,4,24,4C15.938,4,9.023,8.438,6.306,14.691z"></path>
+            <path fill="#4CAF50" d="M24,44c5.138,0,9.822-1.977,13.374-5.178l-6.104-5.306C28.717,34.986,26.468,36,24,36
+                c-5.192,0-9.605-3.321-11.282-7.943l-6.49,5.001C9.046,39.627,16.03,44,24,44z"></path>
+            <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.791,2.235-2.146,4.151-3.928,5.515
+                c0.002-0.001,0.003-0.002,0.005-0.004l6.104,5.306c-0.433,0.383,6.527-4.767,6.527-13.797
+                C44,22.659,43.862,21.35,43.611,20.083z"></path>
+        </svg>
+        <span style="color:black" class="fw-bold">Log in with Google</span> *@

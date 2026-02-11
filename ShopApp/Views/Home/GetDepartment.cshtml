@@ -1,0 +1,41 @@
+﻿@model IEnumerable<ShopApp.Models.Category>
+
+<style>
+    .scroll-container {
+        display: flex;
+        overflow-x: auto;
+        margin-top:30px;
+        width:100%;
+        justify-content: center;
+       
+        
+    }
+
+    .category-card {
+        width:24%;
+        flex: 0 0 auto;
+        text-align: center;
+        height:300px;
+        background-color:white;
+        margin:2px
+        
+    }
+
+        .category-card img {
+            width: 100%;
+            height: 88%;
+            object-fit: cover;
+        }
+</style>
+
+<div class="scroll-container  ">
+    @foreach (var item in Model)
+    {
+        <div class="category-card" >
+           
+            <img src="/imageCategory/@item.ImageDepartment" alt="@item.NameDepartment" />
+			<h5 class="mt-2" >@item.NameDepartment</h5>
+		</div>
+    }
+</div>
+

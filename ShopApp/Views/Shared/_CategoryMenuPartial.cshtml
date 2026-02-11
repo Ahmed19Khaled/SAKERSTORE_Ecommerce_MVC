@@ -1,0 +1,173 @@
+﻿@model List<ShopApp.Models.Category>
+
+<style>
+    /* ===== Categories Menu ===== */
+    .categories-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    /* زر CATEGORIES */
+    .categories-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    /* القائمة الرئيسية */
+    .categories-menu {
+        display: none;
+        background-color: #f8f6fa;
+        padding: 10px;
+        border-radius: 10px;
+        margin-top: 8px;
+    }
+
+    /* عند الفتح */
+    .categories-wrapper.active .categories-menu {
+        display: block;
+    }
+
+    .categories-menu li {
+        list-style: none;
+        margin-bottom: 6px;
+    }
+
+    /* رابط القسم */
+    .category-link1 {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 6px;
+        color: #111;
+        text-decoration: none;
+    }
+
+        .category-link1:hover {
+            background-color: #e5e5e5;
+        }
+
+    /* زر السهم */
+    .toggle-sub {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+    }
+
+    /* القائمة الفرعية */
+    .sub-dropdown {
+        display: none;
+        background-color: #ededed;
+        margin-top: 5px;
+        padding: 6px;
+        border-radius: 8px;
+    }
+
+    /* فتح القائمة الفرعية */
+    .has-sub.open > .sub-dropdown {
+        display: block;
+    }
+
+    /* روابط الأقسام الفرعية */
+    .sub-dropdown a {
+        display: block;
+        padding: 6px 8px;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+        .sub-dropdown a:hover {
+            background-color: #dcdcdc;
+        }
+</style>
+
+<div class="categories-wrapper">
+
+    <!-- زر القائمة -->
+    <div class="categories-toggle">
+        <i class="fa fa-bars"></i>
+        <span>CATEGORIES</span>
+    </div>
+
+    <!-- القائمة -->
+    <ul class="categories-menu">
+
+        @if (Model == null || !Model.Any())
+        {
+            <li class="text-muted">No categories</li>
+        }
+        else
+        {
+            @foreach (var cat in Model)
+            {
+                <li class="has-sub">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a class="category-link1"
+                           asp-controller="Category"
+                           asp-action="PruductCategory"
+                           asp-route-Categoryid="@cat.Id">
+                            @cat.NameDepartment
+                        </a>
+
+                        @if (cat.SubCategories?.Any() == true)
+                        {
+                            <button class="toggle-sub" aria-label="Toggle sub">
+                                <i class="fa fa-chevron-down"></i>
+                            </button>
+                        }
+                    </div>
+
+                    @if (cat.SubCategories?.Any() == true)
+                    {
+                        <ul class="sub-dropdown">
+                            @foreach (var sub in cat.SubCategories)
+                            {
+                                <li>
+                                    <a asp-controller="Category"
+                                       asp-action="PruductCategory"
+                                       asp-route-SubCatigoryId="@sub.Id">
+                                        @sub.Name
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+
+                </li>
+            }
+        }
+
+    </ul>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        document.querySelectorAll(".categories-wrapper").forEach(wrapper => {
+
+            const toggleMain = wrapper.querySelector(".categories-toggle");
+            const menu = wrapper.querySelector(".categories-menu");
+
+            toggleMain.addEventListener("click", function () {
+                wrapper.classList.toggle("active");
+            });
+
+            wrapper.querySelectorAll(".toggle-sub").forEach(btn => {
+                btn.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const parent = this.closest(".has-sub");
+                    parent.classList.toggle("open");
+                });
+            });
+
+        });
+
+    });
+</script>

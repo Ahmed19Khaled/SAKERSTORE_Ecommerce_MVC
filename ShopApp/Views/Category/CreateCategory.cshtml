@@ -1,0 +1,76 @@
+﻿@model ShopApp.Models.Category
+@{
+     Layout = "_AdminLayout";
+    ViewData["Title"] = Model?.Id > 0 ? "EditCategory" : "CreateCategory";
+    bool isEditMode = Model?.Id > 0;
+}
+
+<div class="container mt-5">
+    <div class="row ">
+        <div class="col-md-8">
+            <div class="card shadow-lg rounded-4">
+                <div class="card-header bg-primary text-white text-center fw-bold">
+                    @ViewData["Title"]
+                </div>
+
+                <div class="card-body d-flex gap-4">
+                    <div class="col-md-6">
+                        <form asp-action="@ViewData["Title"]" method="post" enctype="multipart/form-data">
+                            @if (isEditMode)
+                            {
+                                <input type="hidden" asp-for="Id" />
+                            }
+
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                            <div class="mb-3">
+                                <label asp-for="NameDepartment" class="form-label fw-semibold">Category Name</label>
+                                <input asp-for="NameDepartment" class="form-control" />
+                                <span asp-validation-for="NameDepartment" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="formFile" class="form-label fw-semibold">Upload Image</label>
+                                <input asp-for="formFile" type="file" accept="image/*" class="form-control" onchange="previewImage(event)" />
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success">@ViewData["Title"]</button>
+                                <a asp-action="listCategory" class="btn btn-secondary">Back to List</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-md-6 d-flex justify-content-center align-items-start">
+                        @if (isEditMode && !string.IsNullOrEmpty(Model.ImageDepartment))
+                        {
+                            <img id="preview" src="~/imageCategory/@Model.ImageDepartment"
+                                 class="img-thumbnail shadow-sm"
+                                 style="max-height:250px; width:auto;" alt="Current Image" />
+                        }
+                        else
+                        {
+                            <img id="preview" class="img-thumbnail shadow-sm"
+                                 style="max-height:250px; width:auto; display:none;" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        function previewImage(event) {
+            var preview = document.getElementById('preview');
+            preview.src = URL.createObjectURL(event.target.files[0]);
+            preview.style.display = "block";
+        }
+    </script>   
+    
+    <partial name="_ValidationScriptsPartial" />
+
+}
+

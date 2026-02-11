@@ -1,0 +1,938 @@
+﻿@model ShopApp.ViewModel.ProfUserViewModel
+@{
+    ViewData["Title"] = "Manage";
+}
+
+<style>
+    :root {
+        --primary: #8e44ad;
+        --primary-dark: #732d91;
+        --primary-light: #e8d4f5;
+        --accent: #ff9f43;
+        --success: #27ae60;
+        --info: #3498db;
+        --warning: #f39c12;
+        --danger: #e74c3c;
+        --light: #f8f9fa;
+        --dark: #2c3e50;
+        --gray: #95a5a6;
+        --radius-sm: 12px;
+        --radius-md: 20px;
+        --radius-lg: 30px;
+        --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+        --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+        --shadow-lg: 0 15px 40px rgba(0,0,0,0.15);
+        --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Profile Container */
+    .profile-container {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    /* Profile Header */
+    .profile-header {
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+        border-radius: var(--radius-lg);
+        padding: 3rem 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-lg);
+    }
+
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+
+        .profile-header::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+
+    .profile-avatar-container {
+        position: relative;
+        z-index: 2;
+    }
+
+    .profile-avatar {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 6px solid rgba(255, 255, 255, 0.3);
+        box-shadow: var(--shadow-lg);
+        transition: var(--transition);
+        background: white;
+        padding: 4px;
+    }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+    .profile-badge {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: var(--accent);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        box-shadow: var(--shadow-sm);
+        z-index: 3;
+    }
+
+    .profile-name {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 1.5rem 0 0.5rem;
+        letter-spacing: -0.5px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .profile-email {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        box-shadow: var(--shadow-md);
+        transition: var(--transition);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .stat-orders .stat-icon {
+        background: linear-gradient(135deg, var(--info), #2980b9);
+        color: white;
+    }
+
+    .stat-joined .stat-icon {
+        background: linear-gradient(135deg, var(--success), #27ae60);
+        color: white;
+    }
+
+    .stat-spent .stat-icon {
+        background: linear-gradient(135deg, var(--accent), #e67e22);
+        color: white;
+    }
+
+    .stat-info h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin: 0;
+        line-height: 1;
+    }
+
+    .stat-info p {
+        color: var(--gray);
+        margin: 0.5rem 0 0;
+        font-size: 0.9rem;
+    }
+
+    /* Main Content */
+    .main-content {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    @@media (min-width: 992px) {
+        .main-content {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    /* Profile Details Card */
+    .details-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        box-shadow: var(--shadow-md);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+        .details-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--light);
+    }
+
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+        .card-title i {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+    .edit-btn {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: var(--shadow-sm);
+    }
+
+        .edit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+        }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .detail-item {
+        background: #f8f9fa;
+        border-radius: var(--radius-sm);
+        padding: 1.25rem;
+        transition: var(--transition);
+        border: 2px solid transparent;
+    }
+
+        .detail-item:hover {
+            background: white;
+            border-color: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-sm);
+        }
+
+    .detail-label {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--gray);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .detail-label i {
+            width: 20px;
+            color: var(--primary);
+        }
+
+    .detail-value {
+        font-size: 1.1rem;
+        color: var(--dark);
+        font-weight: 600;
+        margin: 0;
+        word-break: break-word;
+    }
+
+        .detail-value.empty {
+            color: var(--gray);
+            font-style: italic;
+        }
+
+    /* Orders Card */
+    .orders-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        box-shadow: var(--shadow-md);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+        .orders-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--warning));
+        }
+
+    .orders-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .orders-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+        .orders-title i {
+            color: var(--accent);
+            font-size: 1.8rem;
+        }
+
+    .orders-count {
+        background: var(--light);
+        color: var(--dark);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    /* Orders Table */
+    .orders-table-container {
+        overflow-x: auto;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--light);
+    }
+
+    .orders-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 800px;
+    }
+
+        .orders-table thead {
+            background: linear-gradient(135deg, var(--primary-light), #f0e6f9);
+        }
+
+        .orders-table th {
+            padding: 1.25rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid var(--light);
+            font-size: 0.95rem;
+        }
+
+        .orders-table td {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--light);
+            vertical-align: middle;
+        }
+
+        .orders-table tbody tr {
+            transition: var(--transition);
+        }
+
+            .orders-table tbody tr:hover {
+                background: rgba(142, 68, 173, 0.03);
+            }
+
+    .order-date {
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .order-address {
+        max-width: 200px;
+        word-wrap: break-word;
+    }
+
+    .order-total {
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 1.1rem;
+    }
+
+    .order-status {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-pending {
+        background: rgba(243, 156, 18, 0.1);
+        color: var(--warning);
+    }
+
+    .status-processing {
+        background: rgba(52, 152, 219, 0.1);
+        color: var(--info);
+    }
+
+    .status-delivered {
+        background: rgba(39, 174, 96, 0.1);
+        color: var(--success);
+    }
+
+    .status-cancelled {
+        background: rgba(231, 76, 60, 0.1);
+        color: var(--danger);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: #e2e8f0;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-title {
+        font-size: 1.5rem;
+        color: var(--dark);
+        margin-bottom: 0.75rem;
+    }
+
+    .empty-description {
+        color: var(--gray);
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-btn {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: var(--transition);
+    }
+
+        .empty-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            color: white;
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .profile-header {
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        .profile-name {
+            font-size: 2rem;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .card-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .edit-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .orders-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .orders-table {
+            min-width: auto;
+        }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 1rem;
+            }
+    }
+
+    /* Animations */
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .animate-fade-up {
+        animation: fadeInUp 0.6s ease;
+    }
+
+    .animate-slide-left {
+        animation: slideInLeft 0.6s ease;
+    }
+
+    /* Loading Skeleton */
+    .skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+        border-radius: 4px;
+    }
+
+    @@keyframes loading {
+        0% {
+            background-position: 200% 0;
+        }
+
+        100% {
+            background-position: -200% 0;
+        }
+    }
+</style>
+
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header animate-fade-up">
+        <div class="profile-avatar-container text-center">
+            <img src="/ImageProfile/@Model.ProfilePictureUrl"
+                 alt="Profile Picture"
+                 class="profile-avatar"
+                 onerror="this.src='https://ui-avatars.com/api/?name=@Uri.EscapeDataString(Model.FullName)&background=8e44ad&color=fff&bold=true&size=160'">
+
+            @if (!string.IsNullOrEmpty(Model.Role))
+            {
+                <div class="profile-badge">
+                    <i class="fas fa-shield-alt me-1"></i>@Model.Role
+                </div>
+            }
+
+            <h1 class="profile-name">@Model.FullName</h1>
+            <p class="profile-email">
+                <i class="fas fa-envelope me-2"></i>@Model.Email
+            </p>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid animate-slide-left">
+        <div class="stat-card stat-orders">
+            <div class="stat-icon">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="stat-info">
+                <h3>@Model.Orders.Count</h3>
+                <p>Total Orders</p>
+            </div>
+        </div>
+
+        <div class="stat-card stat-joined">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3>@Model.CreatedAt.ToString("MMM yyyy")</h3>
+                <p>Joined Date</p>
+            </div>
+        </div>
+
+        <div class="stat-card stat-spent">
+            <div class="stat-icon">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="stat-info">
+                <h3>@Model.Orders.Sum(o => o.TotalAmount).ToString("C")</h3>
+                <p>Total Spent</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Profile Details -->
+        <div class="details-card animate-fade-up">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-user-circle"></i>
+                    Profile Information
+                </h2>
+                <a href="@Url.Action("UpdateProfile", "Account")" class="edit-btn">
+                    <i class="fas fa-edit"></i>
+                    Edit Profile
+                </a>
+            </div>
+
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">
+                        <i class="fas fa-phone"></i>
+                        Phone Number
+                    </span>
+                    <p class="detail-value @(string.IsNullOrEmpty(Model.PhoneNumber) ? "empty" : "")">
+                        @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)
+                    </p>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">
+                        <i class="fas fa-venus-mars"></i>
+                        Gender
+                    </span>
+                    <p class="detail-value @(string.IsNullOrEmpty(Model.Gender) ? "empty" : "")">
+                        @(string.IsNullOrEmpty(Model.Gender) ? "Not specified" : Model.Gender)
+                    </p>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">
+                        <i class="fas fa-birthday-cake"></i>
+                        Birth Date
+                    </span>
+                    <p class="detail-value @(!Model.BirthDate.HasValue ? "empty" : "")">
+                        @(Model.BirthDate?.ToString("MMMM dd, yyyy") ?? "Not specified")
+                    </p>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">
+                        <i class="fas fa-city"></i>
+                        City
+                    </span>
+                    <p class="detail-value @(string.IsNullOrEmpty(Model.City) ? "empty" : "")">
+                        @(string.IsNullOrEmpty(Model.City) ? "Not specified" : Model.City)
+                    </p>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">
+                        <i class="fas fa-globe"></i>
+                        Country
+                    </span>
+                    <p class="detail-value @(string.IsNullOrEmpty(Model.Country) ? "empty" : "")">
+                        @(string.IsNullOrEmpty(Model.Country) ? "Not specified" : Model.Country)
+                    </p>
+                </div>
+
+                <div class="detail-item">
+                    <span class="detail-label">
+                        <i class="fas fa-calendar-plus"></i>
+                        Member Since
+                    </span>
+                    <p class="detail-value">
+                        @Model.CreatedAt.ToString("MMMM dd, yyyy")
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <div class="orders-card animate-fade-up">
+            <div class="orders-header">
+                <h2 class="orders-title">
+                    <i class="fas fa-shopping-bag"></i>
+                    Recent Orders
+                </h2>
+                <div class="orders-count">
+                    @Model.Orders.Count orders
+                </div>
+            </div>
+
+            @if (Model.Orders.Any())
+            {
+                <div class="orders-table-container">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-calendar me-1"></i> Date</th>
+                                <th><i class="fas fa-map-marker-alt me-1"></i> Address</th>
+                                <th><i class="fas fa-dollar-sign me-1"></i> Total</th>
+                                <th><i class="fas fa-tag me-1"></i> Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model.Orders.OrderByDescending(o => o.OrderDate))
+                            {
+                                <tr>
+                                    <td class="order-date">
+                                        @order.OrderDate.ToString("MMM dd, yyyy")
+                                    </td>
+                                    <td class="order-address">
+                                        @order.Address, @order.City
+                                    </td>
+                                    <td class="order-total">
+                                        @order.TotalAmount.ToString("C")
+                                    </td>
+                                    <td>
+                                        @{
+                                            var statusClass = order.Status?.ToLower() switch
+                                            {
+                                                "pending" => "status-pending",
+                                                "processing" => "status-processing",
+                                                "delivered" => "status-delivered",
+                                                "cancelled" => "status-cancelled",
+                                                _ => "status-pending"
+                                            };
+                                        }
+                                        <span class="order-status @statusClass">
+                                            @order.Status
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <h3 class="empty-title">No Orders Yet</h3>
+                    <p class="empty-description">
+                        You haven't placed any orders yet. Start shopping to see your orders here.
+                    </p>
+                    <a href="@Url.Action("Index", "Home")" class="empty-btn">
+                        <i class="fas fa-shopping-cart me-1"></i>
+                        Start Shopping
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Interactive Elements -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add animation classes on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards for animation
+        document.querySelectorAll('.stat-card, .details-card, .orders-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Add hover effect to table rows
+        const tableRows = document.querySelectorAll('.orders-table tbody tr');
+        tableRows.forEach(row => {
+            row.addEventListener('click', function() {
+                // Add your order details navigation logic here
+                console.log('Order clicked:', this);
+            });
+        });
+
+        // Update profile picture on error
+        document.querySelectorAll('.profile-avatar').forEach(img => {
+            img.addEventListener('error', function() {
+                const name = '@Model.FullName';
+                this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=8e44ad&color=fff&bold=true&size=160`;
+            });
+        });
+
+        // Status color coding
+        function updateStatusColors() {
+            document.querySelectorAll('.order-status').forEach(status => {
+                const text = status.textContent.toLowerCase();
+                if (text.includes('pending')) {
+                    status.className = 'order-status status-pending';
+                } else if (text.includes('processing')) {
+                    status.className = 'order-status status-processing';
+                } else if (text.includes('delivered') || text.includes('completed')) {
+                    status.className = 'order-status status-delivered';
+                } else if (text.includes('cancelled')) {
+                    status.className = 'order-status status-cancelled';
+                }
+            });
+        }
+
+        updateStatusColors();
+
+        // Add ripple effect to buttons
+        document.querySelectorAll('.edit-btn, .empty-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                ripple.style.cssText = `
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.4);
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    width: ${size}px;
+                    height: ${size}px;
+                    top: ${y}px;
+                    left: ${x}px;
+                    pointer-events: none;
+                `;
+
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Add CSS for ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @@keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Responsive table for mobile
+        function makeTableResponsive() {
+            const tableContainer = document.querySelector('.orders-table-container');
+            if (window.innerWidth < 768) {
+                tableContainer.style.overflowX = 'auto';
+                tableContainer.style.WebkitOverflowScrolling = 'touch';
+            } else {
+                tableContainer.style.overflowX = 'visible';
+            }
+        }
+
+        makeTableResponsive();
+        window.addEventListener('resize', makeTableResponsive);
+    });
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
