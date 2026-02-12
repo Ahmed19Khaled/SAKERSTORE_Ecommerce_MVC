@@ -1,10 +1,9 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopApp.Data;
-
 using ShopApp.ViewModel;
+using System.Diagnostics;
 
 
 namespace ShopApp.Controllers
@@ -38,34 +37,58 @@ namespace ShopApp.Controllers
         //        .Take(20).ToList();
         //    return PartialView(prod);
         //}
+        public IActionResult Brands()
+        {
+            return View();
+        }
 
+        public IActionResult About()
+        {
+            return View();
+        }
 
+        public IActionResult Contact()
+        {
+            return View();
+        }
 
+        public IActionResult Deals()
+        {
+            return View();
+        }
 
+        public IActionResult NewArrivals()
+        {
+            var products = context.Products
+                         .Include(p => p.SubCategory)
+                         .Include(p => p.Images)
+                         .Include(c => c.Stocks)
+                         .OrderByDescending(p => p.Id)
+                         .Take(15)
+                         .ToList();
 
+            var model = new AllProductsDitals
+            {
+                products = products,
+            };
+
+            //if (Categoryid.HasValue)
+            //    products.Where(x => x.Id == Categoryid.Value);
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult SendMessage(string name, string email, string phone, string subject, string message)
+        {
+            // Handle contact form submission
+            // You can save to database or send email here
+            TempData["Success"] = "Your message has been sent successfully!";
+            return RedirectToAction("Contact");
+        }
 
         public IActionResult Privacy()
         {
             return View();
         }
-
-
-
-
-
-     /*
-        public PartialViewResult GetDepartment()
-        {
-            var categ=context.Categories.ToList();
-            return PartialView( categ);
-        }
-
-        public PartialViewResult GetCothesDep()
-        {
-            var subCategories = context.CategoriesSup.ToList();
-
-            return PartialView(subCategories);
-        }
-      */
     }
 }

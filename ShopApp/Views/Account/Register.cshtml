@@ -1,133 +1,458 @@
 ﻿@model ShopApp.ViewModels.RegisterViewModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Create Account";
+    Layout = null;
 }
-<style>
-    .cont{
-        margin-bottom:200px;
-        color: #fff;
-        padding:15px 20px;
-        box-shadow: 0 0 1rem 0 rgba(0, 0, 0, .2);
-        position: relative;
-        background: #ffffff1a;
-        border: 2px solid #ffffff30;
-        box-shadow: 0 0 30px #0000002a;
-        backdrop-filter: blur(20px);
-        border-radius: 25px;
-        text-align: center !important;
-        justify-content: center !important;
-        align-items: center;
-        margin-bottom: 200px !important;
-    }
-	.cont input {
-        background:#d6dad6;
-        border-radius:20px;
-        margin-top:20px;
-        padding:10px;
-        height:auto;
-	}
 
-    .main1 {
-        background-image: url(/Register/Imag3.jpg);
-        background-size:cover;
-        background-repeat:no-repeat;
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    /* ========== VARIABLES (Same as Login) ========== */
+    :root {
+        --primary: #680FEA; /* تغيير اللون الرئيسي للأخضر ليدل على "تسجيل جديد" */
+        --primary-dark: #760BE7;
+        --accent: #f1c40f;
+        --danger: #e74c3c;
+        --dark: #1e1e2f;
+        --gray: #7f8c8d;
+        --light: #05035A;
+        --radius: 30px;
+        --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
-.cont form{
-        text-align: center !important;
-        justify-content: center !important;
+
+    /* ========== BASE STYLES ========== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); /* خلفية داكنة مختلفة قليلاً */
+       
+        justify-content: center;
+        padding: 1rem;
+        color: var(--dark);
+    }
+
+    /* ========== CONTAINER ========== */
+    .split-screen {
+        display: flex;
+        width: 100%;
+        max-width: 1100px;
+        margin: 2rem auto;
+        min-height: 550px; /* أطول قليلاً من الدخول لاستيعاب الحقول */
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: var(--radius);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        animation: fadeIn 0.6s ease-out;
+    }
+    
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ========== LEFT SIDE (BRAND) ========== */
+    .brand-side {
+        flex: 0.8;
+        background: linear-gradient(135deg, var(--primary),var(--primary-dark)), url('https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+        background-size: cover;
+        background-position: center;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
- }
-    .cont button{
-        width:80%;
-        margin:auto ;
-       border-radius:15px;
+        text-align: center;
+        color: white;
+        position: relative;
+    }
+
+    .brand-content h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .brand-content p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        line-height: 1.6;
+        max-width: 400px;
+    }
+
+    .brand-circles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .circle {
+        position: absolute;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+
+    /* ========== RIGHT SIDE (FORM) ========== */
+    .form-side {
+        flex: 1.2;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: var(--light);
+        overflow-y: auto; /* مهم للحقول الكثيرة */
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+        .form-header h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: aliceblue ;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .form-header a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+
+            .form-header a:hover {
+                text-decoration: underline;
+            }
+
+    /* ========== INPUTS ========== */
+    .form-group {
+        margin-bottom: 1.2rem;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1.2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray);
+        font-size: 1.1rem;
+        transition: var(--transition);
+        z-index: 2;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3.2rem;
+        border: 2px solid #edf2f7;
+        border-radius: 50px;
+        font-size: 0.95rem;
+        background: #fdfdfd;
+        transition: var(--transition);
+        color: var(--dark);
+    }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            background: white;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1);
+        }
+
+            .form-control:focus + .input-icon {
+                color: var(--primary);
+            }
+
+    .validation-message {
+        display: block;
+        color: var(--danger);
+        font-size: 0.8rem;
+        margin-top: 0.4rem;
+        margin-left: 1.2rem;
+        font-weight: 500;
+    }
+
+    /* ========== BUTTONS ========== */
+    .btn-register {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+        .btn-register:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
+        }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        color: var(--gray);
+        font-size: 0.8rem;
+        margin: 1.5rem 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #eee;
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+    /* Social Buttons */
+    .social-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .social-btn {
+        padding: 0.8rem;
+        border: 2px solid #edf2f7;
+        background: white;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        color: var(--dark);
+        width: 100%;
+    }
+
+        .social-btn:hover {
+            background: #f8f9fa;
+            border-color: #ddd;
+            transform: translateY(-2px);
+        }
+
+        .social-btn.google i {
+            color: #DB4437;
+        }
+
+        .social-btn.facebook i {
+            color: #4267B2;
+        }
+
+    /* ========== RESPONSIVE ========== */
+    @@media (max-width: 900px) {
+        body {
+            display: block; /* إلغاء التوسط العمودي */
+            padding: 0;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); /* خلفية داكنة مختلفة قليلاً */
+        }
+
+        .split-screen {
+            flex-direction: column;
+            border-radius: 0;
+            box-shadow: none;
+            min-height: 500px;
+            width:400px;
+            margin: auto auto;
+            margin-top:3rem;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); /* خلفية داكنة مختلفة قليلاً */
+        }
+
+        .brand-side {
+            flex: 0 0 auto;
+            padding: 2.5rem 1.5rem;
+            min-height: auto;
+            border-radius: 0 0 30px 30px; /* جمالية للحافة السفلية */
+            display: none;
+        }
+
+        .brand-content h1 {
+            font-size: 1.8rem;
+        }
+
+        .brand-content p {
+            display: none;
+        }
+        /* إخفاء النص الطويل في الموبايل */
+
+        .form-side {
+            padding: 2rem 1.5rem;
+            border-radius: 30px ;
+        }
+
+        .social-grid {
+            grid-template-columns: 1fr;
+        }
+        /* الأزرار تحت بعض في الموبايل */
+    }
+
+    @@media (max-width: 400px) {
+        .brand-side {
+            padding: 1.5rem 1rem;
+            border-radius: 0 0 20px 20px;
+            display:none;
+        }
+
+        .form-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .form-control {
+            font-size: 0.9rem;
+            padding-left: 2.8rem;
+        }
+
+        .input-icon {
+            left: 1rem;
+            font-size: 1rem;
+        }
     }
 </style>
 
-
-<div class="justify-content-center m-auto mt-4 cont " style="width:400px;min-height:550px" >
-	<h2 class="text-center mt-0 "style="color:#1a1a1a" >@ViewData["Title"]</h2> 
-    <form asp-action="Register" method="post">
-        <div class="form-group">
-            <input placeholder="Full Name" asp-for="FullName" class="  form-control" />
-            <span asp-validation-for="FullName" class="text-danger"></span>
+<div class="split-screen">
+    <div class="brand-side">
+        <div class="brand-circles">
+            <div class="circle" style="top: -10%; left: -10%; width: 200px; height: 200px;"></div>
+            <div class="circle" style="bottom: 10%; right: -5%; width: 150px; height: 150px;"></div>
         </div>
-
-        <div class="form-group">
-            <input placeholder="Email" asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger"></span>
+        <div class="brand-content">
+            <h1>Join Our Community</h1>
+            <p>Create an account today to get exclusive offers, track orders, and experience seamless shopping.</p>
         </div>
-
-        <div class="form-group">
-            <input placeholder="password" asp-for="Password" class="form-control" type="password" />
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <input placeholder="ConfirmPassword" asp-for="ConfirmPassword" class="form-control" type="password" />
-            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-        </div>
-
-        <button type="submit" class="btn btn-sm mt-4 fw-bolder " style="background:#00a73e">Regester</button>
-    </form>
-    <div class="justify-content-center mt-3">
-        <p>
-            Already have an account? <a asp-action="Login" asp-controller="Account" class="fw-bold  " style="text-decoration:underline;color:black; ">login</a>
-        </p>
-   </div>
-    <div class="google-login-button p-2 w-100  btn  " style="border-radius:15px;">
-        <form asp-controller="Account" asp-action="ExternalLogin" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="provider" value="Google" />
-            <button type="submit" class="btn btn-secondary w-100 mt-2">
-                <svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.1" x="0px" y="0px"
-                     class="google-icon" viewBox="0 0 48 48" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12
-                c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24
-                c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
-                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039
-                l5.657-5.657C34.046,6.053,29.268,4,24,4C15.938,4,9.023,8.438,6.306,14.691z"></path>
-                    <path fill="#4CAF50" d="M24,44c5.138,0,9.822-1.977,13.374-5.178l-6.104-5.306C28.717,34.986,26.468,36,24,36
-                c-5.192,0-9.605-3.321-11.282-7.943l-6.49,5.001C9.046,39.627,16.03,44,24,44z"></path>
-                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.791,2.235-2.146,4.151-3.928,5.515
-                c0.002-0.001,0.003-0.002,0.005-0.004l6.104,5.306c-0.433,0.383,6.527-4.767,6.527-13.797
-                C44,22.659,43.862,21.35,43.611,20.083z"></path>
-                </svg> Sign in with Google
-            </button>
-        </form>
-
-        <form asp-controller="Account" asp-action="ExternalLogin" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="provider" value="Facebook" />
-            <button type="submit" class="btn btn-primary w-100 mt-2">
-                <i class="bi bi-facebook"></i>
-                Sign in with Facebook
-            </button>
-        </form>
-
-     
     </div>
 
+    <div class="form-side">
+        <div class="login-card">
+            <div class="form-header">
+                <h2 class="text-white" >Create Account</h2>
+                <p>Already a member? <a asp-action="Login" asp-controller="Account">Log in here</a></p>
+            </div>
+
+            <form asp-action="Register" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <i class="fas fa-user input-icon"></i>
+                        <input asp-for="FullName" class="form-control" placeholder="Full Name" />
+                    </div>
+                    <span asp-validation-for="FullName" class="validation-message"></span>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input asp-for="Email" class="form-control" placeholder="Email Address" type="email" />
+                    </div>
+                    <span asp-validation-for="Email" class="validation-message"></span>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input asp-for="Password" class="form-control" placeholder="Password" type="password" />
+                    </div>
+                    <span asp-validation-for="Password" class="validation-message"></span>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <i class="fas fa-key input-icon"></i>
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password" type="password" />
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="validation-message"></span>
+                </div>
+
+                <button type="submit" class="btn-register">
+                    Get Started <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>Or sign up with</span>
+            </div>
+
+                <form asp-controller="Account" asp-action="ExternalLogin" method="post" style="width:100%">
+                    <input type="hidden" name="provider" value="Google" />
+                    <button type="submit" class="social-btn google w-100" title="Sign up with Google">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                </form>
+
+                @* <form asp-controller="Account" asp-action="ExternalLogin" method="post" style="width:100%">
+                    <input type="hidden" name="provider" value="Facebook" />
+                    <button type="submit" class="social-btn facebook" title="Sign up with Facebook">
+                        <i class="fab fa-facebook-f"></i> Facebook
+                    </button>
+                </form> *@
+            
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+    <partial name="_ValidationScriptsPartial" />
+    @* validation *@
+    <script> 
+        function validatePasswordMatch() {
+            var password = document.getElementById("Password").value;
+            var confirmPassword = document.getElementById("ConfirmPassword").value;
+            var messageElem = document.querySelector("[asp-validation-for='ConfirmPassword']");
+            if (password !== confirmPassword) {
+                messageElem.textContent = "Passwords do not match.";
+            } else {
+                messageElem.textContent = "";
+            }
+                }
+                        document.getElementById("Password").addEventListener("input", validatePasswordMatch);
+                                document.getElementById("ConfirmPassword").addEventListener("input", validatePasswordMatch);
+                                </script>
 
-@* 
-        <svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.1" x="0px" y="0px"
-             class="google-icon" viewBox="0 0 48 48" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12
-                c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24
-                c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
-            <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039
-                l5.657-5.657C34.046,6.053,29.268,4,24,4C15.938,4,9.023,8.438,6.306,14.691z"></path>
-            <path fill="#4CAF50" d="M24,44c5.138,0,9.822-1.977,13.374-5.178l-6.104-5.306C28.717,34.986,26.468,36,24,36
-                c-5.192,0-9.605-3.321-11.282-7.943l-6.49,5.001C9.046,39.627,16.03,44,24,44z"></path>
-            <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.791,2.235-2.146,4.151-3.928,5.515
-                c0.002-0.001,0.003-0.002,0.005-0.004l6.104,5.306c-0.433,0.383,6.527-4.767,6.527-13.797
-                C44,22.659,43.862,21.35,43.611,20.083z"></path>
-        </svg>
-        <span style="color:black" class="fw-bold">Log in with Google</span> *@
+
+
+
+}

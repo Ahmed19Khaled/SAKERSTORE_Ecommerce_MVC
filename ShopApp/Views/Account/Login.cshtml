@@ -1,421 +1,570 @@
 ﻿@model ShopApp.ViewModels.LoginViewModel
+
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Sign In";
+    Layout = null;
 }
+
+<!-- ===== MODERN FONTS & ICONS ===== -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 <style>
-    .main1 {
-        margin-top: 0;
-        width: 100%;
-        height: 100%;
-        background: url(/Register/Imag3.jpg) center/cover no-repeat;
+    /* ---------- DESIGN SYSTEM ---------- */
+    :root {
+        --primary: #6366f1;
+        --primary-glow: rgba(99, 102, 241, 0.4);
+        --accent: #a855f7;
+        --bg-dark: #1303F0;
+        --card-bg: rgba(35,3,75,0.91);
+        --text-light: #ffffff;
+        --text-muted: rgba(255, 255, 255, 0.6);
+        --input-bg: rgba(255, 255, 255, 0.06);
+        --input-border: rgba(255, 255, 255, 0.1);
+        --input-focus-border: var(--primary);
+        --danger: #f43f5e;
+        --success: #10b981;
+        --radius-md: 20px;
+        --radius-sm: 14px;
+        --blur: blur(16px);
+        --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: radial-gradient(circle at 20% 30%, #1e1b4b, #0b0d14);
+        min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-       
+        padding: 1.25rem;
+        position: relative;
+        overflow-x: hidden;
     }
 
-    .bodya {
-        margin-top: 50px;
-		margin-bottom: 120px;
-        padding: 0 !important;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .contain {
-        width: 400px;
-        padding: 25px;
-        border-radius: 30px;
-        background: #ffffff1a;
-        backdrop-filter: blur(20px);
-        box-shadow: 0 0 30px #0000002a;
-        text-align: center;
-    }
-
-        .contain h2 {
-            margin-bottom: 20px;
-            color: #000;
+        /* ---------- ANIMATED BACKGROUND (subtle & creative) ---------- */
+        body::before {
+            content: '';
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="30" cy="30" r="20" fill="%236366f1" opacity="0.2"/><circle cx="150" cy="80" r="40" fill="%23a855f7" opacity="0.15"/><circle cx="180" cy="160" r="30" fill="%233b82f6" opacity="0.1"/></svg>');
+            background-size: 400px 400px;
+            animation: floatBlob 40s infinite linear;
+            pointer-events: none;
         }
 
-    .form-group input {
+    @@keyframes floatBlob {
+        0%
+
+    {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    33% {
+        transform: translate(2%, 1%) rotate(120deg);
+    }
+
+    66% {
+        transform: translate(-1%, 2%) rotate(240deg);
+    }
+
+    100% {
+        transform: translate(0, 0) rotate(360deg);
+    }
+
+    }
+
+    /* ---------- MAIN CARD (glass, compact, sharp) ---------- */
+    .login-card {
         width: 100%;
-        padding: 12px;
-        margin-bottom: 10px;
-        border-radius: 30px;
-        background-color: #ffffffb3;
-        border: none;
+        max-width: 440px; /* صغيره – compact width */
+        background: var(--card-bg);
+        backdrop-filter: var(--blur);
+        -webkit-backdrop-filter: var(--blur);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius-md);
+        padding: 2.5rem 2rem;
+        box-shadow: 0 25px 50px -8px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+        animation: cardAppear 0.6s ease-out;
+        transition: var(--transition);
+    }
+
+    @@keyframes cardAppear {
+        0%
+
+    {
+        opacity: 0;
+        transform: scale(0.96) translateY(10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+
+    }
+
+    /* ---------- BRAND & HEADER ---------- */
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.8rem;
+    }
+
+        .brand i {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 4px 6px var(--primary-glow));
+        }
+
+        .brand span {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            background: linear-gradient(135deg, #fff, #e2e8f0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+    .form-header {
+        margin-bottom: 2rem;
+    }
+
+        .form-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .form-header a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border-bottom: 1px solid transparent;
+        }
+
+            .form-header a:hover {
+                border-bottom-color: var(--primary);
+            }
+
+    /* ---------- FLOATING LABEL GROUPS (space‑saving & modern) ---------- */
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1.1rem;
+        color: var(--text-muted);
+        font-size: 1rem;
+        transition: var(--transition);
+        z-index: 2;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        background: var(--input-bg);
+        border: 1.5px solid var(--input-border);
+        border-radius: var(--radius-sm);
+        font-size: 0.95rem;
+        color: var(--text-light);
+        transition: var(--transition);
         outline: none;
     }
 
-    .form-group span {
-        font-size: 14px;
-        color: red;
-    }
-
-    .contain button[type="submit"] {
-        width: 100%;
-        padding: 10px;
-        font-size: 15px;
-        border-radius: 20px;
-        color: white;
-        border: none;
-        font-weight: bold;
-        margin-top: 10px;
-    }
-
-        .contain button[type="submit"]:hover {
-            cursor: pointer;
+        .form-control:focus {
+            border-color: var(--input-focus-border);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 4px var(--primary-glow);
         }
 
-    .contain p {
-        margin-top: 15px;
+            .form-control:focus ~ .input-icon {
+                color: var(--primary);
+            }
+
+    /* ---------- PASSWORD TOGGLE (creative micro‑interaction) ---------- */
+    .password-toggle {
+        position: absolute;
+        right: 1.1rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 1rem;
+        z-index: 3;
     }
 
-    .contain a {
-        color: black;
-        font-weight: bold;
-        text-decoration: underline;
-    }
-
-    .social-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 20px;
-    }
-
-        .social-buttons form {
-            margin: 0;
+        .password-toggle:hover {
+            color: var(--primary);
         }
 
-    .social-button {
-        width: 100%;
+    /* ---------- VALIDATION MESSAGES (clean & subtle) ---------- */
+    .validation-message {
+        display: block;
+        font-size: 0.75rem;
+        margin-top: 0.4rem;
+        margin-left: 0.8rem;
+        color: var(--danger);
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+
+    /* ---------- OPTIONS ROW (remember + forgot) ---------- */
+    .form-options {
         display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 10px;
-        border-radius: 20px;
-        font-weight: bold;
-        font-size: 14px;
+        justify-content: space-between;
+        margin: 1rem 0 1.8rem;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
         cursor: pointer;
     }
 
-    .google-login-button {
-        color: #000;
-    }
-
-    .facebook-login-button {
-        color: white;
-        border: none;
-    }
-
-        .google-login-button svg,
-        .facebook-login-button i {
-            height: 20px;
-            width: 20px;
+        .checkbox-label input {
+            accent-color: var(--primary);
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
         }
-    /* خلفية شفافة تغطي الشاشة */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
+
+    .forgot-link {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+        .forgot-link:hover {
+            color: var(--primary);
+        }
+
+    /* ---------- PRIMARY BUTTON (gradient, 3D lift) ---------- */
+    .btn-login {
         width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1055;
-        opacity: 1;
-        visibility: visible;
-        transition: opacity 0.4s ease, visibility 0.4s ease;
+        padding: 1rem;
+        background: linear-gradient(145deg, var(--primary), var(--accent));
+        border: none;
+        border-radius: var(--radius-sm);
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        position: relative;
+        overflow: hidden;
     }
 
-        /* حالة الإخفاء */
-        .modal-overlay.hide {
-            opacity: 0;
-            visibility: hidden;
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: width 0.6s, height 0.6s, top 0.6s, left 0.6s;
         }
 
+        .btn-login:hover::before {
+            width: 300px;
+            height: 300px;
+            top: -80px;
+            left: -80px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(99, 102, 241, 0.5);
+        }
+
+    /* ---------- DIVIDER WITH OR (elegant) ---------- */
+    .divider {
+        display: flex;
+        align-items: center;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        margin: 2rem 0 1.5rem;
+    }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+    /* ---------- SOCIAL LOGIN (minimal, elegant) ---------- */
+    .social-login {
+        display: flex;
+        gap: 0.8rem;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .social-btn {
+        flex: 1;
+        padding: 0.8rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius-sm);
+        color: var(--text-light);
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        transition: var(--transition);
+        cursor: pointer;
+        backdrop-filter: blur(8px);
+        width: 100%;
+    }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .social-btn i {
+            font-size: 1.1rem;
+        }
+
+    /* ---------- TOAST / INLINE ERROR (super sleek) ---------- */
+    .error-toast {
+        background: rgba(244, 63, 94, 0.15);
+        border-left: 4px solid var(--danger);
+        backdrop-filter: blur(8px);
+        border-radius: 10px;
+        padding: 1rem 1.2rem;
+        margin-bottom: 1.8rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.8rem;
+        color: #ffe0e0;
+        font-size: 0.85rem;
+        animation: slideDown 0.3s;
+    }
+
+    @@keyframes slideDown {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    .error-toast i {
+        font-size: 1.2rem;
+        color: var(--danger);
+    }
+
+    /* ---------- RESPONSIVE (flawless on all devices) ---------- */
+    @@media (max-width: 480px) {
+        .login-card {
+            padding: 2rem 1.5rem;
+            border-radius: 24px;
+            max-width: 100%;
+        }
+
+        .brand i {
+            font-size: 1.8rem;
+        }
+
+        .brand span {
+            font-size: 1.3rem;
+        }
+
+        .form-header h2 {
+            font-size: 1.6rem;
+        }
+
+        .form-options {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.8rem;
+        }
+
+        .social-login {
+            flex-direction: column;
+        }
+    }
+
+    /* Hide number input spinners etc. */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+        display: none;
+    }
 </style>
 
-@* ✅ تنبيه للأخطاء بشكل احترافي في منتصف الصفحة *@
-@if (!ViewData.ModelState.IsValid)
-{
-    <div id="errorModal" class="modal-overlay d-flex align-items-center justify-content-center">
-        <div class="alert alert-danger text-center shadow-lg rounded-4 p-4 animate__animated animate__fadeInDown" role="alert" style="max-width:400px;">
-            <div class="d-flex flex-column align-items-center">
-                <i class="bi bi-exclamation-triangle-fill fs-1 text-danger mb-3"></i>
-                <h5 class="fw-bold mb-3">حدثت بعض الأخطاء</h5>
-                <ul class="text-start">
-                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                    {
-                        <li>@error.ErrorMessage</li>
-                    }
-                </ul>
-                <button class="btn btn-outline-danger mt-3" onclick="closeErrorModal()">إغلاق</button>
-            </div>
-        </div>
+<!-- ========== MAIN CARD ========== -->
+<div class="login-card">
+
+    <!-- BRAND (small, chic) -->
+    <div class="brand">
+        <i class="fas fa-crown"></i>
+        <span>SAKERSTOR</span>
     </div>
-}
 
+    <!-- HEADER -->
+    <div class="form-header">
+        <h2>Welcome back</h2>
+        <p>Don't have an account? <a asp-action="Register" asp-controller="Account">Sign up free</a></p>
+    </div>
 
-<div class="bodya ">
-    <div class="contain">
-        <form asp-action="Login" method="post">
-            <h2 class="mt-0">Login</h2>
-
-
-            <div class="form-group">
-                <input placeholder="Email" asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+    <!-- GLOBAL ERROR DISPLAY (model‑level) -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="error-toast">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong style="display:block; margin-bottom:4px;">Authentication failed</strong>
+                <span>Invalid email or password. Please try again.</span>
             </div>
+        </div>
+    }
 
-            <div class="form-group">
-                <input placeholder="Password" asp-for="Password" class="form-control" type="password" />
-                <span asp-validation-for="Password" class="text-danger"></span>
+    <!-- LOGIN FORM -->
+    <form asp-action="Login" method="post">
+        @Html.AntiForgeryToken()
+
+        <!-- EMAIL (with icon) -->
+        <div class="form-group">
+            <div class="input-wrapper">
+                <i class="fas fa-envelope input-icon"></i>
+                <input asp-for="Email" class="form-control" placeholder="Email address" autocomplete="email" />
             </div>
-            <a asp-action="ForgotPassword" class="text-decoration-none small text-primary">Forgot password?</a>
-
-
-            <button class="btn-danger btn" type="submit">Login</button>
-
-            <p>
-                Don't have an account?
-                <a asp-action="Register" asp-controller="Account">Sign Up</a>
-            </p>
-        </form>
-
-        <div class="google-login-button p-2 w-100  btn  " >
-            <form asp-controller="Account" asp-action="ExternalLogin" method="post">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="provider" value="Google" />
-                <button type="submit" class="btn btn-secondary w-100 mt-2">
-                    <svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.1" x="0px" y="0px"
-                         class="google-icon" viewBox="0 0 48 48" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12
-                c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24
-                c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
-                        <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039
-                l5.657-5.657C34.046,6.053,29.268,4,24,4C15.938,4,9.023,8.438,6.306,14.691z"></path>
-                        <path fill="#4CAF50" d="M24,44c5.138,0,9.822-1.977,13.374-5.178l-6.104-5.306C28.717,34.986,26.468,36,24,36
-                c-5.192,0-9.605-3.321-11.282-7.943l-6.49,5.001C9.046,39.627,16.03,44,24,44z"></path>
-                        <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.791,2.235-2.146,4.151-3.928,5.515
-                c0.002-0.001,0.003-0.002,0.005-0.004l6.104,5.306c-0.433,0.383,6.527-4.767,6.527-13.797
-                C44,22.659,43.862,21.35,43.611,20.083z"></path>
-                    </svg> Sign in with Google
-                </button>
-            </form>
-
-            <form asp-controller="Account" asp-action="ExternalLogin" method="post">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="provider" value="Facebook" />
-                <button type="submit" class="btn btn-primary w-100 mt-2">
-                    <i class="bi bi-facebook"></i>
-                    Sign in with Facebook
-                </button>
-            </form>
-
-
+            <span asp-validation-for="Email" class="validation-message"></span>
         </div>
 
-    
+        <!-- PASSWORD (with icon + show/hide toggle) -->
+        <div class="form-group">
+            <div class="input-wrapper">
+                <i class="fas fa-lock input-icon"></i>
+                <input asp-for="Password" type="password" id="passwordField" class="form-control" placeholder="Password" autocomplete="current-password" />
+                <i class="fas fa-eye-slash password-toggle" id="togglePassword"></i>
+            </div>
+            <span asp-validation-for="Password" class="validation-message"></span>
+        </div>
+
+        <!-- OPTIONS: REMEMBER ME + FORGOT PASSWORD -->
+        <div class="form-options">
+            <label class="checkbox-label">
+                <input type="checkbox" name="RememberMe" value="true" />
+                <span>Keep me signed in</span>
+            </label>
+            <a asp-action="ForgotPassword" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <!-- SUBMIT BUTTON -->
+        <button type="submit" class="btn-login">
+            Sign in <i class="fas fa-arrow-right"></i>
+        </button>
+    </form>
+
+    <!-- DIVIDER -->
+    <div class="divider">
+        <span>or</span>
+    </div>
+
+    <!-- SOCIAL LOGIN (Google) -->
+    <div class="social-login">
+        <form asp-controller="Account" asp-action="ExternalLogin" method="post" style="width:100%;">
+            <input type="hidden" name="provider" value="Google" />
+            <button type="submit" class="social-btn">
+                <i class="fab fa-google" style="color: #EA4335;"></i> Google
+            </button>
+        </form>
+        <!-- You can easily add more providers here -->
     </div>
 </div>
+
+<!-- ===== SHOW/HIDE PASSWORD (clean vanilla JS) ===== -->
 <script>
-      function closeErrorModal() {
-        let modal = document.getElementById("errorModal");
-        if (modal) {
-            modal.classList.add("hide"); // يضيف كلاس الإخفاء
-            setTimeout(() => modal.style.display = "none", 400); // يختفي نهائي بعد الأنيميشن
+    (function() {
+        const toggle = document.getElementById('togglePassword');
+        if (toggle) {
+            const password = document.getElementById('passwordField');
+            toggle.addEventListener('click', function () {
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                this.classList.toggle('fa-eye-slash');
+                this.classList.toggle('fa-eye');
+            });
         }
-    }
-
-    // إغلاق عند الضغط خارج البوكس
-    window.addEventListener("click", function (e) {
-        let modal = document.getElementById("errorModal");
-        if (modal && e.target === modal) {
-            closeErrorModal();
-        }
-    });
-
-    // ✅ يختفي تلقائي بعد 5 ثواني
-    window.addEventListener("DOMContentLoaded", function () {
-        let modal = document.getElementById("errorModal");
-        if (modal) {
-            setTimeout(closeErrorModal, 5000);
-        }
-    });
-
+    })();
 </script>
 
+<!-- ===== CLIENT‑SIDE VALIDATION (jQuery validation) ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-
+<!-- OPTIONAL: auto‑hide error toast after 5 sec (if you prefer toast behavior) -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <script>
+        setTimeout(() => {
+            const toast = document.querySelector('.error-toast');
+            if (toast) toast.style.opacity = '0';
+        }, 5000);
+    </script>
 }
 
-
-
-@* 
-     <style>
-    .bodya{
-        margin: 0;
-        padding: 0;
-
-        width: 100%;
-        background: url(/imageCategory/Electronc.jpg);
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    h2 {
-        text-align: center;
-    }
-
-    p {
-        margin-left: 20px;
-    }
-
-    .contain {
-        height: 479px;
-        flex-basis: 350px;
-        padding: 10px;
-        border-radius: 30px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        background: #fafafa4b;
-        backdrop-filter: blur(20px);
-    }
-
-    form {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    input {
-        width: 90%;
-        padding: 10px;
-        margin: 10px;
-        border-radius: 30px;
-        background-color: #ffffffb3;
-        border: transparent solid;
-        outline: none;
-    }
-
-    button {
-        width: 90%;
-        padding: 5px;
-        font-size: 15px;
-        border-radius: 20px;
-        margin: 5px;
-        background-color: teal;
-        color: white;
-        border: transparent solid;
-        box-shadow: rgb(10, 11, 11) 1px 3px;
-    }
-
-    .buttons-container {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .apple-login-button, .google-login-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 3px;
-        width: 80%;
-        height: 30px;
-        border-radius: 20px;
-        text-align: center;
-        margin: 5px;
-    }
-
-    .apple-login-button {
-        color: white;
-        background-color: black;
-        box-shadow: rgba(128, 138, 138, 0.795) 1px 3px;
-    }
-
-    .google-login-button {
-        color: black;
-        background-color: white;
-        box-shadow: rgb(10, 11, 11) 1px 3px;
-    }
-
-        button:hover, .apple-login-button:hover, .google-login-button:hover {
-            cursor: pointer;
-            box-shadow: none;
-        }
-
-        button:focus, .apple-login-button:focus, .google-login-button:focus {
-        }
-</style>
-
-<div class="bodya">
-	<div class="contain">
-		<form action="">
-			<h2>Welcome back!</h2>
-			<div class="form-group">
-				<input asp-for="Email" class="form-control" placeholder="Email" />
-				<span asp-validation-for="Email" class="text-danger"></span>
-			</div>
-			<div class="form-group">
-				<input asp-for="Password" class="form-control" type="password" placeholder="Password" />
-				<span asp-validation-for="Password" class="text-danger"></span>
-			</div>
-
-			<p><a href="#">Forgot Password?</a></p>
-			<button>login</button>
-			<p>Dont have an Accont? <a href="/sign up/Sign_up.html">sign up</a></p>
-
-
-		</form>
-
-		<div class="buttons-container">
-
-			<div class="apple-login-button">
-				<svg stroke="currentColor" fill="currentColor" stroke-width="0" class="apple-icon"
-					 viewBox="0 0 1024 1024" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-					<path d="M747.4 535.7c-.4-68.2 30.5-119.6 92.9-157.5-34.9-50-87.7-77.5-157.3-82.8-65.9-5.2-138 38.4-164.4 38.4-27.9 0-91.7-36.6-141.9-36.6C273.1 298.8 163 379.8 163 544.6c0 48.7 8.9 99 26.7 150.8 23.8 68.2 109.6 235.3 199.1 232.6 46.8-1.1 79.9-33.2 140.8-33.2 59.1 0 89.7 33.2 141.9 33.2 90.3-1.3 167.9-153.2 190.5-221.6-121.1-57.1-114.6-167.2-114.6-170.7zm-105.1-305c50.7-60.2 46.1-115 44.6-134.7-44.8 2.6-96.6 30.5-126.1 64.8-32.5 36.8-51.6 82.3-47.5 133.6 48.4 3.7 92.6-21.2 129-63.7z">
-					</path>
-				</svg>
-				<span>Log in with Apple</span>
-			</div>
-			<div class="google-login-button">
-				<svg stroke="currentColor" fill="currentColor" stroke-width="0" version="1.1" x="0px" y="0px"
-					 class="google-icon" viewBox="0 0 48 48" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-					<path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12
-                c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24
-                c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
-					<path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039
-                l5.657-5.657C34.046,6.053,29.268,4,24,4C15.938,4,9.023,8.438,6.306,14.691z"></path>
-					<path fill="#4CAF50" d="M24,44c5.138,0,9.822-1.977,13.374-5.178l-6.104-5.306C28.717,34.986,26.468,36,24,36
-                c-5.192,0-9.605-3.321-11.282-7.943l-6.49,5.001C9.046,39.627,16.03,44,24,44z"></path>
-					<path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.791,2.235-2.146,4.151-3.928,5.515
-                c0.002-0.001,0.003-0.002,0.005-0.004l6.104,5.306c-0.433,0.383,6.527-4.767,6.527-13.797
-                C44,22.659,43.862,21.35,43.611,20.083z"></path>
-				</svg>
-				<span>Log in with Google</span>
-			</div>
-		</div>
-	</div>
-
-  </div>
-
-
-  *@
-
-
-
+<!-- Validation scripts partial (optional if you use default structure) -->
+@* @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+} *@

@@ -77,7 +77,7 @@
         display: none;
         position: absolute;
         top: calc(100% + 8px);
-        right: 0;
+        right: 55px;
         background: white;
         border: 1px solid #e5e7eb;
         border-radius: 12px;
@@ -419,7 +419,6 @@
                     <div class="dropdown-header-email">@Model.Email</div>
                 </div>
                 <button class="btn-close d-lg-none" id="closeDropdown">
-                    <i class="fas fa-times"></i>
                 </button>
             </div>
 
@@ -466,7 +465,7 @@
                         </a>
                     </li> *@
 
-                    @if (!User.IsInRole("User"))
+                    @if (!User.IsInRole("admin"))
                     {
                         <li class="dropdown-divider"></li>
                         <li>

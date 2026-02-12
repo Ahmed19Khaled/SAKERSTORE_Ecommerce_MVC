@@ -102,8 +102,8 @@
 
     .profile-badge {
         position: absolute;
-        bottom: 20px;
-        right: 20px;
+        top: 0px;
+        right: -10px;
         background: var(--accent);
         color: white;
         padding: 8px 20px;
@@ -603,6 +603,116 @@
             background-position: -200% 0;
         }
     }
+    /* إلغاء min-width للجدول عندما يكون العرض أقل من 900px */
+    @@media (max-width: 900px) {
+        .orders-table
+
+    {
+        min-width: auto;
+    }
+
+    }
+
+    /* تحويل الجدول إلى بطاقات (Cards) على الشاشات الضيقة جداً */
+    @@media (max-width: 600px) {
+        .orders-table-container
+
+    {
+        border: none;
+        background: transparent;
+    }
+
+    .orders-table,
+    .orders-table thead,
+    .orders-table tbody,
+    .orders-table th,
+    .orders-table td,
+    .orders-table tr {
+        display: block;
+    }
+
+        .orders-table thead {
+            display: none; /* إخفاء رأس الجدول */
+        }
+
+        .orders-table tr {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--light);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .orders-table td {
+            padding: 0;
+            border: none;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            text-align: right;
+        }
+
+            .orders-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: var(--gray);
+                font-size: 0.85rem;
+                margin-right: 1rem;
+                min-width: 80px;
+            }
+
+    .order-total {
+        font-size: 1.2rem;
+        color: var(--primary);
+    }
+
+    .order-status {
+        margin-left: 0;
+    }
+
+    }
+    @@media (max-width: 576px) {
+        .details-card
+
+    {
+        padding: 1.5rem;
+    }
+
+    .detail-item {
+        padding: 1rem;
+    }
+
+    .detail-label i {
+        width: 18px;
+    }
+
+    .detail-value {
+        font-size: 1rem;
+    }
+    }
+    @@media(max-width: 576px) {
+        .edit-btn, .empty-btn
+
+    {
+        width: 100%;
+        justify-content: center;
+        padding: 0.7rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+    }
+
+    .empty-title {
+        font-size: 1.3rem;
+    }
+
+    }
 </style>
 
 <div class="profile-container">
@@ -672,7 +782,7 @@
                 </h2>
                 <a href="@Url.Action("UpdateProfile", "Account")" class="edit-btn">
                     <i class="fas fa-edit"></i>
-                    Edit Profile
+                    Edit 
                 </a>
             </div>
 
@@ -767,16 +877,16 @@
                             @foreach (var order in Model.Orders.OrderByDescending(o => o.OrderDate))
                             {
                                 <tr>
-                                    <td class="order-date">
+                                    <td class="order-date" data-label="Date">
                                         @order.OrderDate.ToString("MMM dd, yyyy")
                                     </td>
-                                    <td class="order-address">
+                                    <td class="order-address" data-label="Address">
                                         @order.Address, @order.City
                                     </td>
-                                    <td class="order-total">
+                                    <td class="order-total" data-label="Total">
                                         @order.TotalAmount.ToString("C")
                                     </td>
-                                    <td>
+                                    <td data-label="Status" >
                                         @{
                                             var statusClass = order.Status?.ToLower() switch
                                             {

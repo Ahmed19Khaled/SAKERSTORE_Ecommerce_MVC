@@ -5,25 +5,27 @@
     ViewData["Title"] = Model.Category?.NameDepartment ?? Model.SubCategory?.Name ?? "Products";
 }
 
-<!-- ========== DESIGN SYSTEM ========== -->
+<!-- ========== FONTS & ICONS ========== -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<!-- ========== MODERN RESET & VARIABLES ========== -->
 <style>
-    /* ----- Modern CSS Reset & Variables ----- */
-    *,
-    *::before,
-    *::after {
+    /* ----- CSS Reset ----- */
+    *, *::before, *::after {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
     }
 
     :root {
-        /* Color palette - refined & accessible */
+        /* Colors - refined */
         --primary-50: #eef2ff;
         --primary-100: #e0e7ff;
-        --primary-500: #4f46e5; /* indigo */
+        --primary-500: #4f46e5;
         --primary-600: #4338ca;
         --primary-700: #3730a3;
-        --accent-500: #10b981; /* emerald */
+        --accent-500: #10b981;
         --accent-600: #059669;
         --gray-50: #f9fafb;
         --gray-100: #f3f4f6;
@@ -32,15 +34,18 @@
         --gray-600: #4b5563;
         --gray-900: #1f2937;
         --white: #ffffff;
+        /* Shadows */
         --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
         --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-        --border-radius-sm: 0.375rem;
-        --border-radius: 0.75rem;
-        --border-radius-lg: 1rem;
-        --border-radius-xl: 1.5rem;
+        /* Border radius */
+        --radius-sm: 0.375rem;
+        --radius: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
+        /* Transitions */
         --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -57,10 +62,10 @@
         padding: 0 1rem;
     }
 
-    /* ----- Breadcrumbs (elegant) ----- */
+    /* ===== BREADCRUMBS ===== */
     .breadcrumb-wrapper {
         background: var(--white);
-        border-radius: var(--border-radius-lg);
+        border-radius: var(--radius-lg);
         padding: 0.75rem 1.25rem;
         margin: 1.5rem 0;
         box-shadow: var(--shadow-xs);
@@ -101,10 +106,10 @@
             font-weight: 600;
         }
 
-    /* ----- Page Header (gradient modern) ----- */
+    /* ===== HEADER ===== */
     .category-header {
         background: linear-gradient(105deg, var(--primary-700) 0%, var(--primary-500) 100%);
-        border-radius: var(--border-radius-xl);
+        border-radius: var(--radius-xl);
         padding: 2rem 2rem;
         margin-bottom: 2rem;
         color: white;
@@ -141,11 +146,7 @@
         position: relative;
     }
 
-        .category-meta i {
-            font-size: 1.25rem;
-        }
-
-    /* ----- Layout (responsive grid) ----- */
+    /* ===== LAYOUT ===== */
     .category-layout {
         display: grid;
         grid-template-columns: 1fr;
@@ -154,11 +155,11 @@
 
     @@media (min-width: 992px) {
         .category-layout {
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 1fr;
         }
     }
 
-    /* ----- Desktop Sidebar (sticky, clean) ----- */
+    /* ===== DESKTOP FILTER ===== */
     .desktop-filter {
         display: none;
     }
@@ -167,14 +168,14 @@
         .desktop-filter {
             display: block;
             position: sticky;
-            top: 11.3rem;
+            top: 2rem;
             height: fit-content;
         }
     }
 
     .filter-card {
         background: var(--white);
-        border-radius: var(--border-radius);
+        border-radius: var(--radius);
         padding: 1.5rem;
         box-shadow: var(--shadow-sm);
         border: 1px solid var(--gray-100);
@@ -207,7 +208,7 @@
         width: 100%;
         padding: 0.625rem 0.875rem;
         border: 1px solid var(--gray-200);
-        border-radius: var(--border-radius-sm);
+        border-radius: var(--radius-sm);
         font-size: 0.95rem;
         transition: var(--transition);
         background-color: var(--white);
@@ -232,6 +233,7 @@
         margin-top: 1rem;
     }
 
+    /* ===== BUTTONS ===== */
     .btn {
         display: inline-flex;
         align-items: center;
@@ -239,11 +241,12 @@
         gap: 0.5rem;
         padding: 0.625rem 1.25rem;
         font-weight: 600;
-        border-radius: var(--border-radius-sm);
+        border-radius: var(--radius-sm);
         border: 1px solid transparent;
         transition: var(--transition);
         cursor: pointer;
         font-size: 0.95rem;
+        text-decoration: none;
     }
 
     .btn-primary {
@@ -268,7 +271,19 @@
             border-color: var(--gray-400);
         }
 
-    /* ----- Mobile Filter Toggle & Offcanvas ----- */
+    .btn-outline-sm {
+        background: transparent;
+        border: none;
+        color: var(--gray-600);
+        padding: 0.5rem;
+        border-radius: var(--radius-sm);
+    }
+
+        .btn-outline-sm:hover {
+            background: var(--gray-100);
+        }
+
+    /* ===== MOBILE FILTER TOGGLE ===== */
     .mobile-filter-toggle {
         display: block;
         margin-bottom: 1.5rem;
@@ -284,7 +299,7 @@
         width: 100%;
         background: var(--white);
         border: 1px solid var(--gray-200);
-        border-radius: var(--border-radius);
+        border-radius: var(--radius);
         padding: 0.875rem;
         font-weight: 600;
         color: var(--gray-900);
@@ -293,9 +308,14 @@
         align-items: center;
         justify-content: center;
         gap: 0.75rem;
+        transition: var(--transition);
     }
 
-    /* Offcanvas Filter */
+        .filter-toggle-btn:hover {
+            background: var(--gray-50);
+        }
+
+    /* ===== OFF CANVAS FILTER ===== */
     .offcanvas-filter {
         position: fixed;
         top: 0;
@@ -371,10 +391,10 @@
         gap: 0.75rem;
     }
 
-    /* ----- Subcategories (horizontal scroll on mobile, grid on tablet up) ----- */
+    /* ===== SUBCATEGORIES SECTION ===== */
     .subcategories-section {
         background: var(--white);
-        border-radius: var(--border-radius);
+        border-radius: var(--radius);
         padding: 1.5rem;
         margin-bottom: 2rem;
         box-shadow: var(--shadow-sm);
@@ -396,47 +416,18 @@
         gap: 1rem;
     }
 
-    @@media (max-width: 991px) { /* نطبق التصميم الجديد على كل الشاشات حتى 991px */
+    @@media (max-width: 639px) {
         .subcategories-grid {
-            display: grid;
-            grid-template-columns: 1fr; /* بطاقة واحدة في كل سطر */
-            gap: 1rem;
-            padding: 0.5rem 0;
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding-bottom: 0.5rem;
+            gap: 0.75rem;
         }
 
         .subcategory-card {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: var(--gray-50);
-            border-radius: var(--border-radius);
-            border: 1px solid var(--gray-200);
-            width: 100%;
-            flex: none; /* ألغِ السلوك المرن القديم */
-        }
-
-        .subcategory-img {
-            width: 70px; /* تكبير الصورة */
-            height: 70px;
-            border-radius: var(--border-radius-sm);
-        }
-
-        .subcategory-info {
-            flex: 1;
-        }
-
-        .subcategory-name {
-            font-size: 1.1rem; /* خط أكبر */
-            margin-bottom: 0.35rem;
-        }
-
-        .subcategory-count {
-            font-size: 0.9rem;
-        }
-
-        .subcategory-card i {
-            font-size: 1.2rem; /* تكبير سهم التوجيه */
+            flex: 0 0 160px;
+            scroll-snap-align: start;
         }
     }
 
@@ -446,7 +437,7 @@
         gap: 0.75rem;
         padding: 0.75rem;
         background: var(--gray-50);
-        border-radius: var(--border-radius);
+        border-radius: var(--radius);
         text-decoration: none;
         color: inherit;
         transition: var(--transition);
@@ -463,7 +454,7 @@
         width: 56px;
         height: 56px;
         object-fit: cover;
-        border-radius: var(--border-radius-sm);
+        border-radius: var(--radius-sm);
         background: var(--gray-100);
     }
 
@@ -482,7 +473,7 @@
         color: var(--gray-600);
     }
 
-    /* ----- Products Header (sort & count) ----- */
+    /* ===== PRODUCTS HEADER ===== */
     .products-header {
         display: flex;
         flex-wrap: wrap;
@@ -491,7 +482,7 @@
         margin-bottom: 1.5rem;
         background: var(--white);
         padding: 0.875rem 1.25rem;
-        border-radius: var(--border-radius);
+        border-radius: var(--radius);
         box-shadow: var(--shadow-xs);
     }
 
@@ -507,7 +498,7 @@
     .sort-select {
         padding: 0.5rem 2rem 0.5rem 1rem;
         border: 1px solid var(--gray-200);
-        border-radius: var(--border-radius-sm);
+        border-radius: var(--radius-sm);
         font-size: 0.95rem;
         background-color: var(--white);
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
@@ -515,18 +506,26 @@
         background-position: right 0.6rem center;
         background-size: 1.2rem;
         appearance: none;
+        cursor: pointer;
     }
 
-    /* ----- Products Grid (responsive) ----- */
+    /* ===== PRODUCTS GRID ===== */
     .products-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
+        width: 100%;
     }
 
-    @@media (min-width: 640px) {
+    @@media (min-width: 480px) {
         .products-grid {
             grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (min-width: 768px) {
+        .products-grid {
+            grid-template-columns: repeat(3, 1fr);
             gap: 1.25rem;
         }
     }
@@ -544,10 +543,10 @@
         }
     }
 
-    /* ----- Product Card (masterpiece) ----- */
+    /* ===== PRODUCT CARD ===== */
     .product-card {
         background: var(--white);
-        border-radius: var(--border-radius);
+        border-radius: var(--radius);
         overflow: hidden;
         box-shadow: var(--shadow-xs);
         transition: var(--transition);
@@ -555,6 +554,7 @@
         flex-direction: column;
         border: 1px solid var(--gray-100);
         position: relative;
+        height: 100%;
     }
 
         .product-card:hover {
@@ -563,7 +563,6 @@
             border-color: var(--primary-100);
         }
 
-    /* Image container with fixed aspect ratio (1:1) */
     .product-image-wrapper {
         position: relative;
         width: 100%;
@@ -583,7 +582,6 @@
         transform: scale(1.05);
     }
 
-    /* Badge */
     .product-badge {
         position: absolute;
         top: 0.75rem;
@@ -598,7 +596,6 @@
         z-index: 10;
     }
 
-    /* Desktop actions (hover) */
     .product-actions {
         position: absolute;
         top: 0.75rem;
@@ -617,11 +614,17 @@
         transform: translateX(0);
     }
 
-    /* @@media (max-width: 991px) {
+    @@media (max-width: 991px) {
         .product-actions {
-            display: none;
+            display: flex;
+            opacity: 1;
+            transform: none;
+            flex-direction: row;
+            top: auto;
+            bottom: 0.75rem;
+            right: 0.75rem;
         }
-    } */
+    }
 
     .action-btn {
         width: 38px;
@@ -653,46 +656,6 @@
                 background: var(--primary-700);
             }
 
-    /* Mobile actions row */
-    .product-actions-mobile {
-        display: flex;
-        gap: 0.5rem;
-        padding: 1rem 1rem 0;
-    }
-
-    /* @@media (min-width: 992px) {
-        .product-actions-mobile {
-            display: none;
-        }
-    } */
-
-    .btn-mobile {
-        flex: 1;
-        padding: 0.625rem;
-        border-radius: var(--border-radius-sm);
-        border: 1px solid var(--gray-200);
-        background: white;
-        font-size: 0.875rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.375rem;
-        color: var(--gray-700);
-        transition: var(--transition);
-    }
-
-    .btn-mobile-primary {
-        background: var(--primary-600);
-        border-color: var(--primary-600);
-        color: white;
-    }
-
-        .btn-mobile-primary:hover {
-            background: var(--primary-700);
-        }
-
-    /* Product Info */
     .product-info {
         padding: 1rem;
         display: flex;
@@ -723,7 +686,6 @@
                 text-decoration: underline;
             }
 
-    /* Color swatches */
     .product-colors {
         display: flex;
         align-items: center;
@@ -738,7 +700,7 @@
         border: 2px solid var(--white);
         box-shadow: 0 0 0 1px var(--gray-200);
         cursor: pointer;
-        transition: transform 0.15s ease;
+        transition: transform 0.15s ease, box-shadow 0.15s;
     }
 
         .color-swatch.selected {
@@ -746,7 +708,6 @@
             transform: scale(1.1);
         }
 
-    /* Price */
     .product-price {
         display: flex;
         align-items: baseline;
@@ -767,7 +728,7 @@
         text-decoration: line-through;
     }
 
-    /* ----- Slider (lightweight carousel) ----- */
+    /* ===== SLIDER ===== */
     .slider-container {
         position: relative;
         width: 100%;
@@ -798,7 +759,7 @@
 
     .slider-btn {
         position: absolute;
-        top: 70%;
+        top: 50%;
         transform: translateY(-50%);
         width: 32px;
         height: 32px;
@@ -837,19 +798,20 @@
     @@media (max-width: 991px) {
         .slider-btn {
             opacity: 1;
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             background: rgba(255, 255, 255, 0.95);
         }
     }
 
-    /* Empty state */
+    /* ===== EMPTY STATE ===== */
     .empty-state {
         background: var(--white);
-        border-radius: var(--border-radius);
+        border-radius: var(--radius);
         padding: 3rem 2rem;
         text-align: center;
         box-shadow: var(--shadow-sm);
+        grid-column: 1 / -1;
     }
 
     .empty-state-icon {
@@ -869,195 +831,84 @@
         margin-bottom: 1.5rem;
     }
 
-    /* Skeleton loader */
-    .skeleton {
-        background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
-        background-size: 200% 100%;
-        animation: loading 1.5s infinite;
-    }
-
-    @@keyframes loading {
-        0% {
-            background-position: 200% 0;
-        }
-
-        100% {
-            background-position: -200% 0;
-        }
-    }
-
-    .subcategories-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 1rem;
-    }
-
-    .toggle-subcategories-btn {
-        background: none;
-        border: 1px solid var(--gray-200);
-        padding: 0.5rem 1rem;
-        border-radius: 50px;
-        font-size: 0.9rem;
-        color: var(--primary-600);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        cursor: pointer;
-    }
-
-    .subcategories-grid.collapsed {
-        display: none;
+    /* ===== TOAST ===== */
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--primary-600);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 9999px;
+        font-weight: 600;
+        box-shadow: var(--shadow-lg);
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.2s;
     }
 </style>
 
 <!-- ========== MAIN CONTENT ========== -->
 <div class="container">
 
-    <!-- ✅ BREADCRUMB (enhanced) -->
-    <div class="breadcrumb-wrapper">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a asp-action="Index" asp-controller="Home"><i class="fas fa-home me-1"></i>Home</a>
-            </li>
-            @if (Model.Category != null)
-            {
-                <li class="breadcrumb-item">
-                    <a asp-action="PruductCategory" asp-controller="Category" asp-route-Categoryid="@Model.Category.Id">
-                        <i class="fas fa-folder me-1"></i>@Model.Category.NameDepartment
-                    </a>
-                </li>
-            }
-            @if (Model.SubCategory != null)
-            {
-                <li class="breadcrumb-item active" aria-current="page">
-                    <i class="fas fa-tag me-1"></i>@Model.SubCategory.Name
-                </li>
-            }
-        </ol>
-    </div>
 
-    <!-- ✅ CATEGORY HEADER (modern gradient) -->
-    <div class="category-header">
-        <h1 class="category-title">
-            @if (Model.Category != null)
-            {
-                @Model.Category.NameDepartment
-            }
-            else if (Model.SubCategory != null)
-            {
-                @Model.SubCategory.Name
-            }
-            else
-            {
-                <text>All Products</text>
-            }
-        </h1>
-        <div class="category-meta">
-            <i class="fas fa-box-open"></i>
-            <span>@Model.products?.Count() products available</span>
+
+    <!-- ========== CATEGORY HEADER ========== -->
+    @if (Model.Category != null || Model.SubCategory != null)
+    {
+        <div class="category-header">
+            <h1 class="category-title">
+                @(Model.SubCategory?.Name ?? Model.Category?.NameDepartment)
+            </h1>
+            <div class="category-meta">
+                <i class="fas fa-box"></i>
+                <span>@Model.products?.Count() products available</span>
+            </div>
         </div>
-    </div>
+    }
+
+    <!-- ========== SUBCATEGORIES SECTION ========== -->
+    @{
+        var subcategories = context.CategoriesSup.ToList();
+        if (subcategories.Any())
+        {
+            <div class="subcategories-section">
+                <div class="subcategories-title">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Subcategories</span>
+                </div>
+                <div class="subcategories-grid">
+                    @foreach (var sub in subcategories)
+                    {
+                        <a asp-controller="Category" asp-action="PruductCategory" asp-route-SubCatigoryid="@sub.Id" class="subcategory-card">
+                            <img src="@Url.Content("~/imageSubCategory/" + (sub.ImageDepartment ?? "no-image.jpg"))" alt="@sub.Name" class="subcategory-img" loading="lazy">
+                            <div class="subcategory-info">
+                                <div class="subcategory-name">@sub.Name</div>
+                                <div class="subcategory-count">@sub.Products?.Count() items</div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+    }
 
     <!-- ========== LAYOUT GRID ========== -->
     <div class="category-layout">
 
-        <!-- ===== DESKTOP SIDEBAR FILTER ===== -->
-        <aside class="desktop-filter">
-            <div class="filter-card">
-                <h3 class="filter-title">
-                    <i class="fas fa-sliders-h"></i> Filter & Sort
-                </h3>
-                <form asp-action="PruductCategory" asp-controller="Category" method="get" id="desktopFilterForm">
-                    <div class="filter-group">
-                        <label class="filter-label" for="desktopSearch">Product name</label>
-                        <input type="text" id="desktopSearch" name="name" class="filter-input" placeholder="Search..." value="@Context.Request.Query["name"]">
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label" for="desktopSubcategory">Subcategory</label>
-                        <select id="desktopSubcategory" name="SubCatigoryid" class="filter-select">
-                            <option value="">All Subcategories</option>
-                            @foreach (var sub in context.CategoriesSup)
-                            {
-                                <option value="@sub.Id" selected="@(Context.Request.Query["SubCatigoryid"] == sub.Id.ToString())">@sub.Name</option>
-                            }
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label">Price range</label>
-                        <div class="price-range">
-                            <input type="number" name="minPrice" class="filter-input" placeholder="Min" value="@Context.Request.Query["minPrice"]">
-                            <input type="number" name="maxPrice" class="filter-input" placeholder="Max" value="@Context.Request.Query["maxPrice"]">
-                        </div>
-                    </div>
-
-                    <div class="filter-group">
-                        <label class="filter-label" for="desktopOffer">Minimum discount %</label>
-                        <input type="number" id="desktopOffer" name="offer" class="filter-input" min="0" max="100" placeholder="0" value="@Context.Request.Query["offer"]">
-                    </div>
-
-                    <div class="filter-actions">
-                        <button type="submit" class="btn btn-primary w-100">Apply filters</button>
-                        <button type="button" class="btn btn-outline w-100" onclick="resetDesktopFilters()">Reset</button>
-                    </div>
-                </form>
-            </div>
-        </aside>
-
-        <!-- ===== MAIN CONTENT AREA ===== -->
+      
+        <!-- ===== MAIN CONTENT (PRODUCTS) ===== -->
         <main>
 
-            <!-- ===== MOBILE FILTER TOGGLE ===== -->
-            <div class="mobile-filter-toggle">
-                <button class="filter-toggle-btn" onclick="openOffcanvasFilter()">
-                    <i class="fas fa-sliders-h"></i> Filter & Sort
-                    <i class="fas fa-chevron-right ms-auto"></i>
-                </button>
-            </div>
+         
 
-            <!-- ===== SUBCATEGORIES (if any) ===== -->
-            @if (Model.Category != null && Model.Category.SubCategories?.Any() == true)
-            {
-                <div class="subcategories-section">
-                    <div class="subcategories-header">
-                        <div class="subcategories-title">...</div>
-                        <button class="toggle-subcategories-btn" onclick="toggleSubcategories(this)">
-                            <span>Show All</span> <i class="fas fa-chevron-down"></i>
-                        </button>
-                    </div>
-                    <div class="subcategories-title">
-                        <i class="fas fa-layer-group" style="color: var(--primary-500);"></i>
-                        <span>Shop by subcategory</span>
-                    </div>
-                    <div class="subcategories-grid">
-                        @foreach (var sub in Model.Category.SubCategories)
-                        {
-                            <a asp-action="PruductCategory" asp-controller="Category" asp-route-SubCatigoryId="@sub.Id" class="subcategory-card">
-                                <img class="subcategory-img"
-                                     src="@Url.Content("~/imageSubCategory/" + (sub.ImageDepartment ?? "no-image.jpg"))"
-                                     onerror="this.src='/ImgePro/no-image.jpg'"
-                                     alt="@sub.Name"
-                                     loading="lazy">
-                                <div class="subcategory-info">
-                                    <div class="subcategory-name">@sub.Name</div>
-                                    <div class="subcategory-count">@(sub.Products?.Count ?? 0) items</div>
-                                </div>
-                                <i class="fas fa-chevron-right" style="color: var(--gray-400); font-size: 0.875rem;"></i>
-                            </a>
-                        }
-                    </div>
-                </div>
-            }
-
-            <!-- ===== PRODUCTS HEADER (count & sort) ===== -->
+            <!-- Products Header -->
             <div class="products-header">
                 <div class="products-count">
                     <i class="fas fa-boxes"></i> Showing @Model.products?.Count()
                 </div>
                 <div>
-                    <select class="sort-select" onchange="sortProducts(this.value)" aria-label="Sort products">
+                    <select class="sort-select" id="sortSelect" aria-label="Sort products">
                         <option value="newest">Newest</option>
                         <option value="price-low">Price: Low to High</option>
                         <option value="price-high">Price: High to Low</option>
@@ -1067,14 +918,14 @@
                 </div>
             </div>
 
-            <!-- ===== PRODUCTS GRID ===== -->
+            <!-- Products Grid -->
             @if (Model.products != null && Model.products.Any())
             {
                 <div class="products-grid">
                     @foreach (var product in Model.products)
                     {
                         <div class="product-card" data-product-id="@product.Id">
-                            <!-- IMAGE CAROUSEL -->
+                            <!-- Image Carousel -->
                             <div class="product-image-wrapper slider-container">
                                 <div class="slider-slides">
                                     @if (product.Images != null && product.Images.Any())
@@ -1086,8 +937,7 @@
                                                  src="@Url.Content("~/ImgePro/" + img.ImageURL)"
                                                  alt="@product.Name"
                                                  loading="lazy"
-                                                 data-index="@i"
-                                                 onerror="this.src='/ImgePro/no-image.jpg'">
+                                                 data-index="@i">
                                             i++;
                                         }
                                     }
@@ -1103,10 +953,10 @@
                                 <!-- Slider Controls -->
                                 @if (product.Images != null && product.Images.Count > 1)
                                 {
-                                    <button class="slider-btn prev" onclick="slidePrev(event, @product.Id)" aria-label="Previous image">
+                                    <button class="slider-btn prev" data-product-id="@product.Id" aria-label="Previous image">
                                         <i class="fas fa-chevron-left"></i>
                                     </button>
-                                    <button class="slider-btn next" onclick="slideNext(event, @product.Id)" aria-label="Next image">
+                                    <button class="slider-btn next" data-product-id="@product.Id" aria-label="Next image">
                                         <i class="fas fa-chevron-right"></i>
                                     </button>
                                 }
@@ -1117,14 +967,14 @@
                                     <span class="product-badge">-@product.Offer%</span>
                                 }
 
-                                <!-- Desktop Actions (overlay) -->
+                                <!-- Desktop/Tablet Actions -->
                                 <div class="product-actions">
-                                    <button class="action-btn" onclick="addToWishlist(@product.Id)" aria-label="Add to wishlist">
+                                    <button class="action-btn" data-action="wishlist" data-product-id="@product.Id" aria-label="Add to wishlist">
                                         <i class="far fa-heart"></i>
                                     </button>
-                                    <button class="action-btn" onclick="quickView(@product.Id)" aria-label="Quick view">
+                                    <a asp-action="DetailsProduct" asp-controller="Product" asp-route-ProductID="@product.Id" class="action-btn" data-action="quickview" data-product-id="@product.Id" aria-label="Quick view">
                                         <i class="far fa-eye"></i>
-                                    </button>
+                                    </a>
                                     <form asp-action="Add" asp-controller="Cart" method="post" style="display:contents;">
                                         <input type="hidden" name="id" value="@product.Id" />
                                         <input type="hidden" name="stockid" id="selected-stock-@product.Id" />
@@ -1151,8 +1001,8 @@
                                             <div class="color-swatch"
                                                  title="@stock.Color"
                                                  data-stock-id="@stock.StockId"
-                                                 style="background: @stock.Color;"
-                                                 onclick="selectColor(this, @product.Id)">
+                                                 data-product-id="@product.Id"
+                                                 style="background: @stock.Color;">
                                             </div>
                                         }
                                     </div>
@@ -1177,7 +1027,7 @@
             }
             else
             {
-                <!-- EMPTY STATE -->
+                <!-- Empty State -->
                 <div class="empty-state">
                     <div class="empty-state-icon">
                         <i class="fas fa-search"></i>
@@ -1185,7 +1035,7 @@
                     <h3 class="empty-state-title">No products found</h3>
                     <p class="empty-state-desc">Try adjusting your filters or explore other categories.</p>
                     <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
-                        <i class="fas fa-home me-2"></i> Go to homepage
+                        <i class="fas fa-home"></i> Go to homepage
                     </a>
                 </div>
             }
@@ -1193,13 +1043,13 @@
     </div>
 </div>
 
-<!-- ===== MOBILE OFF CANVAS FILTER ===== -->
+<!-- ========== MOBILE OFF CANVAS FILTER ========== -->
 <div id="offcanvasFilter" class="offcanvas-filter" aria-hidden="true">
     <div class="offcanvas-overlay" onclick="closeOffcanvasFilter()"></div>
     <div class="offcanvas-panel">
         <div class="offcanvas-header">
-            <h3><i class="fas fa-sliders-h me-2"></i>Filter & Sort</h3>
-            <button type="button" class="btn btn-outline-sm" onclick="closeOffcanvasFilter()" aria-label="Close">
+            <h3><i class="fas fa-sliders-h"></i> Filter & Sort</h3>
+            <button type="button" class="btn-outline-sm" onclick="closeOffcanvasFilter()" aria-label="Close">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -1213,7 +1063,7 @@
                     <label class="filter-label">Subcategory</label>
                     <select name="SubCatigoryid" class="filter-select">
                         <option value="">All</option>
-                        @foreach (var sub in context.CategoriesSup)
+                        @foreach (var sub in subcategories)
                         {
                             <option value="@sub.Id" selected="@(Context.Request.Query["SubCatigoryid"] == sub.Id.ToString())">@sub.Name</option>
                         }
@@ -1242,161 +1092,190 @@
 <!-- ========== SCRIPTS ========== -->
 @section Scripts {
     <script>
-        // ---------- COLOR SELECTION ----------
-        function selectColor(element, productId) {
-            // remove selected from siblings
-            const container = element.closest('.product-colors');
-            if (container) {
-                container.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('selected'));
-            }
-            element.classList.add('selected');
-            const stockId = element.getAttribute('data-stock-id');
+        (function() {
+            "use strict";
 
-            // update hidden inputs
-            const desktopInput = document.getElementById('selected-stock-' + productId);
-            const mobileInput = document.getElementById('selected-stock-mobile-' + productId);
-            if (desktopInput) desktopInput.value = stockId;
-            if (mobileInput) mobileInput.value = stockId;
-        }
+            // ---------- GLOBAL STATE ----------
+            const sliderState = {};
 
-        // ---------- SLIDER (Carousel) ----------
-        window.sliderState = window.sliderState || {};
-
-        function slidePrev(e, productId) {
-            e.preventDefault();
-            e.stopPropagation();
-            const slides = getSlides(productId);
-            if (!slides) return;
-            sliderState[productId].currentIndex = (sliderState[productId].currentIndex - 1 + slides.length) % slides.length;
-            updateSlider(productId);
-        }
-
-        function slideNext(e, productId) {
-            e.preventDefault();
-            e.stopPropagation();
-            const slides = getSlides(productId);
-            if (!slides) return;
-            sliderState[productId].currentIndex = (sliderState[productId].currentIndex + 1) % slides.length;
-            updateSlider(productId);
-        }
-
-        function getSlides(productId) {
-            const productCard = document.querySelector(`.product-card[data-product-id="${productId}"]`);
-            if (!productCard) return null;
-            const slides = productCard.querySelectorAll('.slide');
-            if (slides.length === 0) return null;
-            if (!sliderState[productId]) {
-                sliderState[productId] = {
-                    currentIndex: Array.from(slides).findIndex(s => s.classList.contains('active')) || 0
-                };
-            }
-            return slides;
-        }
-
-        function updateSlider(productId) {
-            const slides = getSlides(productId);
-            if (!slides) return;
-            slides.forEach((slide, i) => {
-                if (i === sliderState[productId].currentIndex) {
-                    slide.classList.add('active');
-                } else {
-                    slide.classList.remove('active');
-                }
+            // ---------- DOM READY ----------
+            document.addEventListener('DOMContentLoaded', function() {
+                initializeSliders();
+                initializeColorSelection();
+                attachEventDelegation();
+                setSortOptionFromUrl();
             });
-        }
 
-        // Initialize sliders on DOM load
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.product-card').forEach(card => {
-                const productId = card.getAttribute('data-product-id');
-                const slides = card.querySelectorAll('.slide');
-                if (slides.length > 1) {
+            // ---------- SLIDER ----------
+            function initializeSliders() {
+                document.querySelectorAll('.product-card').forEach(card => {
+                    const productId = card.getAttribute('data-product-id');
+                    const slides = card.querySelectorAll('.slide');
+                    if (slides.length > 1) {
+                        sliderState[productId] = { currentIndex: 0 };
+                    }
+                });
+            }
+
+            function getSlides(productId) {
+                const card = document.querySelector(`.product-card[data-product-id="${productId}"]`);
+                if (!card) return null;
+                return card.querySelectorAll('.slide');
+            }
+
+            function updateSlider(productId, direction) {
+                const slides = getSlides(productId);
+                if (!slides || slides.length === 0) return;
+                if (!sliderState[productId]) {
                     sliderState[productId] = { currentIndex: 0 };
                 }
-            });
-        });
+                let currentIndex = sliderState[productId].currentIndex;
+                if (direction === 'next') {
+                    currentIndex = (currentIndex + 1) % slides.length;
+                } else if (direction === 'prev') {
+                    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+                }
+                sliderState[productId].currentIndex = currentIndex;
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === currentIndex);
+                });
+            }
 
-        // ---------- WISHLIST & QUICK VIEW (stubs) ----------
-        function addToWishlist(productId) {
-            showToast('Added to wishlist!', '#10b981');
-        }
-
-        function quickView(productId) {
-            showToast('Quick view coming soon', '#4f46e5');
-        }
-
-        // ---------- TOAST NOTIFICATION ----------
-        function showToast(message, color = '#4f46e5') {
-            const toast = document.createElement('div');
-            toast.textContent = message;
-            toast.style.cssText = `
-                position: fixed; top: 20px; right: 20px; background: ${color};
-                color: white; padding: 12px 24px; border-radius: 9999px;
-                font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-                z-index: 9999; opacity: 0; transition: opacity 0.2s;
-            `;
-            document.body.appendChild(toast);
-            requestAnimationFrame(() => toast.style.opacity = 1);
-            setTimeout(() => {
-                toast.style.opacity = 0;
-                setTimeout(() => toast.remove(), 200);
-            }, 2500);
-        }
-
-        // ---------- SORTING (placeholder) ----------
-        function sortProducts(value) {
-            showToast(`Sorting by: ${value}`, '#4f46e5');
-            // Implement AJAX or redirect with sort param
-        }
-
-        // ---------- MOBILE OFF CANVAS ----------
-        function openOffcanvasFilter() {
-            const offcanvas = document.getElementById('offcanvasFilter');
-            offcanvas.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeOffcanvasFilter() {
-            const offcanvas = document.getElementById('offcanvasFilter');
-            offcanvas.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        function resetMobileFilters() {
-            const form = document.getElementById('mobileFilterForm');
-            form.reset();
-        }
-
-        // ---------- DESKTOP RESET ----------
-        function resetDesktopFilters() {
-            const url = new URL(window.location);
-            url.search = '';
-            window.location.href = url.toString();
-        }
-
-        // ---------- SELECT FIRST COLOR BY DEFAULT ----------
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.product-card').forEach(card => {
-                const firstSwatch = card.querySelector('.color-swatch');
-                if (firstSwatch) {
+            // ---------- COLOR SELECTION ----------
+            function initializeColorSelection() {
+                document.querySelectorAll('.product-card').forEach(card => {
                     const productId = card.getAttribute('data-product-id');
-                    selectColor(firstSwatch, productId);
+                    const firstSwatch = card.querySelector('.color-swatch');
+                    if (firstSwatch) {
+                        selectColor(firstSwatch, productId);
+                    }
+                });
+            }
+
+            function selectColor(element, productId) {
+                const container = element.closest('.product-colors');
+                if (container) {
+                    container.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('selected'));
+                }
+                element.classList.add('selected');
+                const stockId = element.getAttribute('data-stock-id');
+                const desktopInput = document.getElementById('selected-stock-' + productId);
+                if (desktopInput) desktopInput.value = stockId;
+            }
+
+            // ---------- EVENT DELEGATION ----------
+            function attachEventDelegation() {
+                document.addEventListener('click', function(e) {
+                    // Slider prev button
+                    if (e.target.closest('.slider-btn.prev')) {
+                        const btn = e.target.closest('.slider-btn.prev');
+                        const productId = btn.getAttribute('data-product-id');
+                        e.preventDefault();
+                        updateSlider(productId, 'prev');
+                    }
+                    // Slider next button
+                    else if (e.target.closest('.slider-btn.next')) {
+                        const btn = e.target.closest('.slider-btn.next');
+                        const productId = btn.getAttribute('data-product-id');
+                        e.preventDefault();
+                        updateSlider(productId, 'next');
+                    }
+                    // Color swatch
+                    else if (e.target.closest('.color-swatch')) {
+                        const swatch = e.target.closest('.color-swatch');
+                        const productId = swatch.getAttribute('data-product-id');
+                        selectColor(swatch, productId);
+                    }
+                    // Wishlist button
+                    else if (e.target.closest('[data-action="wishlist"]')) {
+                        const btn = e.target.closest('[data-action="wishlist"]');
+                        const productId = btn.getAttribute('data-product-id');
+                        e.preventDefault();
+                        showToast('Added to wishlist!', '#10b981');
+                    }
+                    // Quick view button
+                    else if (e.target.closest('[data-action="quickview"]')) {
+                        const btn = e.target.closest('[data-action="quickview"]');
+                        const productId = btn.getAttribute('data-product-id');
+                        e.preventDefault();
+                        showToast('Quick view coming soon', '#4f46e5');
+                    }
+                });
+
+                // Sort select change
+                const sortSelect = document.getElementById('sortSelect');
+                if (sortSelect) {
+                    sortSelect.addEventListener('change', function() {
+                        const value = this.value;
+                        sortProducts(value);
+                    });
+                }
+            }
+
+            // ---------- SORTING ----------
+            function sortProducts(value) {
+                const url = new URL(window.location);
+                url.searchParams.set('sort', value);
+                window.location.href = url.toString();
+            }
+
+            function setSortOptionFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const sort = urlParams.get('sort');
+                if (sort) {
+                    const select = document.getElementById('sortSelect');
+                    if (select) select.value = sort;
+                }
+            }
+
+            // ---------- TOAST ----------
+            function showToast(message, color = '#4f46e5') {
+                let toast = document.querySelector('.toast');
+                if (!toast) {
+                    toast = document.createElement('div');
+                    toast.className = 'toast';
+                    document.body.appendChild(toast);
+                }
+                toast.textContent = message;
+                toast.style.background = color;
+                toast.style.opacity = '1';
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                }, 2500);
+            }
+
+            // ---------- OFF CANVAS FILTER ----------
+            window.openOffcanvasFilter = function() {
+                const offcanvas = document.getElementById('offcanvasFilter');
+                offcanvas.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+
+            window.closeOffcanvasFilter = function() {
+                const offcanvas = document.getElementById('offcanvasFilter');
+                offcanvas.classList.remove('active');
+                document.body.style.overflow = '';
+            };
+
+            window.resetMobileFilters = function() {
+                const form = document.getElementById('mobileFilterForm');
+                form.reset();
+            };
+
+            // ---------- DESKTOP RESET ----------
+            window.resetDesktopFilters = function() {
+                const url = new URL(window.location);
+                url.search = '';
+                window.location.href = url.toString();
+            };
+
+            // ---------- CLOSE OFF CANVAS ON ESCAPE ----------
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeOffcanvasFilter();
                 }
             });
-        });
 
-        // ---------- CLOSE OFF CANVAS ON ESCAPE ----------
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeOffcanvasFilter();
-            }
-        });
-                function toggleSubcategories(btn) {
-            const grid = btn.closest('.subcategories-section').querySelector('.subcategories-grid');
-            grid.classList.toggle('collapsed');
-            btn.querySelector('span').textContent = grid.classList.contains('collapsed') ? 'more' : 'less';
-            btn.querySelector('i').classList.toggle('fa-chevron-down');
-            btn.querySelector('i').classList.toggle('fa-chevron-up');
-        }
+        })();
     </script>
 }

@@ -3,7 +3,6 @@
 @inject UserManager<User> UserManager
 @inject SignInManager<User> SignInManager
 
-
 @{
     var user = await UserManager.GetUserAsync(User);
 }
@@ -12,291 +11,654 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+    <title>@ViewData["Title"] — Admin Dashboard</title>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome + Bootstrap Icons -->
+    <!-- Font Awesome 6 + Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="~/Register/store.png" rel="icon" />
 
     <style>
+        /* ========== Color Variables – Bright, Professional, Comfortable ========== */
         :root {
-        --sidebar-width: 250px;
-        --collapsed-width: 70px;
-        --primary-color: #4e73df;
-            --secondary-color: #dde0e5;
+            --body-bg: #f9fbfd;
+            --sidebar-bg: #ffffff;
+            --sidebar-border: #e9edf2;
+            --sidebar-text: #334155;
+            --sidebar-icon: #64748b;
+            --sidebar-hover-bg: #f1f5f9;
+            --sidebar-active-bg: #eff6ff;
+            --sidebar-active-border: #3b82f6;
+            --navbar-bg: #ffffff;
+            --accent-color: #3b82f6;
+            --accent-light: #dbeafe;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.01);
+            --shadow-md: 0 8px 20px rgba(0,0,0,0.03), 0 4px 8px rgba(0,0,0,0.02);
+            --border-radius: 20px;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 80px;
+            --topbar-height: 70px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        a{
+            text-decoration: none;
+        }
         body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: var(--secondary-color);
-        margin: 0;
-        padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text-primary);
+            line-height: 1.5;
         }
 
-        .sidebar {
-        width: var(--sidebar-width);
-        height: 100vh;
-        position: fixed;
-        left: 0;
-        top: 0;
-        background: #1d3715;
-        box-shadow: 0 0.15rem 1.75rem rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease;
-        overflow-x: hidden;
-        z-index: 1000;
+        /* ========== Fixed Top Navbar (Visible on all devices) ========== */
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--topbar-height);
+            background-color: var(--navbar-bg);
+            backdrop-filter: blur(8px);
+            background-color: rgba(255,255,255,0.85);
+            border-bottom: 1px solid var(--sidebar-border);
+            display: flex;
+            align-items: center;
+            padding: 0 1.8rem;
+            z-index: 1040;
+            box-shadow: var(--shadow-sm);
         }
 
-        .sidebar.collapsed {
-        width: var(--collapsed-width);
+        .brand {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            text-decoration: none;
         }
 
-        .sidebar h4,
-        .sidebar.collapsed .nav-link span {
-        display: none;
+            .brand i {
+                color: var(--accent-color);
+                margin-right: 0.6rem;
+                font-size: 1.6rem;
+            }
+
+            .brand span {
+                background: linear-gradient(135deg, #2563eb, #1e40af);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+        /* ========== Desktop Sidebar (Elegant, White, Subtle Shadow) ========== */
+        .desktop-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
+            transition: var(--transition);
+            z-index: 1050;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
+            /* Collapsed Mode */
+            .desktop-sidebar.collapsed {
+                width: var(--sidebar-collapsed-width);
+            }
+
+        /* Sidebar Header */
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 1.2rem;
+            height: var(--topbar-height);
+            border-bottom: 1px solid var(--sidebar-border);
+        }
+
+        .sidebar-brand {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .sidebar-brand i {
+                color: var(--accent-color);
+                font-size: 1.4rem;
+            }
+
+        .desktop-sidebar.collapsed .sidebar-brand span {
+            display: none;
+        }
+
+        /* Toggle Button */
         .toggle-btn {
-        border: none;
-        background: none;
-        width: 100%;
-        padding: 1rem;
-        text-align: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            border: none;
+            background: var(--sidebar-hover-bg);
+            color: var(--sidebar-icon);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
         }
 
-        .toggle-btn i {
-        font-size: 1.2rem;
-        color: var(--primary-color);
+            .toggle-btn:hover {
+                background: var(--accent-light);
+                color: var(--accent-color);
+            }
+
+        /* Navigation Menu */
+        .sidebar-nav {
+            flex: 1;
+            padding: 1.8rem 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
         }
 
         .nav-link {
-        color: #f3f4f5;
-        padding: 0.75rem 1rem;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        transition: background 0.2s ease;
-        padding:15px;
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.2rem;
+            border-radius: 16px;
+            color: var(--sidebar-text);
+            font-weight: 500;
+            transition: var(--transition);
+            white-space: nowrap;
+            position: relative;
         }
 
-        .nav-link:hover
-         {
-        background-color: #40401c;
-        color: var(--primary-color);
+            .nav-link i {
+                font-size: 1.3rem;
+                min-width: 32px;
+                text-align: center;
+                color: var(--sidebar-icon);
+            }
+
+            .nav-link span {
+                margin-left: 0.8rem;
+                font-size: 0.98rem;
+            }
+
+            .nav-link:hover {
+                background-color: var(--sidebar-hover-bg);
+                color: var(--text-primary);
+            }
+
+                .nav-link:hover i {
+                    color: var(--accent-color);
+                }
+
+            .nav-link.active {
+                background-color: var(--sidebar-active-bg);
+                color: var(--accent-color);
+                border-left: 4px solid var(--sidebar-active-border);
+                font-weight: 600;
+            }
+
+                .nav-link.active i {
+                    color: var(--accent-color);
+                }
+
+        .desktop-sidebar.collapsed .nav-link span {
+            display: none;
         }
 
-        .nav-link i {
-        margin-left: 10px;
-        min-width: 20px;
-        text-align: center;
+        /* User Section in Sidebar */
+        .sidebar-user {
+            padding: 1.5rem 1rem;
+            border-top: 1px solid var(--sidebar-border);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
         }
 
+        .user-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 16px;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            background-color: #f1f5f9;
+        }
+
+        .user-details {
+            overflow: hidden;
+            transition: opacity 0.2s;
+        }
+
+        .user-fullname {
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .user-email {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .desktop-sidebar.collapsed .user-details {
+            display: none;
+        }
+
+        /* ========== Main Content – No Overlap or Coverage ========== */
         .main-content {
-        margin-left: var(--sidebar-width);
-        padding: 20px;
-        transition: all 0.3s ease;
+            margin-left: var(--sidebar-width);
+            margin-top: var(--topbar-height);
+            padding: 2rem 2.2rem;
+            transition: var(--transition);
+            min-height: calc(100vh - var(--topbar-height));
+            background-color: var(--body-bg);
         }
 
-        .main-content.collapsed {
-        margin-left: var(--collapsed-width);
+            .main-content.expanded {
+                margin-left: var(--sidebar-collapsed-width);
+            }
+
+        /* ========== Fully Responsive Design ========== */
+        @@media (max-width: 991.98px) {
+            .desktop-sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1.5rem;
+            }
+
+            .top-navbar {
+                padding: 0 1.2rem;
+            }
         }
 
-        .card {
-        border: none;
-        border-radius: 10px;
-        box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease;
+        @@media (min-width: 992px) {
+            .mobile-menu-btn {
+                display: none !important;
+            }
+
+            .offcanvas {
+                display: none !important;
+            }
         }
 
-        .card:hover {
-        transform: translateY(-5px);
+        /* ========== Mobile Menu (Offcanvas) – Clean and Fast ========== */
+        .offcanvas.offcanvas-start {
+            background-color: white;
+            width: 300px !important;
+            border-right: none;
+            box-shadow: var(--shadow-md);
         }
 
-        .nav-tooltip {
-        position: relative;
+        .offcanvas-header {
+            border-bottom: 1px solid var(--sidebar-border);
+            padding: 1.2rem;
         }
 
-        .nav-tooltip:hover::after {
-        content: attr(data-title);
-        position: absolute;
-        right: -10px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: #343a40;
-        color: white;
-        padding: 3px 8px;
-        font-size: 0.75rem;
-        white-space: nowrap;
-        border-radius: 4px;
+        .offcanvas-title i {
+            color: var(--accent-color);
+        }
+
+        /* ========== User Dropdown Menu ========== */
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.5rem 0.8rem;
+            border-radius: 40px;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+            .user-menu:hover {
+                background: #f1f5f9;
+            }
+
+        .dropdown-menu {
+            border: none;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            padding: 0.6rem 0;
+        }
+
+        .dropdown-item {
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+        }
+
+            .dropdown-item i {
+                width: 1.6rem;
+                color: var(--accent-color);
+            }
+
+        /* ========== Useful General Styles ========== */
+        .text-accent {
+            color: var(--accent-color);
+        }
+
+        .bg-soft-accent {
+            background-color: var(--accent-light);
         }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar collapsed" id="sidebar">
-        <!-- تمت إضافة collapsed هنا -->
-        <div class="p-3">
-            <button id="toggleSidebar" class="toggle-btn">
+    <!-- ========== Top Navbar – Present on All Devices ========== -->
+    <nav class="top-navbar">
+        <!-- Mobile Menu Button (Shows offcanvas) -->
+        <button class="btn btn-link mobile-menu-btn p-0 me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" style="font-size: 1.6rem; color: var(--text-primary);">
+            <i class="fas fa-bars"></i>
+        </button>
+
+      
+
+        <div class="flex-grow-1"></div>
+
+        <!-- User Dropdown Menu (Desktop and Mobile) -->
+        @if (User.Identity.IsAuthenticated && user != null)
+        {
+            <div class="dropdown">
+                <div class="user-menu" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="~/ImageProfile/@user.ProfilePictureUrl" class="user-avatar" style="width: 38px; height: 38px;" alt="@user.FullName">
+                    <span class="d-none d-md-inline fw-semibold">@user.FullName</span>
+                    <i class="fas fa-chevron-down" style="font-size: 0.75rem; color: var(--text-secondary);"></i>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li>
+                        <a class="dropdown-item" asp-action="Manage" asp-controller="Account">
+                            <i class="fas fa-user-circle"></i> Profile
+                        </a>
+                    </li>
+                   
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a href="@Url.Action("Logout", "Account")" class="dropdown-item text-danger">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex gap-2">
+                <a href="@Url.Action("Login", "Account")" class="btn btn-outline-primary rounded-pill px-4">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a href="@Url.Action("Register", "Account")" class="btn btn-primary rounded-pill px-4">
+                    <i class="fas fa-user-plus"></i> Register
+                </a>
+            </div>
+        }
+    </nav>
+
+    <!-- ========== Desktop Sidebar (Visible only on lg and larger) ========== -->
+    <aside class="desktop-sidebar d-none d-lg-flex" id="desktopSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <i class="fas fa-store-alt"></i>
+                <span>SAKERSTOR.Express</span>
+            </div>
+            <button id="toggleSidebarBtn" class="toggle-btn">
                 <i class="fas fa-angle-double-left"></i>
             </button>
-            <h4 class="text-center mb-4">Dashboard</h4>
-            <ul class="nav flex-column">
+        </div>
 
-                
-                <li class="nav-item">
-                    <a class="nav-link active" asp-controller="Admin" asp-action="Dashboard">
-                        <i class="fas fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
-                    </a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" asp-action="listCategory" asp-controller="Category">
-						<i class="fas fa-file-invoice"></i>
-						<span>Category</span>
-					</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" asp-action="ListsubCategory" asp-controller="SubCategory">
-						<i class="fas fa-file-invoice"></i>
-						<span>SubCategory</span>
-					</a>
-				</li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-action="ListProduct" asp-controller="Product">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Product</span>
-                    </a>
-                </li>
-              
-                <li class="nav-item">
-                    <a class="nav-link" asp-action="GetAllOrder" asp-controller="OrderManeg">
-                        <i class="fas fa-calendar"></i>
-                        <span>Orders</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-action="AllAccount" asp-controller="ManagementsAccount">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span>Accounts</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-action="" asp-controller="">
-                        <i class="fas fa-envelope"></i>
-                        <span>Messages</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-action="" asp-controller="">
-                        <i class="fas fa-bell"></i>
-                        <span>Notification</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-action="" asp-controller="">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
-                    </a>
-                </li>
-                <!-- User authentication links -->
-                <!-- User Info and Auth Links -->
-                @if (User.Identity.IsAuthenticated)
-                {
-                    <!-- User Info -->
-                 
-                    <li class="nav-item">
-                        <div class="nav-link d-flex align-items-center">
-                            <div class="user d-flex align-items-center" style="min-width: 200px;">
-                                <img src="~/ImageProfile/@user.ProfilePictureUrl" class="rounded-circle" style="width:35px" alt="Alternate Text" />
-                                <span class="fw-bold text-white text-truncate" style="max-width: 150px; display: inline-block;" title="@user.FullName">
-                                    &nbsp; Hello, @user.FullName
-                                </span>
-                            </div>
-                        </div>
-                    </li>
+        <!-- Main Navigation Links -->
+        <div class="sidebar-nav">
+            <a class="nav-link active" asp-controller="Admin" asp-action="Dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a class="nav-link" asp-action="listCategory" asp-controller="Category">
+                <i class="fas fa-tags"></i>
+                <span>Categories</span>
+            </a>
+            <a class="nav-link" asp-action="ListsubCategory" asp-controller="SubCategory">
+                <i class="fas fa-layer-group"></i>
+                <span>Subcategories</span>
+            </a>
+            <a class="nav-link" asp-action="ListProduct" asp-controller="Product">
+                <i class="fas fa-box"></i>
+                <span>Products</span>
+            </a>
+            <a class="nav-link" asp-action="GetAllOrder" asp-controller="OrderManeg">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Orders</span>
+            </a>
+            <a class="nav-link" asp-action="AllAccount" asp-controller="ManagementsAccount">
+                <i class="fas fa-users-cog"></i>
+                <span>Accounts</span>
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-envelope"></i>
+                <span>Messages</span>
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
+            </a>
+            <a class="nav-link" href="#">
+                <i class="fas fa-sliders-h"></i>
+                <span>Settings</span>
+            </a>
+        </div>
 
-                    
+        <!-- User Information in Sidebar -->
+        @if (User.Identity.IsAuthenticated && user != null)
+        {
+            <div class="sidebar-user">
+                <img src="~/ImageProfile/@user.ProfilePictureUrl" class="user-avatar" alt="User">
+                <div class="user-details">
+                    <div class="user-fullname">@user.FullName</div>
+                    <div class="user-email">@user.Email</div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="sidebar-user">
+                <div class="user-details">
+                    <div class="user-fullname">Guest</div>
+                    <div class="user-email">
+                        <a href="@Url.Action("Login", "Account")" class="text-decoration-none">Sign In</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </aside>
 
-                    <!-- Logout Button -->
-                    <li class="nav-item">
-                        <a href="@Url.Action("Logout", "Account")" class="nav-link">
-                            <i class="bi bi-box-arrow-left fw-bold  " style=" font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; color: #d7093c;"></i>
-                            <span style="color: #ffffff;">Logout</span>
-                        </a>
-                    </li>
-                }
-                else
-                {
-                    <!-- Login -->
-                    <li class="nav-item">
-                        <a href="@Url.Action("Login", "Account")" class="nav-link">
-                            <i class="fas fa-sign-in-alt"></i>&ensp;
-                            <span> Login</span>
-                        </a>
-                    </li>
-
-                    <!-- Register -->
-                    <li class="nav-item">
-                        <a href="@Url.Action("Register", "Account")" class="nav-link">
-                            <i class="fas fa-user-plus"></i> &ensp;
-                            <span> Register</span>
-                        </a>
-                    </li>
-                }
-
-               
-            </ul>
+    <!-- ========== Mobile Menu (Offcanvas) – Visible Only on Small Screens ========== -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="mobileSidebarLabel">
+                <i class="fas fa-store-alt me-2" style="color: var(--accent-color);"></i>
+                Shop Express
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body px-3">
+            <!-- User Profile for Mobile -->
+            @if (User.Identity.IsAuthenticated && user != null)
+            {
+                <div class="d-flex align-items-center gap-3 mb-4 p-3 bg-light rounded-4">
+                    <img src="~/ImageProfile/@user.ProfilePictureUrl" class="rounded-3" width="54" height="54" style="object-fit: cover; border: 2px solid var(--accent-light);">
+                    <div>
+                        <div class="fw-bold">@user.FullName</div>
+                        <small class="text-secondary">@user.Email</small>
+                    </div>
+                </div>
+            }
+            <!-- Navigation Links on Mobile -->
+            <div class="nav flex-column">
+                <a class="nav-link" asp-controller="Admin" asp-action="Dashboard">
+                    <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+                </a>
+                <a class="nav-link" asp-action="listCategory" asp-controller="Category">
+                    <i class="fas fa-tags"></i> <span>Categories</span>
+                </a>
+                <a class="nav-link" asp-action="ListsubCategory" asp-controller="SubCategory">
+                    <i class="fas fa-layer-group"></i> <span>Subcategories</span>
+                </a>
+                <a class="nav-link" asp-action="ListProduct" asp-controller="Product">
+                    <i class="fas fa-box"></i> <span>Products</span>
+                </a>
+                <a class="nav-link" asp-action="GetAllOrder" asp-controller="OrderManeg">
+                    <i class="fas fa-shopping-cart"></i> <span>Orders</span>
+                </a>
+                <a class="nav-link" asp-action="AllAccount" asp-controller="ManagementsAccount">
+                    <i class="fas fa-users-cog"></i> <span>Accounts</span>
+                </a>
+                <a class="nav-link" href="#">
+                    <i class="fas fa-envelope"></i> <span>Messages</span>
+                </a>
+                <a class="nav-link" href="#">
+                    <i class="fas fa-bell"></i> <span>Notifications</span>
+                </a>
+                <a class="nav-link" href="#">
+                    <i class="fas fa-cog"></i> <span>Settings</span>
+                </a>
+            </div>
+            @if (!User.Identity.IsAuthenticated)
+            {
+                <hr>
+                <div class="d-grid gap-2 mt-3">
+                    <a href="@Url.Action("Login", "Account")" class="btn btn-outline-primary rounded-pill">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                    <a href="@Url.Action("Register", "Account")" class="btn btn-primary rounded-pill">
+                        <i class="fas fa-user-plus"></i> Register
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="mt-4 pt-3 border-top">
+                    <a href="@Url.Action("Logout", "Account")" class="btn btn-outline-danger rounded-pill w-100">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            }
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content collapsed justify-content-center align-items-center" id="mainContent">
-        <!-- تمت إضافة collapsed هنا -->
+    <!-- ========== Main Content ========== -->
+    <main class="main-content" id="mainContent">
         @RenderBody()
-    </div>
+    </main>
 
-    <!-- jQuery أولاً -->
+    <!-- ========== Scripts ========== -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- jQuery Validation (CDN) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
-
-    <!-- Bootstrap بعد jQuery -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const toggleBtn = document.getElementById('toggleSidebar');
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const icon = toggleBtn.querySelector('i');
+        (function() {
+            'use strict';
 
-            function updateIcon() {
-                if (sidebar.classList.contains('collapsed')) {
-                    icon.classList.remove('fa-angle-double-left');
-                    icon.classList.add('fa-angle-double-right');
+            // Sidebar control elements
+            const sidebar = document.getElementById('desktopSidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleBtn = document.getElementById('toggleSidebarBtn');
+
+            if (sidebar && mainContent && toggleBtn) {
+                // Restore saved state
+                const savedState = localStorage.getItem('sidebarCollapsed');
+                if (savedState === 'true') {
+                    sidebar.classList.add('collapsed');
+                    mainContent.classList.add('expanded');
+                    toggleBtn.innerHTML = '<i class="fas fa-angle-double-right"></i>';
                 } else {
-                    icon.classList.remove('fa-angle-double-right');
-                    icon.classList.add('fa-angle-double-left');
+                    sidebar.classList.remove('collapsed');
+                    mainContent.classList.remove('expanded');
+                    toggleBtn.innerHTML = '<i class="fas fa-angle-double-left"></i>';
                 }
+
+                // Toggle state on click
+                toggleBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+
+                    // Change icon and save state
+                    const isCollapsed = sidebar.classList.contains('collapsed');
+                    if (isCollapsed) {
+                        toggleBtn.innerHTML = '<i class="fas fa-angle-double-right"></i>';
+                    } else {
+                        toggleBtn.innerHTML = '<i class="fas fa-angle-double-left"></i>';
+                    }
+                    localStorage.setItem('sidebarCollapsed', isCollapsed);
+                });
             }
 
-            updateIcon();
+            // Initialize tooltips automatically for collapsed sidebar
+            function initTooltips() {
+                if (sidebar && sidebar.classList.contains('collapsed')) {
+                    const links = sidebar.querySelectorAll('.nav-link');
+                    links.forEach(link => {
+                        const span = link.querySelector('span');
+                        if (span && span.innerText) {
+                            link.setAttribute('data-bs-toggle', 'tooltip');
+                            link.setAttribute('data-bs-placement', 'right');
+                            link.setAttribute('title', span.innerText);
+                        }
+                    });
+                } else {
+                    if (sidebar) {
+                        const links = sidebar.querySelectorAll('.nav-link[data-bs-toggle="tooltip"]');
+                        links.forEach(link => {
+                            const tooltip = bootstrap.Tooltip.getInstance(link);
+                            if (tooltip) tooltip.dispose();
+                            link.removeAttribute('data-bs-toggle');
+                            link.removeAttribute('data-bs-placement');
+                            link.removeAttribute('title');
+                        });
+                    }
+                }
+                // Activate tooltips for all new elements
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map(function(el) {
+                    return new bootstrap.Tooltip(el);
+                });
+            }
 
-            toggleBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('collapsed');
-                updateIcon();
-            });
-        });
+            // Initialize tooltips after page load and on every toggle
+            window.addEventListener('load', initTooltips);
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    setTimeout(initTooltips, 50);
+                });
+            }
+        })();
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

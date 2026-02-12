@@ -38,23 +38,29 @@ namespace ShopApp.Services
             var json = await res.Content.ReadAsStringAsync();
             return JsonDoc(json).RootElement.GetProperty("token").GetString();
         }
-          // انشاء طلب للسيرفر اني اجيب رقم الاردر
-        public async Task<int> CreateOrderAsync(string token, decimal amountCents)
+        // انشاء طلب للسيرفر اني اجيب رقم الاردر
+        public async Task<int> CreateOrderAsync(string token, decimal amountCents, string merchantOrderId)
         {
             var req = new
             {
                 auth_token = token,
                 delivery_needed = false,
-                amount_cents = (int)(amountCents),
+                amount_cents = (int)amountCents,
                 currency = "EGP",
+                merchant_order_id = merchantOrderId, // 🔥 هذا أهم سطر
                 items = new object[] { }
             };
 
-            var res = await _http.PostAsync("https://accept.paymob.com/api/ecommerce/orders", CreateContent(req));
+            var res = await _http.PostAsync(
+                "https://accept.paymob.com/api/ecommerce/orders",
+                CreateContent(req));
+
             var json = await res.Content.ReadAsStringAsync();
+
             return JsonDoc(json).RootElement.GetProperty("id").GetInt32();
         }
-            // الحصول علي مفتاح الدفع
+
+        // الحصول علي مفتاح الدفع
         public async Task<string> GetPaymentKeyAsync(string token, int orderId, decimal amountCents, string name, string email, string phone)
         {
             var req = new

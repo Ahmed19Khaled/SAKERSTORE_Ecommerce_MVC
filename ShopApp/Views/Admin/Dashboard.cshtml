@@ -6,391 +6,672 @@
     Layout = "_AdminLayout";
 }
 
-
-
-
 <style>
-
+    /* ========== Design Variables – Light, Clean, Professional ========== */
     :root {
-        --bg-dark: #1e1e2f;
-        --bg-darker: #161625;
-        --card-dark: #2c2c40;
-        --text-light: #e0e0e0;
-        --primary: #4fc3f7;
-        --secondary: #ff8a65;
-        --success: #66bb6a;
-        --danger: #ef5350;
-        --warning: #ffa726;
+        --dash-bg: #f8fafc;
+        --dash-card-bg: #ffffff;
+        --dash-border: #e9edf2;
+        --dash-text-primary: #0f172a;
+        --dash-text-secondary: #475569;
+        --dash-text-muted: #64748b;
+        --dash-accent: #2563eb;
+        --dash-accent-light: #dbeafe;
+        --dash-success: #10b981;
+        --dash-success-light: #d1fae5;
+        --dash-danger: #ef4444;
+        --dash-danger-light: #fee2e2;
+        --dash-warning: #f59e0b;
+        --dash-warning-light: #fef3c7;
+        --dash-purple: #8b5cf6;
+        --dash-purple-light: #ede9fe;
+        --dash-shadow: 0 4px 12px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(0, 0, 0, 0.01);
+        --dash-shadow-hover: 0 12px 24px -8px rgba(0, 0, 0, 0.08);
+        --dash-radius: 20px;
+        --dash-radius-sm: 16px;
+        --dash-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
-        background-color: var(--bg-dark);
-        color: var(--text-light);
+        background-color: var(--dash-bg);
+        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    .table {
-        background-color: var(--card-dark);
-        color: var(--text-light);
-    }
-
-        .table thead {
-            background-color: var(--bg-darker);
-            color: var(--primary);
-        }
-
-        .table tbody tr {
-            transition: background-color 0.2s;
-        }
-
-            .table tbody tr:hover {
-                background-color: #2a2a3d;
-            }
-
-    .overview-card {
-        background-color: #2a2a2a;
-        color: white;
-        border-radius: 16px;
-        padding: 16px;
+    /* ========== Stats Cards ========== */
+    .stat-card {
+        background-color: var(--dash-card-bg);
+        border: 1px solid var(--dash-border);
+        border-radius: var(--dash-radius);
+        padding: 1.5rem 1.2rem;
+        box-shadow: var(--dash-shadow);
+        transition: var(--dash-transition);
         position: relative;
-        min-height: 130px;
         overflow: hidden;
-        transition: 0.3s ease;
+        height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }
 
-    tr > th {
-        color: var(--primary) !important;
-    }
-
-    tr > td {
-        color: var(--text-light) !important;
-    }
-
-    .table td {
-        background-color: #29293e !important;
-    }
-
-    .table th {
-        background-color: #29293e !important;
-    }
-
-        .overview-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        .stat-card:hover {
+            box-shadow: var(--dash-shadow-hover);
+            transform: translateY(-4px);
+            border-color: transparent;
         }
 
-        .overview-card h6 {
-            font-size: 0.75rem;
-            margin-bottom: 6px;
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+    }
+
+        .stat-icon.blue {
+            background-color: var(--dash-accent-light);
+            color: var(--dash-accent);
         }
 
-        .overview-card h3 {
-            font-size: 1.2rem;
-            margin: 0;
+        .stat-icon.red {
+            background-color: var(--dash-danger-light);
+            color: var(--dash-danger);
         }
 
-        .overview-card small {
-            font-size: 0.7rem;
-            opacity: 0.85;
+        .stat-icon.green {
+            background-color: var(--dash-success-light);
+            color: var(--dash-success);
         }
 
-        .overview-card .icon {
-            font-size: 2rem;
-            position: absolute;
-            bottom: 12px;
-            right: 12px;
-            opacity: 0.3;
+        .stat-icon.orange {
+            background-color: var(--dash-warning-light);
+            color: var(--dash-warning);
         }
 
-    /* ألوان مختلفة للخلفيات */
-    .bg-card-sales {
-        background: linear-gradient(135deg, #43cea2, #185a9d);
+        .stat-icon.purple {
+            background-color: var(--dash-purple-light);
+            color: var(--dash-purple);
+        }
+
+    .stat-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--dash-text-muted);
+        font-weight: 600;
+        margin-bottom: 0.25rem;
     }
 
-    .bg-card-expenses {
-        background: linear-gradient(135deg, #f85032, #e73827);
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dash-text-primary);
+        line-height: 1.2;
+        margin-bottom: 0.25rem;
     }
 
-    .bg-card-visitors {
-        background: linear-gradient(135deg, #3a1c71, #d76d77);
+    .stat-trend {
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-weight: 500;
     }
 
-    .bg-card-orders {
-        background: linear-gradient(135deg, #f7971e, #ffd200);
-        color: #000;
+    .trend-up {
+        color: var(--dash-success);
     }
 
-    .bg-card-today {
-        background: linear-gradient(135deg, #4ca1af, #c4e0e5);
-        color: #000;
+    .trend-down {
+        color: var(--dash-danger);
     }
 
-    /* استجابة للشاشات الصغيرة */
+    /* ========== Chart Container ========== */
+    .chart-container {
+        background-color: var(--dash-card-bg);
+        border-radius: var(--dash-radius);
+        border: 1px solid var(--dash-border);
+        padding: 1.5rem;
+        margin-top: 1.8rem;
+        box-shadow: var(--dash-shadow);
+        height: 400px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chart-wrapper {
+        flex: 1;
+        position: relative;
+        min-height: 0;
+    }
+
+    .chart-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--dash-text-primary);
+        margin-bottom: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        flex-shrink: 0;
+    }
+
+        .chart-title i {
+            color: var(--dash-accent);
+        }
+
+    /* ========== Modern Tables ========== */
+    .modern-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .modern-table thead th {
+            background-color: transparent;
+            color: var(--dash-text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid var(--dash-border);
+        }
+
+        .modern-table tbody td {
+            padding: 1rem 0.75rem;
+            color: var(--dash-text-secondary);
+            border-bottom: 1px solid var(--dash-border);
+            vertical-align: middle;
+            background-color: transparent !important;
+        }
+
+        .modern-table tbody tr:hover td {
+            background-color: #f1f5f9 !important;
+        }
+
+    .product-thumb {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        object-fit: cover;
+        border: 1px solid var(--dash-border);
+        background-color: white;
+    }
+
+    .badge-available {
+        background-color: var(--dash-success-light);
+        color: var(--dash-success);
+        padding: 0.35rem 0.8rem;
+        border-radius: 40px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .badge-unavailable {
+        background-color: var(--dash-danger-light);
+        color: var(--dash-danger);
+        padding: 0.35rem 0.8rem;
+        border-radius: 40px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    /* ========== Profile Card (Sidebar) ========== */
+    .profile-card {
+        background-color: var(--dash-card-bg);
+        border: 1px solid var(--dash-border);
+        border-radius: var(--dash-radius);
+        padding: 1.8rem 1.5rem;
+        box-shadow: var(--dash-shadow);
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 28px;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+        margin-bottom: 1rem;
+    }
+
+    .profile-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--dash-text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .profile-role {
+        color: var(--dash-text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .profile-stats {
+        display: flex;
+        justify-content: space-around;
+        margin: 1.5rem 0;
+        padding: 1rem 0;
+        border-top: 1px solid var(--dash-border);
+        border-bottom: 1px solid var(--dash-border);
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--dash-text-primary);
+    }
+
+    .seller-badge {
+        background: linear-gradient(95deg, #f59e0b20, #f59e0b10);
+        color: #b45309;
+        padding: 0.6rem 1rem;
+        border-radius: 40px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+        border: 1px solid #f59e0b30;
+    }
+
+    /* ========== Order List ========== */
+    .order-list {
+        background-color: var(--dash-card-bg);
+        border: 1px solid var(--dash-border);
+        border-radius: var(--dash-radius);
+        padding: 1.5rem;
+    }
+
+    .order-item {
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid var(--dash-border);
+        cursor: pointer;
+        transition: var(--dash-transition);
+    }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-item:hover {
+            background-color: #f8fafc;
+            padding-left: 0.5rem;
+        }
+
+    .order-img {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        object-fit: cover;
+        margin-right: 1rem;
+        border: 1px solid var(--dash-border);
+    }
+
+    .order-info {
+        flex: 1;
+    }
+
+    .order-name {
+        font-weight: 600;
+        color: var(--dash-text-primary);
+        margin-bottom: 0.1rem;
+    }
+
+    .order-amount {
+        color: var(--dash-success);
+        font-weight: 700;
+    }
+
+    .see-all-link {
+        display: block;
+        text-align: center;
+        margin-top: 1.2rem;
+        color: var(--dash-accent);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+        .see-all-link:hover {
+            text-decoration: underline;
+        }
+
+    /* ========== Responsive Improvements ========== */
     @@media (max-width: 768px) {
-        .overview-card h3
+        .stat-value {
+            font-size: 1.6rem;
+        }
 
-    {
-        font-size: 1rem;
-    }
+        .profile-card {
+            padding: 1.5rem 1rem;
+        }
 
-    .overview-card h6,
-    .overview-card small {
-        font-size: 0.65rem;
-    }
+        .chart-container {
+            height: 350px;
+        }
 
-    .overview-card .icon {
-        font-size: 1.5rem;
-    }
+        .modern-table thead {
+            display: none;
+        }
 
+        .modern-table tbody td {
+            display: block;
+            width: 100%;
+            text-align: right;
+            padding-left: 50%;
+            position: relative;
+            border-bottom: none;
+        }
+
+            .modern-table tbody td:before {
+                content: attr(data-label);
+                position: absolute;
+                left: 1rem;
+                width: 45%;
+                font-weight: 600;
+                color: var(--dash-text-muted);
+                text-align: left;
+            }
+
+        .modern-table tbody tr {
+            display: block;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--dash-border);
+            border-radius: var(--dash-radius-sm);
+            padding: 1rem;
+        }
+
+        .product-thumb {
+            width: 60px;
+            height: 60px;
+        }
     }
 </style>
 
-<div class=" ">
-    <div class="row mb-4">
-        <!-- Overview Cards -->
-        <div class="col-md-9">
-            <div class="row g-3 ">
-                <div class="col-6 col-md-3" style="max-width: 210px;">
-                    <div class="overview-card bg-card-sales">
-                        <div class="card-content">
-                            <h6><i class="bi bi-cash-stack me-1"></i> Total Sales</h6>
-                            <h3>$@Model.TotalRevenue</h3>
-                            <small><i class="bi bi-arrow-up-right-circle-fill me-1"></i>+24%</small>
+<div class="container-fluid px-0">
+    <!-- Main Row -->
+    <div class="row g-4">
+        <!-- Main Column (Primary Content) -->
+        <div class="col-xl-9 col-lg-8">
+            <!-- Quick Stats Cards -->
+            <div class="row g-3 mb-2">
+                <div class="col-sm-6 col-md-4 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-dollar-sign"></i>
                         </div>
-                        <i class="bi bi-bar-chart-line-fill icon"></i>
+                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-value">$@Model.TotalRevenue.ToString("N0")</div>
+                        <div class="stat-trend">
+                            <span class="trend-up"><i class="fas fa-arrow-up"></i> +24%</span>
+                            <span class="text-muted ms-1">from last month</span>
+                        </div>
                     </div>
                 </div>
-
-                <div class="col-6 col-md-3" style="max-width: 210px;">
-                    <div class="overview-card bg-card-expenses">
-                        <div class="card-content">
-                            <h6><i class="bi bi-credit-card-2-front me-1"></i> Total Expenses</h6>
-                            <h3>$@Model.TotalExpenses</h3>
-                            <small><i class="bi bi-arrow-down-right-circle-fill me-1"></i>-32%</small>
+                <div class="col-sm-6 col-md-4 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon red">
+                            <i class="fas fa-credit-card"></i>
                         </div>
-                        <i class="bi bi-graph-down-arrow icon"></i>
+                        <div class="stat-label">Total Expenses</div>
+                        <div class="stat-value">$@Model.TotalExpenses.ToString("N0")</div>
+                        <div class="stat-trend">
+                            <span class="trend-down"><i class="fas fa-arrow-down"></i> -32%</span>
+                            <span class="text-muted ms-1">from last month</span>
+                        </div>
                     </div>
                 </div>
-
-                <div class="col-6 col-md-3" style="max-width: 210px;">
-                    <div class="overview-card bg-card-visitors">
-                        <div class="card-content">
-                            <h6><i class="bi bi-people-fill me-1"></i> Total Visitors</h6>
-                            <h3>@Model.TotalVisitors</h3>
-                            <small><i class="bi bi-arrow-up-right-circle-fill me-1"></i>+48%</small>
+                <div class="col-sm-6 col-md-4 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-users"></i>
                         </div>
-                        <i class="bi bi-person-check-fill icon"></i>
+                        <div class="stat-label">Total Visitors</div>
+                        <div class="stat-value">@Model.TotalVisitors.ToString("N0")</div>
+                        <div class="stat-trend">
+                            <span class="trend-up"><i class="fas fa-arrow-up"></i> +48%</span>
+                            <span class="text-muted ms-1">from last month</span>
+                        </div>
                     </div>
                 </div>
-
-                <div class="col-6 col-md-3" style="max-width: 210px;">
-                    <div class="overview-card bg-card-orders">
-                        <div class="card-content">
-                            <h6><i class="bi bi-cart-fill me-1"></i> Total Orders</h6>
-                            <h3>@Model.TotalOrders</h3>
-                            <small><i class="bi bi-arrow-down-right-circle-fill me-1"></i>-12%</small>
+                <div class="col-sm-6 col-md-4 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-shopping-cart"></i>
                         </div>
-                        <i class="bi bi-bag-check-fill icon"></i>
+                        <div class="stat-label">Total Orders</div>
+                        <div class="stat-value">@Model.TotalOrders.ToString("N0")</div>
+                        <div class="stat-trend">
+                            <span class="trend-down"><i class="fas fa-arrow-down"></i> -12%</span>
+                            <span class="text-muted ms-1">from last month</span>
+                        </div>
                     </div>
                 </div>
-
-                <div class="col-6 col-md-3" style="max-width: 220px;">
-                    <div class="overview-card bg-card-today">
-                        <div class="card-content">
-                            <h6><i class="bi bi-cart-check-fill me-1"></i> Orders Today</h6>
-                            <h3>@Model.ordertoday</h3>
-                            <small><i class="bi bi-arrow-up-right-circle-fill me-1"></i>+12%</small>
+                <div class="col-sm-6 col-md-4 col-xl-3">
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-calendar-day"></i>
                         </div>
-                        <i class="bi bi-bag-check-fill icon"></i>
+                        <div class="stat-label">Today's Orders</div>
+                        <div class="stat-value">@Model.ordertoday.ToString("N0")</div>
+                        <div class="stat-trend">
+                            <span class="trend-up"><i class="fas fa-arrow-up"></i> +12%</span>
+                            <span class="text-muted ms-1">from yesterday</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Income Chart Placeholder -->
-
-            <div class="mt-4">
-                <h4>Income (Monthly) </h4>
-                <canvas id="incomeChart" class="p-2 " style="width: 100%; max-width:1000px; height: 300px; background:linear-gradient(#e85a5a,#ddcbcb);"></canvas>
+            <!-- Monthly Income Chart -->
+            <div class="chart-container">
+                <div class="chart-title">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Monthly Income</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="incomeChart"></canvas>
+                </div>
             </div>
 
-            <!-- Popular Products -->
+            <!-- Top Selling Products Table -->
             <div class="mt-4">
-                <h5>Popular Products</h5>
-                <table class="table table-dark-custom ">
-                    <thead>                  
-                        <tr class="" s  >
-                            <th >Photo</th>
-                            <th>Name</th>
-                            <th>Date</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Sale QTY</th>
-                            <th>Stock QTY</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var product in Model.TopProducts)
-                        {
-                            <tr class="fw-bold" style="" >
-                                <td><img src="/ImgePro/@product.ImageUrl" width="80" /></td>
-                                <td class="text-truncate " style="max-width:100px;">@product.ProductName</td>
-                                <td>@product.SaleDate.ToString("MMM,dd,yyyy")</td>
-                                <td>@product.Category</td>
-                                <td class="text-success fw-bold" >$@product.Price</td>
-                                <td class="fw-bold" style="color:darkred" >@product.TotalSold</td>
-                                <td class="text-success fw-bold">
-                                    <div>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold" style="color: var(--dash-text-primary);">
+                        <i class="fas fa-crown me-2" style="color: #f59e0b;"></i> Top Selling Products
+                    </h5>
+                    <span class="text-muted small">Last 30 days</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Product Name</th>
+                                <th>Sale Date</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Qty Sold</th>
+                                <th>Availability</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var product in Model.TopProducts)
+                            {
+                                <tr>
+                                    <td data-label="Image">
+                                        <img src="/ImgePro/@product.ImageUrl" class="product-thumb" alt="@product.ProductName">
+                                    </td>
+                                    <td data-label="Product Name" class="fw-semibold" style="color: var(--dash-text-primary);">
+                                        @product.ProductName
+                                    </td>
+                                    <td data-label="Sale Date">@product.SaleDate.ToString("dd MMM, yyyy")</td>
+                                    <td data-label="Category">
+                                        <span class="badge bg-light text-dark px-3 py-2 rounded-pill">@product.Category</span>
+                                    </td>
+                                    <td data-label="Price" class="fw-bold" style="color: var(--dash-success);">
+                                        $@product.Price.ToString("N2")
+                                    </td>
+                                    <td data-label="Qty Sold" class="fw-bold" style="color: var(--dash-accent);">
+                                        @product.TotalSold
+                                    </td>
+                                    <td data-label="Availability">
                                         @if (product.isavilabel)
                                         {
-                                            <span class="badge bg-success">Available</span>
+                                            <span class="badge-available">
+                                                <i class="fas fa-check-circle me-1"></i> In Stock
+                                            </span>
+                                            <div class="mt-1 small text-muted">@product.TotalQTY units</div>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-danger">Unavailable</span>
+                                            <span class="badge-unavailable">
+                                                <i class="fas fa-times-circle me-1"></i> Out of Stock
+                                            </span>
                                         }
-                                    </div>
-                                    <div class="mt-1 text-primary">QTY @product.TotalQTY</div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- Side Panel -->
-        <div class="col-md-3">
-            <div class="side-panel mb-4 shadow-sm border-0 bg-dark rounded-4">
-                <div class="text-center">
-                    <img src="~/ImageProfile/@Model.imageuser" class="rounded-circle mb-2 shadow" style="width: 120px; height: 120px; object-fit: cover;" />
-                    <h5 class="fw-bold mb-1">@Model.User.FullName</h5>
-                    <p class=" small"><i class="bi bi-person-badge me-1"></i>Administrator</p>
-
-                    <a href="/Admin/EditProfile" class="btn btn-outline-primary btn-sm mt-2 shadow-sm">
-                        <i class="bi bi-pencil-square"></i> Edit Profile
-                    </a>
-
+        <!-- Sidebar Column (Profile + Latest Orders) -->
+        <div class="col-xl-3 col-lg-4">
+            <!-- Profile Card -->
+            <div class="profile-card">
+                <img src="~/ImageProfile/@Model.imageuser" class="profile-avatar" alt="@Model.User?.FullName">
+                <h3 class="profile-name">@Model.User?.FullName</h3>
+                <div class="profile-role">
+                    <i class="fas fa-shield-alt me-1"></i> Store Manager
                 </div>
+                <a href="/Admin/EditProfile" class="btn btn-outline-primary rounded-pill px-4 py-2 mb-3" style="border-width: 1.5px;">
+                    <i class="fas fa-user-edit me-1"></i> Edit Profile
+                </a>
 
-                <hr />
-
-                <div class="row text-center">
-                    <div class="col-6">
-                        <h6 class="mb-0 fw-bold">@Model.ProductsCount</h6>
-                        <small class=" text-white">Products</small>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">@Model.ProductsCount</div>
+                        <div class="stat-label">Products</div>
                     </div>
-                    <div class="col-6">
-                        <h6 class="mb-0 fw-bold"><i class="bi bi-person-badge"></i> @Model.Followers</h6>
-                         <small class="">Followers</small>
+                    <div class="stat-item">
+                        <div class="stat-number">@Model.Followers.ToString("N0")</div>
+                        <div class="stat-label">Followers</div>
                     </div>
                 </div>
 
-                <hr />
-
-                <div class="px-2">
-                    <span class="badge badge-star bg-warning text-white p-2 w-100 mb-2">
-                        <i class="bi bi-star-fill me-1"></i> Star Seller
-                    </span>
-                    <div class="progress" style="height: 8px;">
-                        <div class="progress-bar bg-warning" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
+                <div class="seller-badge mb-2">
+                    <i class="fas fa-star text-warning"></i>
+                    <span>Top Seller</span>
+                </div>
+                <div class="progress" style="height: 6px; background-color: #e2e8f0; border-radius: 30px;">
+                    <div class="progress-bar bg-warning" style="width: 85%; border-radius: 30px;"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-2 small text-muted">
+                    <span>Performance Level</span>
+                    <span class="fw-bold">85%</span>
                 </div>
             </div>
 
-
-            <!-- Recent Orders -->
-            <div class="side-panel">
-                <h4>Latest Orders</h4>
-                <table class="table align-middle align-content-center tab ">
-                    <thead>
-                        <tr>
-                            <th>Image</th>
-                            <th>Name</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    @foreach (var order in Model.LatestOrders)
-                    {
-                        var firstProduct = order.Items.FirstOrDefault()?.Product;
-                        var firstImage = firstProduct?.Images.FirstOrDefault()?.ImageURL;
-                        <tr class="w-100s" onclick="window.location.href='@Url.Action("Details" ,"OrderManeg", new { orderId = order.Id })'" style="cursor: pointer;">
-                            <td>
-                                <div class="d-flex align-middle">
-                                    <i class="bi bi-box-seam me-2"></i>
-                                    <img src="~/ImgePro/@firstImage"
-                                         class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;" />
-                                </div>
-                            </td>
-                            <td>
-                                <div class="fw-bold text-truncate" style="color:#e8d5d5; max-width:100px">@order.FullName</div>
-                            </td>
-                            <td>
-                                <div class="text-success">$@order.TotalAmount</div>
-                            </td>
-                        </tr>
-                    }
-                </table>
-                <a asp-action="GetAllOrder" asp-controller="OrderManeg" class="d-block mt-2 text-center text-primary">See All</a>
+            <!-- Latest Orders -->
+            <div class="order-list">
+                <h5 class="fw-bold mb-3" style="color: var(--dash-text-primary);">
+                    <i class="fas fa-clock me-2" style="color: var(--dash-accent);"></i> Latest Orders
+                </h5>
+                @foreach (var order in Model.LatestOrders.Take(5))
+                {
+                    var firstProduct = order.Items?.FirstOrDefault()?.Product;
+                    var firstImage = firstProduct?.Images?.FirstOrDefault()?.ImageURL;
+                    <div class="order-item" onclick="window.location.href='@Url.Action("Details", "OrderManeg", new { orderId = order.Id })'">
+                        <img src="~/ImgePro/@firstImage" class="order-img" alt="Order" onerror="this.src='/images/placeholder.png'">
+                        <div class="order-info">
+                            <div class="order-name">@order.FullName</div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted small"><i class="fas fa-box me-1"></i>@order.Items?.Count() items</span>
+                                <span class="order-amount">$@order.TotalAmount.ToString("N2")</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <a asp-action="GetAllOrder" asp-controller="OrderManeg" class="see-all-link">
+                    View All Orders <i class="fas fa-arrow-right ms-1"></i>
+                </a>
             </div>
         </div>
     </div>
 </div>
+
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const ctx = document.getElementById('incomeChart').getContext('2d');
 
-                const incomeChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: @Html.Raw(JsonSerializer.Serialize(Model.MonthlyIncome.Select(m => m.Month))),
-                datasets: [{
-                    label: 'Income',
-                    data: @Html.Raw(JsonSerializer.Serialize(Model.MonthlyIncome.Select(m => m.Amount))),
-                    backgroundColor: '#282da5',
-                    borderRadius: 8,
-                    barThickness: 40
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: ctx => `$${ctx.raw}`
-                        },
-                        bodyColor: "#ffffff", // ← لون النص داخل التولتيب
-                        titleColor: "#ffffff",
-                        backgroundColor: "#2b2b3c"
-                    }
+            // Data from ViewModel
+            const months = @Html.Raw(JsonSerializer.Serialize(Model.MonthlyIncome.Select(m => m.Month)));
+            const amounts = @Html.Raw(JsonSerializer.Serialize(Model.MonthlyIncome.Select(m => m.Amount)));
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Income',
+                        data: amounts,
+                        backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                        borderRadius: 8,
+                        barPercentage: 0.6,
+                        categoryPercentage: 0.8
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: value => `$${value}`,
-                            color: "#ffffff" // ← هنا لتغيير لون الأرقام إلى أبيض
-                        },
-                        grid: {
-                            color: "rgba(255,255,255,0.1)" // خطوط الشبكة خفيفة
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `$${context.raw.toLocaleString()}`
+                            },
+                            backgroundColor: '#0f172a',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#e2e8f0',
+                            padding: 12,
+                            cornerRadius: 12
                         }
                     },
-                    x: {
-                        ticks: {
-                            color: "#ffffff" // ← الأشهر أيضًا بالأبيض
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#e9edf2' },
+                            ticks: {
+                                callback: (value) => '$' + value.toLocaleString(),
+                                color: '#64748b'
+                            }
                         },
-                        grid: {
-                            color: "rgba(255,255,255,0.05)"
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#64748b' }
                         }
                     }
                 }
-            }
-        });
-
+            });
         });
     </script>
 }

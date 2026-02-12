@@ -1,8 +1,239 @@
-﻿<div class="container text-center mt-5">
-    <div class="alert alert-success p-5">
-        <h2 class="mb-3">🎉 تم إتمام طلبك بنجاح!</h2>
-        <p>رقم الطلب: <strong>#@Model.Id</strong></p>
-        <p>سنقوم بالتواصل معك قريبًا لتأكيد الشحن.</p>
-        <a href="/" class="btn btn-primary mt-3">العودة للرئيسية</a>
+﻿@{
+    ViewData["Title"] = "Order Confirmation";
+}
+
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-color: #28a745;
+        --text-main: #2d3436;
+        --text-muted: #636e72;
+        --bg-light: #f8faff;
+    }
+
+    body {
+        background-color: #f4f7f6;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .success-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+        padding: 20px;
+    }
+
+    .success-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        max-width: 550px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+        /* تأثير الخط العلوي الملون */
+        .success-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--primary-gradient);
+        }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* تصميم أيقونة النجاح المتحركة */
+    .icon-wrapper {
+        width: 100px;
+        height: 100px;
+        background: #ebfaf0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+    }
+
+    .checkmark-svg {
+        width: 50px;
+        height: 50px;
+        fill: none;
+        stroke: var(--success-color);
+        stroke-width: 5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        animation: drawCheck 0.8s ease-in-out forwards 0.5s;
+    }
+
+    @@keyframes drawCheck {
+        to {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    .success-title {
+        font-size: 2rem;
+        color: var(--text-main);
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .success-subtitle {
+        color: var(--text-muted);
+        font-size: 1.05rem;
+        margin-bottom: 30px;
+    }
+
+    /* صندوق تفاصيل الطلب */
+    .order-summary {
+        background: var(--bg-light);
+        border: 1px solid #edf2f7;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px dashed #d1d8e0;
+    }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+    .label {
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .value {
+        color: var(--text-main);
+        font-weight: 700;
+    }
+
+    /* الأزرار */
+    .button-group {
+        display: grid;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .btn-main {
+        padding: 14px 20px;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary-filled {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+        .btn-primary-filled:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+    .btn-outline {
+        background: white;
+        color: #764ba2;
+        border: 2px solid #764ba2;
+    }
+
+        .btn-outline:hover {
+            background: #f8f9ff;
+            transform: translateY(-3px);
+        }
+
+    .help-text {
+        margin-top: 25px;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+        .help-text a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+    @@media (max-width: 500px) {
+        .button-group {
+            grid-template-columns: 1fr;
+        }
+
+        .success-card {
+            padding: 25px;
+        }
+    }
+</style>
+
+<div class="success-container">
+    <div class="success-card">
+        <div class="icon-wrapper">
+            <svg class="checkmark-svg" viewBox="0 0 52 52">
+                <path d="M14 27l7.5 7.5L38 18"></path>
+            </svg>
+        </div>
+
+        <h1 class="success-title">Order Confirmed!</h1>
+        <p class="success-subtitle">Hooray! Your order has been placed and is being processed by our team.</p>
+
+        <div class="order-summary">
+            @{
+                var orderNo = "#ORD-77210"; // مثال
+                var orderStatus = "Processing";
+                var orderDate = DateTime.Now;
+            }
+            <div class="summary-row">
+                <span class="label">Order Number</span>
+                <span class="value">@orderNo</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Status</span>
+                <span class="value" style="color: #2ecc71;">● @orderStatus</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Expected Delivery</span>
+                <span class="value">@orderDate.AddDays(3).ToString("MMM dd, yyyy")</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <a href="/" class="btn-main w-100  btn-primary-filled">Continue Shopping</a>
+        </div>
+
+        <p class="help-text">
+            Need any help? <a asp-action="Contact" asp-controller="Home">Contact Support</a>
+        </p>
     </div>
 </div>

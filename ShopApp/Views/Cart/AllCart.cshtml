@@ -1,195 +1,589 @@
 ﻿@model List<CartItem>
 @{
-	ViewData["Title"] = "AllCart";
+    ViewData["Title"] = "AllCart";
 }
 
+@* Anti‑forgery token for AJAX requests *@
+@Html.AntiForgeryToken()
+
 <style>
-	table {
-		background-color: white;
-		border-radius: 10px;
-		overflow: hidden;
-	}
+    /* -------------------------------
+           Global Design Tokens (Light Theme)
+        -------------------------------- */
+    :root {
+        --brand-purple: #6f42c1;
+        --brand-purple-light: #f3e8ff;
+        --gray-soft: #f8f9fc;
+        --gray-border: #e9ecef;
+        --shadow-sm: 0 8px 20px rgba(0,0,0,0.02);
+        --shadow-hover: 0 12px 28px rgba(111, 66, 193, 0.08);
+        --radius-md: 16px;
+        --radius-sm: 12px;
+        --transition: all 0.2s ease;
+    }
 
-	th, td {
-		vertical-align: middle;
-		text-align: center;
-		color: gray !important;
-	}
+    body {
+        background-color: #fafbfc;
+    }
 
-	.product-image {
-		height: 100px;
-		object-fit: contain;
-	}
+    /* -------------------------------
+           Cart Table (Large screens)
+        -------------------------------- */
+    .cart-table {
+        background: white;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        transition: var(--transition);
+    }
 
-	.quantity-box {
-		background-color: #f0f0f0;
-		padding: 6px;
-		border-radius: 6px;
-		width: 50px;
-		margin: auto;
-	}
+        .cart-table thead th {
+            background: var(--gray-soft);
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            padding: 1rem 0.75rem;
+            border-bottom: 2px solid var(--gray-border);
+            white-space: nowrap;
+        }
 
-	.total-price {
-		color: purple;
-		font-weight: bold;
-	}
+        .cart-table tbody td {
+            padding: 1.25rem 0.75rem;
+            vertical-align: middle;
+            background: white;
+            border-bottom: 1px solid var(--gray-border);
+            color: #2d3748;
+        }
 
-	.cart-buttons {
-		display: flex;
-		gap: 10px;
-		justify-content: space-between;
-		margin-top: 20px;
-	}
+        .cart-table tbody tr:hover td {
+            background-color: #fcfcfd;
+        }
 
-	.btn-custom {
-		padding: 10px 20px;
-		border-radius: 6px;
-	}
+    /* Product image cell */
+    .product-img-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
 
-	.btn-purple {
-		background-color: white;
-		border: 1px solid #ccc;
-		color: purple;
-	}
+    .product-thumb {
+        width: 64px;
+        height: 64px;
+        border-radius: var(--radius-sm);
+        object-fit: contain;
+        background: white;
+        padding: 6px;
+        border: 1px solid var(--gray-border);
+        transition: var(--transition);
+    }
 
-		.btn-purple:hover {
-			background-color: #f3f3f3;
-		}
+        .product-thumb:hover {
+            border-color: var(--brand-purple);
+            transform: scale(1.02);
+        }
 
-	.btn-icon {
-		background-color: #f4f4f4;
-		border: none;
-		padding: 6px 10px;
-		border-radius: 6px;
-	}
+    .product-name {
+        font-weight: 600;
+        color: #1a202c;
+        margin-bottom: 0;
+        text-decoration: none;
+    }
 
-		.btn-icon i {
-			font-size: 20px;
-			color: gray;
-		}
+        .product-name:hover {
+            color: var(--brand-purple);
+        }
+
+    /* Price & total */
+    .price-now {
+        color: var(--brand-purple);
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .total-price {
+        color: #2c3e50 !important;
+        font-weight: 700;
+        font-size: 1.1rem;
+        background: #f8fafc;
+        padding: 0.4rem 0.8rem;
+        border-radius: 40px;
+        display: inline-block;
+    }
+
+    /* Color swatch – modern circle */
+    .color-swatch {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 0 0 1px #dee2e6, 0 2px 6px rgba(0,0,0,0.04);
+        margin: 0 auto;
+    }
+
+    /* Quantity input */
+    .quantity-input {
+        width: 70px;
+        text-align: center;
+        background: white;
+        border: 1px solid var(--gray-border);
+        border-radius: 40px;
+        padding: 0.5rem 0.25rem;
+        font-weight: 500;
+        color: #1a202c;
+        transition: var(--transition);
+    }
+
+        .quantity-input:focus {
+            border-color: var(--brand-purple);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.12);
+        }
+
+    /* Remove button */
+    .btn-remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: #fff3f3;
+        color: #b91c1c;
+        border: none;
+        transition: var(--transition);
+    }
+
+        .btn-remove:hover {
+            background: #fee2e2;
+            color: #991b1b;
+            transform: scale(0.96);
+        }
+
+        .btn-remove i {
+            font-size: 1.2rem;
+        }
+
+    /* -------------------------------
+           Summary Card (Sidebar)
+        -------------------------------- */
+    .summary-card {
+        background: white;
+        border-radius: var(--radius-md);
+        border: none;
+        box-shadow: var(--shadow-sm);
+        position: sticky;
+        top: 24px;
+        transition: var(--transition);
+    }
+
+        .summary-card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+    .summary-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid var(--brand-purple-light);
+        padding-bottom: 0.75rem;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 2rem;
+    }
+
+    .total-label {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #334155;
+    }
+
+    .total-amount {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--brand-purple);
+        letter-spacing: -0.01em;
+    }
+
+    .btn-soft-purple {
+        background: white;
+        border: 1.5px solid var(--gray-border);
+        color: #4b5563;
+        padding: 0.6rem 1.4rem;
+        border-radius: 40px;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+        .btn-soft-purple:hover {
+            background: var(--brand-purple-light);
+            border-color: var(--brand-purple);
+            color: var(--brand-purple);
+        }
+
+    .btn-checkout {
+        background: var(--brand-purple);
+        color: white;
+        width: 100%;
+        padding: 0.85rem;
+        border-radius: 40px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        border: none;
+        transition: var(--transition);
+        margin-top: 1rem;
+    }
+
+        .btn-checkout:hover {
+            background: #5a32a3;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(111, 66, 193, 0.25);
+        }
+
+    /* -------------------------------
+           Responsive → Cards on Mobile
+        -------------------------------- */
+    .cart-card-layout {
+        display: none;
+    }
+
+    @@media (max-width: 991.98px) {
+        .desktop-table {
+            display: none;
+        }
+
+        .cart-card-layout {
+            display: block;
+        }
+
+        .cart-item-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.02);
+            border: 1px solid var(--gray-border);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            transition: var(--transition);
+        }
+
+            .cart-item-card:hover {
+                border-color: var(--brand-purple-light);
+                box-shadow: 0 8px 20px rgba(111, 66, 193, 0.06);
+            }
+
+        .card-item-img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            border-radius: 16px;
+            border: 1px solid var(--gray-border);
+            padding: 6px;
+        }
+
+        .card-item-details {
+            flex: 1;
+        }
+
+        .card-item-title {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 6px;
+            font-size: 1.1rem;
+        }
+
+        .card-item-price {
+            color: var(--brand-purple);
+            font-weight: 700;
+        }
+
+        .card-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .color-swatch-sm {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px #dee2e6;
+        }
+
+        .summary-card {
+            margin-top: 2rem;
+            position: static;
+        }
+    }
+
+    /* Extra small fine-tuning */
+    @@media (max-width: 575.98px) {
+        .cart-item-card {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .card-item-row {
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .total-amount {
+            font-size: 1.6rem;
+        }
+    }
 </style>
 
 @if (!Model.Any())
 {
-	<p class="text-center">سلتك فارغة.</p>
+    <div class="container py-5 text-center">
+        <i class="bi bi-cart-x" style="font-size: 4rem; color: #cbd5e1;"></i>
+        <h3 class="mt-4 fw-semibold text-secondary">Your cart feels lonely</h3>
+        <p class="text-muted mb-4">Discover our products and fill it with style.</p>
+        <a href="/Home/Index" class="btn btn-purple btn-lg px-5 rounded-pill">
+            <i class="bi bi-arrow-right me-2"></i>Continue Shopping
+        </a>
+    </div>
 }
 else
 {
-	<div class="d-flex flex-wrap mt-4 mx-2 box-shadow  justify-content-between  ">
-		<table class="table  align-middle text-center" style="width:65%">
-			<thead class="bg-light">
-				<tr>
-					<th>Remove</th>
+    <div class="container-fluid py-4 px-lg-5">
+        <!-- DESKTOP / TABLET LAYOUT (≥992px) -->
+        <div class="desktop-table">
+            <div class="row g-5">
+                <!-- Cart items - table view -->
+                <div class="col-lg-8">
+                    <div class="table-responsive rounded-4">
+                        <table class="cart-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 60px"></th>
+                                    <th style="width: 100px">Product</th>
+                                    <th>Details</th>
+                                    <th>Price</th>
+                                    <th>Qty</th>
+                                    <th>Color</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <!-- Remove -->
+                                        <td>
+                                            <a href="/Cart/Remove/@item.Product.Id" class="btn-remove">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </a>
+                                        </td>
+                                        <!-- Image + Name (combined) -->
+                                        <td>
+                                            <a asp-action="DetailsProduct" asp-controller="Product" asp-route-ProductID="@item.ProductId" class="text-decoration-none">
+                                                <div class="product-img-wrapper">
+                                                    <img class="product-thumb"
+                                                         src="/ImgePro/@(item.Product.Images != null && item.Product.Images.Any() ? item.Product.Images.First().ImageURL : "no-image.jpg")"
+                                                         alt="@item.Product.Name">
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a asp-action="DetailsProduct" asp-controller="Product" asp-route-ProductID="@item.ProductId" class="product-name">
+                                                @item.Product.Name
+                                            </a>
+                                        </td>
+                                        <!-- Price after discount -->
+                                        <td>
+                                            <span class="price-now">
+                                                @((item.Product.Price * (100 - (item.Product.Offer ?? 0)) / 100).ToString("C"))
+                                            </span>
+                                        </td>
+                                        <!-- Quantity -->
+                                        <td>
+                                            <form asp-action="Add" asp-controller="Cart" method="post">
+                                                <input type="hidden" name="id" value="@item.Product.Id" />
+                                                <input type="hidden" name="stockid" value="@item.StockID" />
+                                                <input type="number"
+                                                       min="1"
+                                                       value="@item.Quantity"
+                                                       class="quantity-input"
+                                                       onchange="updateQuantity(@item.ProductId, @item.StockID, this.value, this)" />
+                                            </form>
+                                        </td>
+                                        <!-- Color swatch -->
+                                        <td>
+                                            <div class="color-swatch" style="background: @item.Stock.Color;"></div>
+                                        </td>
+                                        <!-- Item total -->
+                                        <td>
+                                            <span class="total-price">
+                                                @{
+                                                    var itemTotal = item.Quantity * item.Product.Price * (100 - (item.Product.Offer ?? 0)) / 100;
+                                                }
+                                                $@itemTotal.ToString("F2")
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Action buttons under table (optional, but we moved most to summary) -->
+                </div>
 
-					<th>Image</th>
-					<th>Product(s)</th>
-					<th>Price</th>
-					<th>Qty</th>
-					<th>Color</th>
-					<th>Total</th>
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (var item in Model)
-				{
-					<tr>
-						<td>
-							<a class="btn-icon" href="/Cart/Remove/@item.Product.Id">
-								<i class="bi bi-trash3-fill"></i>
-							</a>
-						</td>
-						<td>
-                               <a class="text-decoration-none" asp-action="DetailsProduct" asp-controller="Product" asp-route-ProductID="@item.ProductId">
+                <!-- Summary sidebar -->
+                <div class="col-lg-4">
+                    <div class="summary-card p-4 text-center">
+                        <h3 class="summary-title">Order Summary</h3>
+                        <div class="total-row">
+                            <span class="total-label">Total</span>
+                            <span class="total-amount" id="total-payment">@ViewBag.Total.ToString("C")</span>
+                        </div>
 
-							<img class="card-img-top"
-								 src="/ImgePro/@(item.Product.Images != null && item.Product.Images.Any() ? item.Product.Images.First().ImageURL : "no-image.jpg")"
-								 alt="@item.Product.Name"
-								 style="height: 50px; object-fit: contain;" />   </a>
-						</td>
-						<td>
-							<div>@item.Product.Name</div>
+                        <div class="d-flex gap-3 mb-3">
+                            <a href="/Cart/Clear" class="btn-soft-purple flex-fill text-center">
+                                <i class="bi bi-trash me-1"></i>Clear
+                            </a>
+                            <a href="/Home/Index" class="btn-soft-purple flex-fill text-center">
+                                <i class="bi bi-cart me-1"></i>Shop
+                            </a>
+                        </div>
 
-						</td>
-						<td class="text-primary fw-bold" >  @((item.Product.Price * (100 - item.Product.Offer.Value) / 100).ToString("C"))</td>
-						<td>
-							<form asp-action="Add" asp-controller="Cart" method="post">
-								<input type="hidden" name="id" value="@item.Product.Id" />
-								<input type="hidden" name="stockid" value="@item.StockID" />
-								<input type="number"
-									   min="1"
-									   value="@item.Quantity"
-									   class="quantity-box"
-									   onchange="updateQuantity(@item.ProductId, @item.StockID, this.value, this)" />
+                        <a asp-action="Checkout" asp-controller="Order" class="btn-checkout m-auto text-center">
+                            <i class="bi bi-lock-fill me-2"></i>Secure Checkout
+                        </a>
+                        <p class="text-muted text-center small mt-3 mb-0">
+                            <i class="bi bi-shield-check me-1"></i>100% secure payment
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-							</form>
-						</td>
+        <!-- ========== MOBILE LAYOUT ( < 992px) ========== -->
+        <div class="cart-card-layout">
+            @foreach (var item in Model)
+            {
+                <div class="cart-item-card">
+                    <!-- Top row: image + title + remove -->
+                    <div style="display: flex; align-items: center; gap: 1rem; width: 100%;">
+                        <a asp-action="DetailsProduct" asp-controller="Product" asp-route-ProductID="@item.ProductId">
+                            <img class="card-item-img"
+                                 src="/ImgePro/@(item.Product.Images != null && item.Product.Images.Any() ? item.Product.Images.First().ImageURL : "no-image.jpg")"
+                                 alt="@item.Product.Name">
+                        </a>
+                        <div class="card-item-details">
+                            <a asp-action="DetailsProduct" asp-controller="Product" asp-route-ProductID="@item.ProductId" class="card-item-title text-decoration-none">
+                                @item.Product.Name
+                            </a>
+                            <div class="d-flex align-items-center gap-2 mt-1">
+                                <span class="price-now">@((item.Product.Price * (100 - (item.Product.Offer ?? 0)) / 100).ToString("C"))</span>
+                                <span class="text-muted">|</span>
+                                <span class="text-secondary" style="font-size: 0.9rem;">Stock: @item.Stock.Color</span>
+                            </div>
+                        </div>
+                        <a href="/Cart/Remove/@item.Product.Id" class="btn-remove ms-auto">
+                            <i class="bi bi-trash3-fill"></i>
+                        </a>
+                    </div>
 
-						<td >  <div class="m-auto p-3" style=" border:double #c26060 ; width:70px;height:30px;background:@item.Stock.Color" /> </td>
-						<td class="total-price" style="color:darkblue !important;"> $@(item.Quantity* item.Product.Price * (100 - item.Product.Offer.Value) / 100)</td>
+                    <!-- Bottom row: quantity, color swatch, item total -->
+                    <div class="card-item-row">
+                        <div class="d-flex align-items-center gap-3">
+                            <!-- Color swatch -->
+                            <div class="color-swatch-sm" style="background: @item.Stock.Color;"></div>
+                            <!-- Quantity form -->
+                            <form asp-action="Add" asp-controller="Cart" method="post" class="d-flex align-items-center gap-1">
+                                <input type="hidden" name="id" value="@item.Product.Id" />
+                                <input type="hidden" name="stockid" value="@item.StockID" />
+                                <label class="small text-muted me-1">Qty:</label>
+                                <input type="number"
+                                       min="1"
+                                       value="@item.Quantity"
+                                       class="quantity-input"
+                                       style="width: 60px; padding: 0.3rem;"
+                                       onchange="updateQuantity(@item.ProductId, @item.StockID, this.value, this)" />
+                            </form>
+                        </div>
+                        <span class="total-price fw-bold fs-5">
+                            $@((item.Quantity * item.Product.Price * (100 - (item.Product.Offer ?? 0)) / 100).ToString("F2"))
+                        </span>
+                    </div>
+                </div>
+            }
 
-					</tr>
-				}
-			</tbody>
-
-
-		</table>
-		<div class="card h-75  align-items-center  p-2 ">
-			<div class=" ">
-				<p colspan="6" class="text-end" style="color: red !important; font-size:xx-large">
-					<strong>Total Payment</strong> <span id="total-payment">@ViewBag.Total.ToString("C")</span>
-				</p>
-
-			</div>
-			<div>
-				<p colspan="6" class="text-center">
-
-					<a class="btn btn-purple btn-custom me-2" href="/Cart/Clear">
-						<i class="bi bi-trash me-1"></i>Clear shopping cart
-					</a>
-					<a class="btn btn-purple btn-custom" href="/Home/Index">
-						<i class="bi bi-cart me-1"></i>Continue shopping
-					</a>
-				</p>
-			</div>
-			<div class="w-auto">
-				<a asp-action="Checkout" asp-controller="Order" class="btn btn-outline-success" style="width:200px">Check Out</a>
-
-			</div>
-
-
-		</div>
-
-	</div>
-
+            <!-- Mobile summary card -->
+            <div class="summary-card p-4 mt-4">
+                <h3 class="summary-title">Summary</h3>
+                <div class="total-row">
+                    <span class="total-label">Total</span>
+                    <span class="total-amount" id="total-payment-mobile">@ViewBag.Total.ToString("C")</span>
+                </div>
+                <div class="d-flex gap-3 mb-3">
+                    <a href="/Cart/Clear" class="btn-soft-purple flex-fill text-center">
+                        <i class="bi bi-trash me-1"></i>Clear
+                    </a>
+                    <a href="/Home/Index" class="btn-soft-purple flex-fill text-center">
+                        <i class="bi bi-cart me-1"></i>Shop
+                    </a>
+                </div>
+                <a asp-action="Checkout" asp-controller="Order" class="btn-checkout">
+                    <i class="bi bi-lock-fill me-2"></i>Checkout
+                </a>
+            </div>
+        </div>
+    </div>
 }
 
 <script>
-	function updateQuantity(productId, stockId, qty, inputEl) {
-		fetch('/Cart/UpdateQuantity', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-			},
-			body: JSON.stringify({ productId, stockId, qty })
-		})
-		.then(res => res.json())
-		.then(data => {
-			if (data.success) {
-				const totalCell = inputEl.closest('tr').querySelector('.total-price');
-				totalCell.textContent = `$${data.itemTotal.toFixed(2)}`;
+    // ----- AJAX quantity update (fully compatible with both layouts) -----
+    function updateQuantity(productId, stockId, qty, inputEl) {
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-				const cartTotalEl = document.getElementById('total-payment');
-				if (cartTotalEl) cartTotalEl.textContent = `$${data.cartTotal.toFixed(2)}`;
-			} else if (data.redirectUrl) {
-				window.location.href = data.redirectUrl;
-			} else {
-				alert(data.message || "حدث خطأ.");
-			}
-		})
-		.catch(err => {
-			console.error("Error updating quantity:", err);
-		});
-	}
+        fetch('/Cart/UpdateQuantity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({ productId, stockId, qty })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Update total in the same row (both table and card layouts)
+                    const row = inputEl.closest('tr') || inputEl.closest('.cart-item-card');
+                    if (row) {
+                        const totalSpan = row.querySelector('.total-price');
+                        if (totalSpan) totalSpan.textContent = `$${data.itemTotal.toFixed(2)}`;
+                    }
+
+                    // Update global total (both desktop and mobile)
+                    const totalEl = document.getElementById('total-payment');
+                    if (totalEl) totalEl.textContent = `$${data.cartTotal.toFixed(2)}`;
+                    const totalMobile = document.getElementById('total-payment-mobile');
+                    if (totalMobile) totalMobile.textContent = `$${data.cartTotal.toFixed(2)}`;
+                } else if (data.redirectUrl) {
+                    window.location.href = data.redirectUrl;
+                } else {
+                    alert(data.message || "An error occurred.");
+                }
+            })
+            .catch(err => {
+                console.error("Update error:", err);
+            });
+    }
 </script>
-

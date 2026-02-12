@@ -1,74 +1,564 @@
 ﻿@model ShopApp.ViewModel.OrderCheckoutViewModel
 @{
-    ViewData["Title"] = "إتمام الطلب";
+    ViewData["Title"] = "Secure Checkout";
 }
 
+@* Anti‑forgery token already included by form tag helper *@
 
 <style>
-    .container input{
-    box-shadow:10px;
-     }
+    /* ----- Design System (Soft & Trustworthy) ----- */
+    :root {
+        --brand-green: #0ca678;
+        --brand-green-light: #e6fcf5;
+        --brand-green-dark: #099268;
+        --gray-bg: #f8fafc;
+        --card-shadow: 0 20px 35px -8px rgba(0,0,0,0.05), 0 5px 12px -4px rgba(0,0,0,0.02);
+        --focus-ring: 0 0 0 4px rgba(12, 166, 120, 0.12);
+        --radius-card: 28px;
+        --radius-input: 60px;
+        --transition: all 0.2s ease;
+    }
+
+    body {
+        background: linear-gradient(145deg, #f1f5f9 0%, #f8fafc 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* ----- Progress Stepper (Cart → Checkout → Confirmation) ----- */
+    .checkout-progress {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 2.5rem;
+        flex-wrap: wrap;
+    }
+
+    .step {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #94a3b8;
+        font-weight: 500;
+        font-size: 0.9rem;
+        padding: 0.4rem 1rem;
+        border-radius: 40px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        transition: var(--transition);
+    }
+
+        .step.active {
+            background: var(--brand-green);
+            border-color: var(--brand-green);
+            color: white;
+            box-shadow: 0 8px 18px rgba(12, 166, 120, 0.2);
+        }
+
+        .step i {
+            font-size: 1.1rem;
+        }
+
+    .step-line {
+        width: 30px;
+        height: 2px;
+        background: #cbd5e1;
+    }
+
+    /* ----- Main Card Layout ----- */
+    .checkout-grid {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 2rem;
+        max-width: 1280px;
+        margin: 0 auto;
+        align-items: start;
+    }
+
+    /* ----- Form Card ----- */
+    .form-card {
+        background: white;
+        border-radius: var(--radius-card);
+        padding: 2.2rem 2rem;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(255,255,255,0.5);
+        backdrop-filter: blur(4px);
+    }
+
+    .form-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #0b1c2f;
+        letter-spacing: -0.01em;
+    }
+
+        .form-title i {
+            color: var(--brand-green);
+            font-size: 1.8rem;
+        }
+
+    /* ----- Input Groups (modern pill style) ----- */
+    .input-group-modern {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1.5rem;
+    }
+
+    .input-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        color: #475569;
+        margin-bottom: 0.4rem;
+        margin-left: 0.5rem;
+    }
+
+    .input-wrapper {
+        display: flex;
+        align-items: center;
+        background: white;
+        border: 1.5px solid #e9edf2;
+        border-radius: var(--radius-input);
+        transition: var(--transition);
+        padding: 0.1rem 0.1rem 0.1rem 1rem;
+    }
+
+        .input-wrapper:focus-within {
+            border-color: var(--brand-green);
+            box-shadow: var(--focus-ring);
+            background: white;
+        }
+
+        .input-wrapper i {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .input-wrapper:focus-within i {
+            color: var(--brand-green);
+        }
+
+    .modern-input {
+        width: 100%;
+        border: none;
+        padding: 0.85rem 1rem 0.85rem 0.5rem;
+        background: transparent;
+        font-size: 1rem;
+        border-radius: var(--radius-input);
+    }
+
+        .modern-input:focus {
+            outline: none;
+        }
+
+        .modern-input::placeholder {
+            color: #b9c4ce;
+            font-weight: 300;
+        }
+
+    /* ----- Address/City/Country group (inline on large) ----- */
+    .address-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    /* ----- Payment method ----- */
+    .payment-options {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.75rem;
+    }
+
+    .payment-card {
+        flex: 1 1 180px;
+        background: #f9fcff;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 1.2rem 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+        .payment-card:hover {
+            border-color: var(--brand-green);
+            background: #f3fef9;
+        }
+
+        .payment-card.selected {
+            border-color: var(--brand-green);
+            background: var(--brand-green-light);
+            box-shadow: 0 6px 14px rgba(12, 166, 120, 0.1);
+        }
+
+        .payment-card input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--brand-green);
+            margin: 0;
+        }
+
+        .payment-card label {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+    /* ----- Order Summary Card ----- */
+    .summary-card {
+        background: white;
+        border-radius: var(--radius-card);
+        padding: 2rem 1.8rem;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(255,255,255,0.5);
+        position: sticky;
+        top: 120px;
+    }
+
+    .summary-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.8rem;
+        color: #0b1c2f;
+        border-bottom: 2px dashed #e2e8f0;
+        padding-bottom: 1rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        color: #334155;
+        font-size: 1rem;
+    }
+
+    .summary-divider {
+        height: 2px;
+        background: linear-gradient(to right, #e2e8f0, transparent);
+        margin: 1.2rem 0;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin: 1.5rem 0 1rem;
+    }
+
+    .total-label {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .total-amount {
+        font-size: 1.9rem;
+        font-weight: 800;
+        color: var(--brand-green-dark);
+        letter-spacing: -0.01em;
+    }
+
+    .btn-checkout {
+        background: var(--brand-green);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 60px;
+        font-weight: 700;
+        font-size: 1.2rem;
+        width: 100%;
+        transition: var(--transition);
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        border: 1px solid var(--brand-green);
+    }
+
+        .btn-checkout:hover {
+            background: var(--brand-green-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 18px 28px -8px rgba(12, 166, 120, 0.4);
+            border-color: var(--brand-green-dark);
+        }
+
+        .btn-checkout i {
+            font-size: 1.3rem;
+        }
+
+    /* ----- Responsive (Mobile / Tablet) ----- */
+    @@media (max-width: 992px) {
+        .checkout-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .summary-card {
+            position: static;
+            order: -1; /* summary on top for mobile */
+        }
+
+        .address-group {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .form-card {
+            padding: 1.5rem;
+        }
+
+        .payment-options {
+            flex-direction: column;
+        }
+
+        .payment-card {
+            flex: auto;
+        }
+
+        .total-amount {
+            font-size: 1.6rem;
+        }
+
+        .step span {
+            display: none; /* hide text, keep icons on very small */
+        }
+
+        .step i {
+            margin: 0;
+        }
+    }
+
+    /* Validation styling */
+    .field-validation-error {
+        display: block;
+        font-size: 0.8rem;
+        margin-top: 0.4rem;
+        margin-left: 0.8rem;
+        color: #e53e3e;
+        font-weight: 500;
+    }
+
+    .input-validation-error {
+        border-color: #feb2b2 !important;
+        background: #fff5f5;
+    }
 </style>
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 shadow-lg p-4 rounded bg-light">
-            <h2 class="text-center mb-4 text-primary">📦 CHECK OUT</h2>
-            <form asp-action="Checkout" asp-controller="Order" method="post">
-                <div class="form-group mb-4">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-                        <input asp-for="FullName" class="form-control" placeholder="Name" />
+
+<div class="container py-5">
+    <!-- Progress Steps -->
+    <div class="checkout-progress">
+        <div class="step">
+            <i class="bi bi-cart3"></i>
+            <span>Cart</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step active">
+            <i class="bi bi-box-seam"></i>
+            <span>Checkout</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+            <i class="bi bi-check2-circle"></i>
+            <span>Confirmation</span>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="checkout-grid">
+        <!-- ========== LEFT COLUMN: DELIVERY & PAYMENT ========== -->
+        <div class="form-card">
+            <h2 class="form-title">
+                <i class="bi bi-pencil-square"></i>
+                Shipping details
+            </h2>
+
+            <form asp-action="Checkout" asp-controller="Order" method="post" id="checkout-form">
+                @* Full Name *@
+                <div class="input-group-modern">
+                    <span class="input-label">Full name</span>
+                    <div class="input-wrapper">
+                        <i class="bi bi-person-fill"></i>
+                        <input asp-for="FullName" class="modern-input" placeholder="e.g. Ahmed Hassan" />
                     </div>
-                    <span asp-validation-for="FullName" class="text-danger"></span>
+                    <span asp-validation-for="FullName"></span>
                 </div>
 
-                <div class="form-group mb-4">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
-                        <input asp-for="PhoneNumber" class="form-control" placeholder="Phone" />
+                @* Phone *@
+                <div class="input-group-modern">
+                    <span class="input-label">Phone number</span>
+                    <div class="input-wrapper">
+                        <i class="bi bi-telephone-fill"></i>
+                        <input asp-for="PhoneNumber" class="modern-input" placeholder="+20 123 456 789" />
                     </div>
-                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    <span asp-validation-for="PhoneNumber"></span>
                 </div>
 
-                <div class="form-group mb-4">
-                    <input asp-for="Address" class="form-control" placeholder="Adress" />
-                    <span asp-validation-for="Address" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mb-4">
-                    <input asp-for="Country" class="form-control" placeholder="Country" />
-                    <span asp-validation-for="Country" class="text-danger"></span>
-                </div>
-
-                <div class="form-group mb-4">
-                    <input asp-for="City" class="form-control" placeholder="City" />
-                    <span asp-validation-for="City" class="text-danger"></span>
-                </div>
-                <div class="form-group mb-4">
-                    <label class="form-label fw-bold">طريقة الدفع</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="Online" checked />
-                        <label class="form-check-label">💳 دفع إلكتروني (Visa / MasterCard)</label>
+                @* Address (full width) *@
+                <div class="input-group-modern">
+                    <span class="input-label">Street address</span>
+                    <div class="input-wrapper">
+                        <i class="bi bi-house-door-fill"></i>
+                        <input asp-for="Address" class="modern-input" placeholder="Building, street, etc." />
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="CashOnDelivery" />
-                        <label class="form-check-label">📦 الدفع عند الاستلام</label>
+                    <span asp-validation-for="Address"></span>
+                </div>
+
+                @* Country & City (side by side) *@
+                <div class="address-group">
+                    <div class="input-group-modern">
+                        <span class="input-label">Country</span>
+                        <div class="input-wrapper">
+                            <i class="bi bi-globe2"></i>
+                            <input asp-for="Country" class="modern-input" placeholder="Egypt" />
+                        </div>
+                        <span asp-validation-for="Country"></span>
                     </div>
-                    <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                    <div class="input-group-modern">
+                        <span class="input-label">City</span>
+                        <div class="input-wrapper">
+                            <i class="bi bi-building"></i>
+                            <input asp-for="City" class="modern-input" placeholder="Cairo" />
+                        </div>
+                        <span asp-validation-for="City"></span>
+                    </div>
                 </div>
 
-                <div class="alert alert-success text-end fs-5 mt-4">
-                    💰 <strong>TOTAL PAYMENT </strong> @Model.TotalAmount.ToString("C")
+                @* Payment method – visually rich cards *@
+                <div class="input-group-modern mt-3">
+                    <span class="input-label">Payment method</span>
+                    <div class="payment-options">
+                        <div class="payment-card" onclick="selectPayment(this, 'Online')">
+                            <input type="radio" asp-for="PaymentMethod" value="Online" checked id="payOnline" />
+                            <label for="payOnline">💳 Visa / MasterCard</label>
+                        </div>
+                        <div class="payment-card" onclick="selectPayment(this, 'CashOnDelivery')">
+                            <input type="radio" asp-for="PaymentMethod" value="CashOnDelivery" id="payCash" />
+                            <label for="payCash">📦 Cash on delivery</label>
+                        </div>
+                    </div>
+                    <span asp-validation-for="PaymentMethod"></span>
                 </div>
 
-                <div class="text-center">
-                    <button type="submit" class="btn btn-success btn-lg px-4">SUMIT ✅</button>
+                @* Hidden but powerful: total amount is already displayed in summary *@
+                @* We keep the alert? Not needed – we moved total to summary *@
+
+                @* On mobile the submit button is inside the form, on desktop we use the button from summary? 
+                   We need a submit button in the form. We'll place it here and also have one in summary? 
+                   Better to have one primary submit button – we can place it at the end of the form on all devices.
+                   The summary card will contain a duplicate button that submits the form via JS or we keep only one.
+                   For simplicity and best UX, we keep the main submit button at the bottom of the form.
+                   The summary card can show total and a secure badge, but the main action is here. *@
+                <div class="mt-5 d-md-none">
+                    <button type="submit" class="btn-checkout">
+                        <i class="bi bi-lock-fill"></i> Complete order
+                    </button>
+                    <p class="text-muted text-center small mt-3">
+                        <i class="bi bi-shield-check me-1"></i>Your data is encrypted
+                    </p>
+                </div>
+
+                @* On desktop, we hide this button because we'll use the one in summary card *@
+                <div class="d-none d-md-block">
+                    @* This button is hidden on desktop – we rely on the summary button *@
+                    @* But the summary button is outside the form, so we need to either:
+                       1) Move summary button inside form (less layout flexibility)
+                       2) Use JavaScript to submit form from summary button
+                       I'll choose option 2 (elegant): summary button triggers form submit.
+                       So we keep this button hidden on desktop and visible on mobile.
+                    *@
                 </div>
             </form>
+        </div>
+
+        <!-- ========== RIGHT COLUMN: ORDER SUMMARY ========== -->
+        <div class="summary-card">
+            <h3 class="summary-title">
+                <i class="bi bi-receipt-cutoff" style="color: var(--brand-green);"></i>
+                Order summary
+            </h3>
+
+            @* If you have cart items, you could loop here. For now we show total only *@
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span class="fw-semibold">@Model.TotalAmount.ToString("C")</span>
+            </div>
+            <div class="summary-row">
+                <span>Shipping</span>
+                <span class="text-success fw-semibold">Free</span>
+            </div>
+            <div class="summary-divider"></div>
+
+            <div class="total-row">
+                <span class="total-label">Total</span>
+                <span class="total-amount" id="summary-total">@Model.TotalAmount.ToString("C")</span>
+            </div>
+
+            @* Desktop submit button – triggers form submission *@
+            <button class="btn-checkout d-none d-md-flex" id="desktop-submit">
+                <i class="bi bi-lock-fill"></i> Secure checkout
+            </button>
+
+            @* Secure badges *@
+            <div class="d-flex justify-content-center gap-3 mt-4 text-muted small">
+                <span><i class="bi bi-shield-lock"></i> SSL</span>
+                <span><i class="bi bi-credit-card"></i> PCI</span>
+                <span><i class="bi bi-clock-history"></i> 30‑day returns</span>
+            </div>
         </div>
     </div>
 </div>
 
+<script>
+    // ----- Highlight selected payment card -----
+    function selectPayment(cardElement, value) {
+        // Remove 'selected' class from all cards
+        document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
+        // Add 'selected' to the clicked card
+        cardElement.classList.add('selected');
+        // Check the radio button
+        const radio = cardElement.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+    }
+
+    // Preselect the default payment method (Online) on page load
+      document.addEventListener('DOMContentLoaded', function() {
+
+        const defaultCard = document.querySelector('.payment-card input[value="Online"]')?.closest('.payment-card');
+        if (defaultCard) defaultCard.classList.add('selected');
+
+        const desktopBtn = document.getElementById('desktop-submit');
+        if (desktopBtn) {
+            desktopBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const form = document.getElementById('checkout-form');
+                if (form) form.submit();
+            });
+        }
+    });
+
+
+    // (Optional) If you want real‑time total updates based on shipping etc., extend here.
+</script>
+
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
+    @* Enable client‑side validation *@
 }

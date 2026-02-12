@@ -1,0 +1,237 @@
+﻿@{
+    ViewData["Title"] = "About Us - SAKERSTOR";
+}
+
+<style>
+    :root {
+        --primary-color: #8e44ad;
+        --accent-color: #ff9f43;
+        --text-dark: #1f2937;
+        --text-light: #6b7280;
+        --bg-light: #f3f4f6;
+    }
+
+    .about-header {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #732d91 100%);
+        color: white;
+        padding: 3rem 1rem;
+        text-align: center;
+        margin-bottom: 3rem;
+        border-radius: 0 0 20px 20px;
+    }
+
+    .about-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+    }
+
+    .about-content {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .about-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .about-section h2 {
+        color: var(--primary-color);
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .about-section h2 i {
+        font-size: 1.5rem;
+    }
+
+    .about-section p {
+        line-height: 1.8;
+        color: var(--text-light);
+        margin-bottom: 1rem;
+    }
+
+    .values-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .value-card {
+        background: linear-gradient(135deg, rgba(142, 68, 173, 0.1), rgba(255, 159, 67, 0.1));
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .value-card h3 {
+        color: var(--primary-color);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .value-card p {
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    .team-section {
+        margin-top: 3rem;
+    }
+
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 1.5rem;
+    }
+
+    .team-member {
+        text-align: center;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .team-avatar {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 1rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.5rem;
+    }
+
+    .team-member h3 {
+        color: var(--text-dark);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .team-member .position {
+        color: var(--primary-color);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    @@media (max-width: 768px) {
+        .about-header h1 {
+            font-size: 2rem;
+        }
+
+        .about-section {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<div class="about-header">
+    <h1>About SAKERSTOR</h1>
+    <p style="font-size: 1.1rem; opacity: 0.9;">Your trusted online shopping destination</p>
+</div>
+
+<div class="container about-content">
+    <!-- Our Story Section -->
+    <div class="about-section">
+        <h2><i class="fas fa-book"></i> Our Story</h2>
+        <p>
+            SAKERSTOR was founded in 2020 with a simple mission: to make quality shopping accessible to everyone. 
+            What started as a small online store has grown into one of the most trusted e-commerce platforms in the region.
+        </p>
+        <p>
+            We believe that shopping should be easy, enjoyable, and rewarding. That's why we're committed to providing 
+            the best products, prices, and customer service in the industry.
+        </p>
+    </div>
+
+    <!-- Our Mission Section -->
+    <div class="about-section">
+        <h2><i class="fas fa-target"></i> Our Mission & Values</h2>
+        <div class="values-grid">
+            <div class="value-card">
+                <h3>🎯 Quality First</h3>
+                <p>We carefully select every product to ensure the highest quality standards.</p>
+            </div>
+            <div class="value-card">
+                <h3>💳 Best Prices</h3>
+                <p>Competitive pricing without compromising on quality or selection.</p>
+            </div>
+            <div class="value-card">
+                <h3>🚚 Fast Delivery</h3>
+                <p>Quick and reliable shipping to get your orders to you on time.</p>
+            </div>
+            <div class="value-card">
+                <h3>👥 Customer Focus</h3>
+                <p>Your satisfaction is our top priority. We're here 24/7 to help.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- What We Offer Section -->
+    <div class="about-section">
+        <h2><i class="fas fa-shopping-bag"></i> What We Offer</h2>
+        <p>
+            At SAKERSTOR, we offer a wide range of products across multiple categories:
+        </p>
+        <ul style="color: var(--text-light); line-height: 2;">
+            <li>✓ Fashion & Apparel</li>
+            <li>✓ Footwear & Shoes</li>
+            <li>✓ Accessories & Jewelry</li>
+            <li>✓ Electronics & Gadgets</li>
+            <li>✓ Home & Kitchen</li>
+            <li>✓ Beauty & Personal Care</li>
+        </ul>
+    </div>
+
+    <!-- Our Team Section -->
+    <div class="team-section">
+        <div class="about-section">
+            <h2><i class="fas fa-users"></i> Our Leadership Team</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="team-avatar">👨‍💼</div>
+                    <h3>Ahmed Khaled</h3>
+                    <p class="position">Founder & CEO</p>
+                </div>
+                <div class="team-member">
+                    <div class="team-avatar">👩‍💼</div>
+                    <h3>Fatima Ahmed</h3>
+                    <p class="position">Operations Manager</p>
+                </div>
+                <div class="team-member">
+                    <div class="team-avatar">👨‍💻</div>
+                    <h3>Mohamed Ali</h3>
+                    <p class="position">Tech Lead</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Choose Us -->
+    <div class="about-section">
+        <h2><i class="fas fa-star"></i> Why Choose SAKERSTOR?</h2>
+        <p>
+            With thousands of satisfied customers and a growing community, SAKERSTOR stands out for:
+        </p>
+        <ul style="color: var(--text-light); line-height: 2;">
+            <li><strong>✓ Secure Checkout:</strong> Multiple payment options with secure transactions</li>
+            <li><strong>✓ Easy Returns:</strong> 30-day return policy for your peace of mind</li>
+            <li><strong>✓ Expert Support:</strong> Friendly customer service team ready to help</li>
+            <li><strong>✓ Loyalty Rewards:</strong> Earn points on every purchase</li>
+            <li><strong>✓ Exclusive Deals:</strong> Regular discounts and special offers</li>
+        </ul>
+    </div>
+</div>

@@ -17,7 +17,7 @@ namespace ShopApp.Controllers.Admin
     public class OrderManegController : Controller
     {
         private readonly AppDBcontext _context;
-        private readonly UserManager<User> _userManager ;
+        private readonly UserManager<User> _userManager;
 
         public OrderManegController(AppDBcontext context, UserManager<User> userManager)
         {
@@ -52,7 +52,7 @@ namespace ShopApp.Controllers.Admin
             var order = await _context.Orders
                 .Include(x => x.Items)
                 .ThenInclude(c => c.Product)
-                .ThenInclude(c=>c.Images)
+                .ThenInclude(c => c.Images)
                 .Include(c => c.Items)
                 .ThenInclude(i => i.Stock)
                 .FirstOrDefaultAsync(x => x.Id == orderId); // استخدم Async
@@ -71,16 +71,16 @@ namespace ShopApp.Controllers.Admin
         }
 
 
-        [HttpPost] 
-        public async Task<IActionResult> EditStatuse(string status,int id)
+        [HttpPost]
+        public async Task<IActionResult> EditStatuse(string status, int id)
         {
-            var order=_context.Orders.FirstOrDefault(x => x.Id == id);
-            order.Status=status;
+            var order = _context.Orders.FirstOrDefault(x => x.Id == id);
+            order.Status = status;
             _context.SaveChanges();
 
             return RedirectToAction(nameof(GetAllOrder));
         }
-    
+
         public IActionResult Delete(int id)
         {
             var order = _context.Orders.FirstOrDefault(o => o.Id == id);
@@ -91,6 +91,17 @@ namespace ShopApp.Controllers.Admin
             }
             return RedirectToAction(nameof(GetAllOrder));
         }
+        public IActionResult EditIsPaidOrnot(int id, bool isPaid)
+        {
+            var order = _context.Orders.FirstOrDefault(o => o.Id == id);
+            if (order != null)
+            {
+                order.ISPaid = isPaid;
+                _context.SaveChanges();
+            }
+            return RedirectToAction(nameof(Details), new { orderId = id });
+        }
+    
     }
 }
 

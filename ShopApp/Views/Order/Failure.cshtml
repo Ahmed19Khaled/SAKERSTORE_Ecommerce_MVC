@@ -1,0 +1,221 @@
+﻿@{
+    ViewData["Title"] = "Order Failed";
+}
+
+<style>
+    :root {
+        --error-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);
+        --text-main: #2d3436;
+        --text-muted: #636e72;
+        --bg-fail: #fff5f5;
+    }
+
+    .failure-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+        padding: 20px;
+    }
+
+    .failure-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+        padding: 40px;
+        max-width: 550px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        animation: slideUp 0.6s ease-out;
+    }
+
+        /* الخط العلوي باللون الأحمر */
+        .failure-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--error-gradient);
+        }
+
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* أيقونة الخطأ المتحركة */
+    .icon-wrapper-fail {
+        width: 100px;
+        height: 100px;
+        background: #fff0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+        animation: shake 0.5s ease-in-out;
+    }
+
+    .cross-svg {
+        width: 45px;
+        height: 45px;
+        stroke: #ff4757;
+        stroke-width: 5;
+        stroke-linecap: round;
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        animation: drawCross 0.8s ease-out forwards 0.3s;
+    }
+
+    @@keyframes drawCross {
+        to {
+            stroke-dashoffset: 0;
+        }
+    }
+
+    @@keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-10px);
+        }
+
+        75% {
+            transform: translateX(10px);
+        }
+    }
+
+    .failure-title {
+        font-size: 2rem;
+        color: var(--text-main);
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .failure-subtitle {
+        color: var(--text-muted);
+        font-size: 1.05rem;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+
+    /* صندوق تفاصيل الخطأ */
+    .error-details {
+        background: var(--bg-fail);
+        border: 1px solid #fed7d7;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 25px;
+        text-align: left;
+    }
+
+    .error-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #c53030;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    /* الأزرار */
+    .button-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .btn-action {
+        padding: 14px 20px;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        border: none;
+    }
+
+    .btn-retry {
+        background: var(--error-gradient);
+        color: white;
+        box-shadow: 0 10px 20px rgba(238, 82, 83, 0.2);
+    }
+
+        .btn-retry:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(238, 82, 83, 0.3);
+            color: white;
+        }
+
+    .btn-secondary {
+        background: #f1f2f6;
+        color: #57606f;
+    }
+
+        .btn-secondary:hover {
+            background: #dfe4ea;
+        }
+
+    .support-link {
+        margin-top: 25px;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+        .support-link a {
+            color: #ee5253;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+    @@media (max-width: 500px) {
+        .button-group {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="failure-container">
+    <div class="failure-card">
+        <div class="icon-wrapper-fail">
+            <svg class="cross-svg" viewBox="0 0 52 52">
+                <path d="M16 16L36 36M36 16L16 36"></path>
+            </svg>
+        </div>
+
+        <h1 class="failure-title">Oops! Order Failed</h1>
+        <p class="failure-subtitle">
+            Something went wrong while processing your payment. Don't worry, no funds were deducted.
+        </p>
+
+        <div class="error-details">
+            <div class="error-info">
+                <span>⚠️</span>
+                <span>Reason: Card declined by the issuing bank.</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <a asp-action="Checkout" asp-controller="Order" class="btn-action btn-retry">Try Again</a>
+            <a  asp-controller="Cart" asp-action="AllCart" class="btn-action btn-secondary">Return to Cart</a>
+        </div>
+
+        <p class="support-link">
+            Stuck? <a asp-action="Contact" asp-controller="Home">Chat with Support</a>
+        </p>
+    </div>
+</div>

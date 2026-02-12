@@ -1,4 +1,4 @@
-﻿@using Microsoft.EntityFrameworkCore
+﻿﻿@using Microsoft.EntityFrameworkCore
 @using ShopApp.Data
 @inject AppDBcontext _context
 @{
@@ -41,6 +41,8 @@
     @* somm *@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    @* icons <i class="bi bi-check-lg"></i> *@
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
 
 
     <style>
@@ -54,7 +56,7 @@
             --white: #fff;
             --header-height: 70px;
             --mobile-header-height: 60px;
-            --top-bar-height: 50px;
+            --top-bar-height: 30px;
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 20px;
@@ -68,6 +70,9 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+        a{
+            text-decoration: none;
         }
 
         body {
@@ -112,12 +117,10 @@
             background: linear-gradient(135deg, var(--primary-dark), var(--primary));
             color: #fff;
             font-size: 0.85rem;
-            padding: 8px 0;
             position: fixed;
             top: 0;
             width: 100%;
             z-index: 1100;
-            height: var(--top-bar-height);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
@@ -1022,7 +1025,6 @@
             position: sticky; /* أو fixed لو تحب */
             top: 0;
             z-index: 1055; /* أعلى من الهيدر */
-            background: #fff;
             border-top: 1px solid #eee;
         }
 
@@ -1061,7 +1063,36 @@
                 }
 
         }
-        
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border-radius: 20px;
+            border: 1px solid gray;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: gray;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            flex: 0 1 auto;
+            min-width: 0;
+            max-width: 48%;
+        }
+
+        .nav-links
+        {
+              display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            /* في البدايه  */
+            justify-content: center;
+
+
+        }
 
     </style>
 </head>
@@ -1074,9 +1105,14 @@
                 <span><i class="fas fa-phone-alt me-1"></i> <a href="https://wa.me/201012421198"> +201012421198 </a>  </span>
             </div>
             <div class="top-bar-right">
-                <a href="#" class="hover-underline">Track Order</a>
-                <a href="#" class="hover-underline">About</a>
-                <a href="#" class="hover-underline">Contact</a>
+                @if (order != null)
+                {
+                    <a asp-controller="Order"
+                    asp-action="OrderConfirmation"
+                    asp-route-orderId="@order.Id" class="hover-underline">Track Order</a>
+                }
+                <a asp-controller="Home" asp-action="About" class="hover-underline">About</a>
+                <a asp-controller="Home" asp-action="Contact" class="hover-underline">Contact</a>
             </div>
         </div>
     </div>
@@ -1099,10 +1135,13 @@
             <!-- Desktop Search -->
             <div class="search-container d-none d-lg-block">
                 <div class="search">
-                    <input type="text" placeholder="Search for products, brands and more..." aria-label="Search products" />
-                    <button type="button" aria-label="Submit search">
-                        <i class="fas fa-search"></i>
-                    </button>
+                    <form asp-action="PruductCategory" asp-controller="Category" method="post">
+                        <input type="text" name="name" placeholder="Search for products, brands and more..." aria-label="Search products" />
+                        <button type="button" aria-label="Submit search">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                    
                 </div>
             </div>
 
@@ -1173,10 +1212,10 @@
                 </div>
 
                 <!-- Navigation Links -->
-               
+                <div class="nav-links" style="display: flex; gap: 1rem;">
                     <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
-                    <a class="nav-link" href="#">Shop</a>
-                    <a class="nav-link" href="#">New Arrivals</a>
+                    <a class="nav-link" asp-action="PruductCategory" asp-controller="Category">Shop</a>
+                    <a class="nav-link" asp-controller="Home" asp-action="NewArrivals">New Arrivals</a>
 
                     @if (order != null)
                     {
@@ -1188,8 +1227,11 @@
                         </a>
                     }
 
-                    <a class="nav-link" href="#">Deals</a>
-                    <a class="nav-link" href="#">Brands</a>
+                    <a class="nav-link" asp-controller="Home" asp-action="Deals">Deals</a>
+                    <a class="nav-link" asp-controller="Home" asp-action="Brands">Brands</a>
+                    <a class="nav-link" asp-controller="Home" asp-action="About">About</a>
+                    <a class="nav-link" asp-controller="Home" asp-action="Contact">Contact</a>
+                </div>
             </div>
         </nav>
 
@@ -1198,12 +1240,12 @@
     <!-- Mobile Search Overlay -->
     <div class="mobile-search-overlay" id="mobileSearchOverlay">
         <div class="mobile-search-container">
-            <div class="search">
-                <input type="text" placeholder="What are you looking for?" aria-label="Search products" />
-                <button type="button" aria-label="Submit search">
+            <form asp-action="PruductCategory" asp-controller="Category" class="search">
+                <input type="text" name="name" placeholder="What are you looking for?" aria-label="Search products" />
+                <button type="submit" aria-label="Submit search">
                     <i class="fas fa-search"></i>
                 </button>
-            </div>
+            </form>
         </div>
         <button class="close-search" id="closeSearch" aria-label="Close search">
             <i class="fas fa-times"></i>
@@ -1223,20 +1265,28 @@
                     var c = categories[i];
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c@i" aria-expanded="false">
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#c@i"
+                                    aria-expanded="false"
+                                    aria-controls="c@i">
                                 <i class="fas fa-folder me-2"></i> @c.NameDepartment
                             </button>
                         </h2>
+
                         <div id="c@i" class="accordion-collapse collapse" data-bs-parent="#catAcc">
                             <div class="accordion-body">
                                 @foreach (var s in c.SubCategories)
                                 {
-                                    <a class="d-block py-2" asp-controller="Category" asp-action="PruductCategory" asp-route-SubCatigoryId="@s.Id">
+                                    <a class="d-block py-2"
+                                       href="@Url.Action("PruductCategory", "Category", new { SubCatigoryId = s.Id })">
                                         <i class="fas fa-chevron-right me-2"></i> @s.Name
                                     </a>
                                 }
                             </div>
                         </div>
+
                     </div>
                 }
             </div>
@@ -1245,15 +1295,15 @@
             <div class="mt-4 px-3">
                 <h6 class="mb-3 text-muted">Quick Links</h6>
                 <a href="/" class="d-block py-2 border-bottom"><i class="fas fa-home me-2"></i> Home</a>
-                <a href="/Account" class="d-block py-2 border-bottom"><i class="fas fa-user me-2"></i> My Account</a>
+                <a asp-action="Manage" asp-controller="Account" class="d-block py-2 border-bottom"><i class="fas fa-user me-2"></i> My Account</a>
                 @if (order != null)
                 {
                     <a asp-controller="Order" asp-action="OrderConfirmation" asp-route-orderId="@order.Id" class="d-block py-2 border-bottom">
                         <i class="fas fa-truck me-2"></i> Track Order
                     </a>
                 }
-                <a href="#" class="d-block py-2 border-bottom"><i class="fas fa-tag me-2"></i> Deals</a>
-                <a href="#" class="d-block py-2"><i class="fas fa-headset me-2"></i> Customer Support</a>
+                <a asp-controller="Home" asp-action="Deals" class="d-block py-2 border-bottom"><i class="fas fa-tag me-2"></i> Deals</a>
+                <a asp-action="Home" asp-controller="Contact"  class="d-block py-2"><i class="fas fa-headset me-2"></i> Customer Support</a>
             </div>
         </div>
     </div>
@@ -1299,17 +1349,22 @@
                 <div>
                     <h5 class="text-white mb-3">Quick Links</h5>
                     <div class="d-flex flex-column">
-                        <a href="#" class="footer-link mb-2">Home</a>
-                        <a href="#" class="footer-link mb-2">Shop</a>
-                        <a href="#" class="footer-link mb-2">About Us</a>
-                        <a href="#" class="footer-link mb-2">Contact</a>
+                        <a href="/" class="footer-link mb-2">Home</a>
+                        <a asp-action="PruductCategory" asp-controller="Category" class="footer-link mb-2">Shop</a>
+                        <a asp-controller="Home" asp-action="About" class="footer-link mb-2">About Us</a>
+                        <a asp-controller="Home" asp-action="Contact" class="footer-link mb-2">Contact</a>
                     </div>
                 </div>
                 <div>
                     <h5 class="text-white mb-3">Account</h5>
                     <div class="d-flex flex-column">
-                        <a href="#" class="footer-link mb-2">My Profile</a>
-                        <a href="#" class="footer-link mb-2">Orders</a>
+                        <a asp-controller="Account" asp-action="Manage" class="footer-link mb-2">My Profile</a>
+                        @if (order != null)
+                        {
+                            <a asp-controller="Order"
+                               asp-action="OrderConfirmation"
+                               asp-route-orderId="@order.Id" class="footer-link mb-2">Orders</a>
+                        }
                         <a href="#" class="footer-link mb-2">Wishlist</a>
                         <a href="#" class="footer-link mb-2">Settings</a>
                     </div>
@@ -1478,23 +1533,24 @@
                 }
             });
 
-            // Close offcanvas when clicking on links
-            const offcanvasLinks = document.querySelectorAll('#mobileMenu a');
-            offcanvasLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    // Don't prevent default for external links
-                    const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('mobileMenu'));
-                    if (offcanvas) {
-                        offcanvas.hide();
-                    }
+           // Close offcanvas only for real navigation links (skip accordion toggles)
+        const offcanvasLinks = document.querySelectorAll('#mobileMenu a');
 
-                    // Add click animation
-                    this.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 200);
-                });
-            });
+        offcanvasLinks.forEach(link => {
+          link.addEventListener('click', function (e) {
+            // إذا هذا العنصر هو زر لفتح collapse/accordion — تجاهل ولا نقفل الـ offcanvas
+            if (this.matches('[data-bs-toggle="collapse"], .accordion-button')) return;
+
+            // تجاهل الروابط الفارغة أو الـ anchors التي تستخدم '#'
+            const href = this.getAttribute('href');
+            if (!href || href.trim() === '#' || href.startsWith('javascript:')) return;
+
+            const offcanvasEl = document.getElementById('mobileMenu');
+            const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+            if (offcanvas) offcanvas.hide();
+          });
+        });
+
 
             // Mobile bottom nav click effects
             const mobileBottomLinks = document.querySelectorAll('.mobile-bottom a');

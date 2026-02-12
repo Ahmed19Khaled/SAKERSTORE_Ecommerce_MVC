@@ -1,11 +1,12 @@
-﻿using System;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ShopApp.Data;
 using ShopApp.Data.ShopApp.Data;
 using ShopApp.Models;
 using ShopApp.Models.Services;
 using ShopApp.Services;
+using System;
+using X.Paymob.CashIn;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +49,14 @@ builder.Services.AddAuthentication()
          options.CallbackPath = "/signin-facebook"; // هذا مهم!
 
    });
+builder.Services.AddPaymobCashIn(options =>
+{
+    options.ApiKey = builder.Configuration["Paymob:ApiKey"] ?? string.Empty;
+    options.Hmac = builder.Configuration["Paymob:Hmac"] ?? string.Empty;
+});
+
+
+builder.Services.AddScoped<IPaymobCashInBroker, PaymobCashInBroker>();
 
 
 builder.Logging.ClearProviders();
